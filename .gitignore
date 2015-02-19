@@ -1,0 +1,39 @@
+# NetBeans specific #
+build/
+nbbuild/
+dist/
+nbdist/
+nbactions.xml
+nb-configuration.xml
+core
+nbproject/*
+ 
+#java specific
+*.class
+ 
+#general swap/backup files
+*.so
+*.log
+*.out
+*~
+*.swp
+*.DS_Store
+*.lock
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+# But not these files... 
+# -> needed libraries:
+#!jlfgr-1_0.jar
+#!jtar-1.1.jar
+
+# other exclusions:
+!nbproject/project.properties
+!nbproject/project.xml
+
