@@ -12,6 +12,7 @@ nbproject/*
 *.class
  
 #general swap/backup files
+*.txt
 *.so
 *.log
 *.out
@@ -36,4 +37,3 @@ hs_err_pid*
 # other exclusions:
 !nbproject/project.properties
 !nbproject/project.xml
-
