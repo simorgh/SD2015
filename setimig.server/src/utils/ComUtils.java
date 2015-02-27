@@ -145,9 +145,8 @@ public class ComUtils {
         int numBytes = 4;
         
         // Llegim l'string
-        byte bStr[]=new byte[numBytes];
         char cStr[]=new char[numBytes];
-        bStr = read_bytes(numBytes);
+        byte bStr[] = read_bytes(numBytes);
         for(int i=0;i<numBytes;i++)
                 cStr[i]=(char)bStr[i];
         

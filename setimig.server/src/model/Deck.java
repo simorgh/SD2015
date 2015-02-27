@@ -20,7 +20,7 @@ import java.util.Collections;
  */
 
 public class Deck {
-    private ArrayList cards;
+    private ArrayList<String> cards;
     
     /**
      * Class constructor
@@ -58,15 +58,14 @@ public class Deck {
      * Shuffles the deck
      */
     public void shuffle(){
-        Collections.shuffle(cards);
+        Collections.shuffle(getCards());
     }
-    
+
     /**
-     * Draws a card from indicated position
-     * @param position
-     * @return 
+     * @return the cards
      */
-    public String drawCard(int position){
-        return (String) this.cards.get(position);
+    public ArrayList<String> getCards() {
+        return cards;
     }
+
 }

@@ -112,14 +112,14 @@ public class Protocol extends utils.ComUtils{
      * @param score 
      * @throws java.io.IOException 
      */
-    public void sendBankScore(int number, ArrayList <String> cards, float score) throws IOException{
+    public void sendBankScore(int number, ArrayList <char[]> cards, float score) throws IOException{
         sendHeader(Protocol.BANK_SCORE);
         write_char(' ');
         
-        for (String c : cards) {
-            System.out.print(c.charAt(0) + c.charAt(1) + " ");
-            write_char(c.charAt(0));
-            write_char(c.charAt(1));
+        for (char[] c : cards) {
+            System.out.print(c[0] + c[1] + " ");
+            write_char(c[0]);
+            write_char(c[1]);
         }
         
         System.out.println("@sendBankScore -> " + String.format("%2.1f", score));
@@ -172,6 +172,16 @@ public class Protocol extends utils.ComUtils{
 //////////////////////////////////////////////////////////////
 //               CLIENT RECEPTIONS VERIFICATION
 //////////////////////////////////////////////////////////////
+    
+    /**
+     *
+     * @return
+     * @throws IOException
+     */  
+    public String readHeader() throws IOException{
+        return read_string_command();
+    }
+    
     public boolean recieveStart(){
         try {
             String cmd = read_string_command();
@@ -182,35 +192,14 @@ public class Protocol extends utils.ComUtils{
         return false;
     }
 
-    public boolean recieveDraw(){
-        try {
-            String cmd = read_string_command();
-            if((cmd.toUpperCase()).equals(Protocol.DRAW)) return true;
-        } catch (IOException ex) {
-            Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return false;
-    }
     
-    public int recieveAnte(){
+    public int recieveRaise(){
         int raise = 0;
         try {
-            String cmd = read_string_command();
-            if(!(cmd.toUpperCase()).equals(Protocol.ANTE)) return -1;
             raise = read_int32();
         } catch (IOException ex) {
             Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
         }
         return raise;
-    }
-
-    public boolean recievePass(){
-        try {
-            String cmd = read_string_command();
-            if((cmd.toUpperCase()).equals(Protocol.PASS)) return true;
-        } catch (IOException ex) {
-            Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return false;
     }
 }
