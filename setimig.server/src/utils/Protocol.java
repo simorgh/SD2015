@@ -115,6 +115,7 @@ public class Protocol extends utils.ComUtils{
     public void sendBankScore(int number, ArrayList <char[]> cards, float score) throws IOException{
         sendHeader(Protocol.BANK_SCORE);
         write_char(' ');
+        write_int32(number);
         
         for (char[] c : cards) {
             System.out.print(c[0] + c[1] + " ");
