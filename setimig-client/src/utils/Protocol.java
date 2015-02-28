@@ -11,6 +11,7 @@ package utils;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -112,25 +113,39 @@ public class Protocol extends utils.ComUtils{
 //////////////////////////////////////////////////////////////
 //               SERVER RECEPTIONS VERIFICATION
 //////////////////////////////////////////////////////////////
-    public boolean recieveStartingBet(){
+    
+    public int recieveStartingBet(){
+        int bet = 0;
         try {
             String cmd = read_string_command();
-            if((cmd.toUpperCase()).equals(Protocol.STARTING_BET)) return true;
+            if(!(cmd.toUpperCase()).equals(Protocol.CARD)) return bet;
+            if( !(read_char() == ' ') ) return bet;
+            
+            // bet caption
+            bet = read_int32();
         } catch (IOException ex) {
             Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return false;
+        return bet;
     }
     
     
-    public boolean recieveCard(){
+    public char[] recieveCard(){
+        char[] card = null;
         try {
             String cmd = read_string_command();
-            if((cmd.toUpperCase()).equals(Protocol.CARD)) return true;
+            if(!(cmd.toUpperCase()).equals(Protocol.CARD)) return null;
+            if( !(read_char() == ' ') ) return null;
+            
+            // card caption
+            card = new char[2];
+            for(int i=0; i<2; i++) card[i] = read_char();
+            
         } catch (IOException ex) {
             Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return false;
+        
+        return card;
     }
     
     public boolean recieveBusting(){
@@ -143,24 +158,47 @@ public class Protocol extends utils.ComUtils{
         return false;
     }
     
-    public boolean recieveBankScore(){
+    public ArrayList <String> recieveBankScore(){
+        ArrayList <String> bank_resume = new ArrayList <>();
+        
         try {
             String cmd = read_string_command();
-            if((cmd.toUpperCase()).equals(Protocol.BANK_SCORE)) return true;
+            if(!(cmd.toUpperCase()).equals(Protocol.BANK_SCORE)) return null;
+            if( !(read_char() == ' ') ) return null;
+            
+            // card caption
+            int i = read_int32();
+            
+            char[] card = new char[2];
+            for(int j = 0; j<i; j++){
+                card[0] = read_char();
+                card[1] = read_char();
+                bank_resume.add(new String(card)); 
+            }
+            
+            String score = read_string_command();
+            if(score.length() != 4) return null;
+    
+            bank_resume.add(score);
+            
         } catch (IOException ex) {
             Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return false;
+        
+        return bank_resume;
     }
     
-    public boolean recieveGains(){
+    public int recieveGains(){
+        int gains = -1;
         try {
             String cmd = read_string_command();
-            if((cmd.toUpperCase()).equals(Protocol.GAINS)) return true;
+            if(!(cmd.toUpperCase()).equals(Protocol.GAINS)) return gains;
+            if( !(read_char() == ' ') ) return gains;
+            gains = read_int32();
         } catch (IOException ex) {
             Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return false;
+        return gains;
     }
     
     public boolean recieveError(){

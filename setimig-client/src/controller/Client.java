@@ -1,26 +1,30 @@
 package controller;
 
-import utils.ComUtils;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
+import utils.Protocol;
+import view.Console;
 
 /**
  *
  * @author simorgh & dzigor92
  */
 public class Client {
-
+    private static final String ERROR_OPT = "!! Wrong option. Please enter a valid action.";
+    
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         String nomMaquina, str;
         int numPort, value;
+        Console console = new Console();
 
         InetAddress maquinaServidora;
         Socket socket = null;
-        ComUtils comUtils;
+        Protocol pr;
 /*
         if (args.length != 2){
             System.out.println("Us: java Client <maquina_servidora> <port>");
@@ -37,11 +41,51 @@ public class Client {
             
             maquinaServidora = InetAddress.getByName(nomMaquina); /* Obtenim la IP de la maquina servidora */
             socket = new Socket(maquinaServidora, numPort); /* Obrim una connexio amb el servidor */
-            comUtils = new ComUtils(socket); /* Obrim un flux d'entrada/sortida amb el servidor */
-
-            //TODO: game logic for player comes here:
-
-           
+            pr = new Protocol(socket);
+            
+            console.printWelcome();
+            pr.sendStart();
+            int str_bet = pr.recieveStartingBet();
+            console.printStartingBet(str_bet);
+            
+            // game loop
+            boolean end = false;
+            do{
+                char opt = console.printInGameOptions();
+                char[] card;
+                switch(opt){
+                    case '1': 
+                        pr.sendDraw();
+                        card = pr.recieveCard();
+                        console.printNewCard(card);
+                        // TODO check busting (Model should be needed for SCORE tracking & BSTG prevention)
+                        break;
+                        
+                    case '2': 
+                        int rise = console.enterRaise();
+                        pr.sendAnte(rise);
+                        pr.sendDraw();
+                        card = pr.recieveCard();
+                        console.printNewCard(card);
+                        // TODO check busting (Model should be needed for SCORE tracking & BSTG prevention)
+                        break;
+                        
+                    case '3': 
+                        pr.sendPass();
+                        end = true;
+                        break;
+                    default: 
+                        console.printError(Client.ERROR_OPT);
+                        break;
+                }  
+            } while(!end);
+            
+            ArrayList <String> bank_score = pr.recieveBankScore();
+            console.printBankScore(bank_score);
+            
+            int gain = pr.recieveGains();
+            console.printGains(gain);
+              
         } catch (IOException e) {
             System.out.println("Els errors han de ser tractats correctament en el vostre programa.");
         } finally {

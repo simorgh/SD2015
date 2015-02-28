@@ -5,10 +5,94 @@
  */
 package view;
 
+import java.util.ArrayList;
+import java.util.Scanner;
+
 /**
  *
  * @author simorgh & dzigor92
  */
 public class Console {
+    private static Console instance = null; /* SingleTone pattern */
+    Scanner in;
     
+    public Console() {
+      // Exists only to defeat instantiation.
+       in = new Scanner(System.in);
+    }
+    
+    public static Console getInstance() {
+        if(instance == null) {
+            instance = new Console();
+        }
+        return instance;
+    }
+    
+    public void printWelcome(){
+        System.out.println(".------.------.------.     .------.     .------.------.------.\n" +
+            "|S.--. |E.--. |T.--. |.-.  |I.--. |.-.  |M.--. |I.--. |G.--. |\n" +
+            "| :/\\: | (\\/) | :/\\: ((5)) | (\\/) ((5)) | (\\/) | (\\/) | :/\\: |\n" +
+            "| :\\/: | :\\/: | (__) |'-.-.| :\\/: |'-.-.| :\\/: | :\\/: | :\\/: |\n" +
+            "| '--'S| '--'E| '--'T| ((1)| '--'I| ((1)| '--'M| '--'I| '--'G|\n" +
+            "`------`------`------'  '-'`------'  '-'`------`------`------'");
+    }
+    
+    public char printInGameOptions(){
+        System.out.println(
+            "╔════════════════════╦═══════════╦═══════════╦═══════════╗\n" +
+            "║░░░Player Actions░░░║  1. Draw  ║  2. Ante  ║  3. Pass  ║\n" +
+            "╚════════════════════╩═══════════╩═══════════╩═══════════╝\n");
+        System.out.print("► Select action number: ");
+        return in.next().charAt(0);
+    }
+    
+    public void printStartingBet(int bet){
+        System.out.println("► Connection Established: STARTING BET is " + bet);
+    }
+    
+    
+    public void printError(String error){
+        System.out.println(error);
+    }
+    
+    public int enterRaise(){
+        System.out.print("► How much do you want to raise?: ");
+        
+        boolean end = false;
+        do{
+            if (in.hasNextInt()) {
+                int a = in.nextInt() ; 
+                return a;
+            } else {
+                System.out.println("► Sorry, couldn't understand you!");
+            }
+        } while(true); 
+    }
+    
+    public void printNewCard(char[] card){
+        System.out.println("         _____\n" +
+            "        |" + card[0] + "    |\n" +
+            "        |     |\n" +
+            "        |  " + card[1] + "  |\n" +
+            "        |     |\n" +
+            "        |____" + card[0] + "|");
+    }
+    
+    public void printBankScore(ArrayList <String> game){
+        System.out.println("░░░░░░░░░░░░ BANK GAME RESUME ░░░░░░░░░░░░");
+        for(int i=0; i <= game.size()-1; i++){
+            char [] card = game.get(i).toCharArray();
+            printNewCard(card);
+        }
+        System.out.println("░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░SCORE░░" + game.get(game.size()-1));
+    }
+    
+    public void printGains(int gains){
+        String feedback = "";
+        if(gains>0) feedback = "You win!";
+        else if (gains<0) feedback = "You lose...";
+        else if (gains==0) feedback = "Tie!!";
+            
+        System.out.println("► GAINS: " + gains + " "+ feedback);
+    }
 }
