@@ -37,8 +37,9 @@ public class Console {
             "`------`------`------'  '-'`------'  '-'`------`------`------'");
     }
     
-    public char printInGameOptions(){
+    public char printInGameOptions(float score){
         System.out.println(
+            " SCORE: " + String.format("%2.1f", score) + "\n" +
             "╔════════════════════╦═══════════╦═══════════╦═══════════╗\n" +
             "║░░░Player Actions░░░║  1. Draw  ║  2. Ante  ║  3. Pass  ║\n" +
             "╚════════════════════╩═══════════╩═══════════╩═══════════╝\n");

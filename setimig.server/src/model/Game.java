@@ -75,13 +75,6 @@ public class Game {
     public int getBet() {
         return bet;
     }
-
-    /**
-     * @param bet the bet to set
-     */
-    public void setBet(int bet) {
-        this.bet = bet;
-    }
     
     /**
      * Calculates the value of the card 
@@ -97,7 +90,7 @@ public class Game {
     
     /**
      * Adds the value of the drawn card to player's score
-     * @param value 
+     * @param D
      */
     public void updatePlayerScore(char D){
         float value = this.getCardValue(D);
@@ -105,8 +98,8 @@ public class Game {
     }
     
     /**
-     * Adds the value of the drawn card to bank's score 
-     * @param value 
+     * Adds the value of the drawn card to bank's score
+     * @param D 
      */
     public void updateBankScore(char D){
         float value = this.getCardValue(D);

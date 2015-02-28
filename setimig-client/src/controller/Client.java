@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import model.Game;
 import utils.Protocol;
 import view.Console;
 
@@ -21,6 +22,7 @@ public class Client {
         String nomMaquina, str;
         int numPort, value;
         Console console = new Console();
+        Game g;
 
         InetAddress maquinaServidora;
         Socket socket = null;
@@ -42,6 +44,7 @@ public class Client {
             maquinaServidora = InetAddress.getByName(nomMaquina); /* Obtenim la IP de la maquina servidora */
             socket = new Socket(maquinaServidora, numPort); /* Obrim una connexio amb el servidor */
             pr = new Protocol(socket);
+            g = new Game();
             
             console.printWelcome();
             pr.sendStart();
@@ -51,14 +54,19 @@ public class Client {
             // game loop
             boolean end = false;
             do{
-                char opt = console.printInGameOptions();
+                char opt = console.printInGameOptions(g.getPlayerScore());
                 char[] card;
                 switch(opt){
                     case '1': 
                         pr.sendDraw();
                         card = pr.recieveCard();
                         console.printNewCard(card);
-                        // TODO check busting (Model should be needed for SCORE tracking & BSTG prevention)
+                        g.updatePlayerScore(card[0]);
+                         
+                        if(g.isBusted()){ 
+                            pr.recieveBusting();
+                            end = true;
+                        }
                         break;
                         
                     case '2': 
@@ -67,7 +75,12 @@ public class Client {
                         pr.sendDraw();
                         card = pr.recieveCard();
                         console.printNewCard(card);
-                        // TODO check busting (Model should be needed for SCORE tracking & BSTG prevention)
+                        g.updatePlayerScore(card[0]);
+                        
+                        if(g.isBusted()){ 
+                            pr.recieveBusting();
+                            end = true;
+                        } 
                         break;
                         
                     case '3': 
