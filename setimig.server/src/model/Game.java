@@ -14,7 +14,6 @@ public class Game {
     private ArrayList handPlayer;
     private float playerScore;
     private float bankScore;
-    private int gains;
     private int bet;
     
     private int cont;
@@ -24,13 +23,12 @@ public class Game {
      * 
      * @param deck 
      */
-    public Game(Deck deck){
+    public Game(Deck deck, int bet){
         this.deck = deck;
         this.handBank = new ArrayList();
         this.handPlayer = new ArrayList();
-        this. gains = 0;
-        this.bet = 0;
         
+        this.bet = bet; 
         this.cont = 0;    
     }
 
@@ -53,20 +51,6 @@ public class Game {
      */
     public ArrayList getHandPlayer() {
         return handPlayer;
-    }
-
-    /**
-     * @return the gain
-     */
-    public int getGain() {
-        return gains;
-    }
-
-    /**
-     * @param gain the gain to set
-     */
-    public void setGain(int gain) {
-        this.gains = gain;
     }
 
     /**
@@ -171,5 +155,22 @@ public class Game {
         this.cont++;
         return card;
     }
-    
+
+    public int computeGains(){
+        Integer boost = null ;
+        // Player wins
+        if(this.playerScore == 7.5f && this.playerScore != this.bankScore) boost = 2;   // 7&half reached!
+        //else if (this.playerScore < 7.5f && this.playerScore > this.bankScore ) boost = 1; //Regular success
+        //else if (this.playerScore < 7.5f && this.bankScore > 7.5f) boost = 1;
+        else if(this.playerScore < 7.5f && (this.playerScore > this.bankScore || this.bankScore > 7.5f)) boost = 1; //Regular success
+        
+        else if (this.playerScore == this.bankScore) boost = 0; //Tie
+ 
+        //Player loses
+        else if (this.playerScore > 7.5|| (this.playerScore < 7.5 && this.playerScore < this.bankScore)) boost = -1;
+        //else if (this.playerScore < 7.5 && this.playerScore < this.bankScore) boost = -1;
+        System.out.println("Gains sent from server: "+boost*this.getBet());
+        return boost*this.getBet();
+    }
+
 }

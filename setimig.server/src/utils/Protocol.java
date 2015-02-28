@@ -11,6 +11,7 @@ package utils;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -118,13 +119,13 @@ public class Protocol extends utils.ComUtils{
         write_int32(number);
         
         for (char[] c : cards) {
-            System.out.print(c[0] + c[1] + " ");
+            System.out.print(c[0] +" "+ c[1] + " ");
             write_char(c[0]);
             write_char(c[1]);
         }
-        
-        System.out.println("@sendBankScore -> " + String.format("%2.1f", score));
-        sendHeader(String.format("%2.1f", score));
+       
+        System.out.println("\n@sendBankScore -> " + customFormat(score));
+        sendHeader(customFormat(score));
     }
     
     /**
@@ -180,7 +181,10 @@ public class Protocol extends utils.ComUtils{
      * @throws IOException
      */  
     public String readHeader() throws IOException{
-        return read_string_command();
+        String header = read_string_command();
+        System.out.println(header);
+        
+        return header;
     }
     
     public boolean recieveStart(){
@@ -197,10 +201,24 @@ public class Protocol extends utils.ComUtils{
     public int recieveRaise(){
         int raise = 0;
         try {
+            if( !(read_char() == ' ') ) return -1;
             raise = read_int32();
         } catch (IOException ex) {
             Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
         }
         return raise;
     }
+
+    /**
+     * Desc. Customizes the format of the float to %2.1 
+     * @param value
+     * @return Formatted float as a String
+     */
+    private String customFormat( float value ) {
+        DecimalFormat myFormatter = new DecimalFormat("00.0");
+        String output = myFormatter.format(value);
+        return output;
+    }
+
+
 }

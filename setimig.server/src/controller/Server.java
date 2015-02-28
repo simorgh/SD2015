@@ -24,7 +24,7 @@ public class Server {
         Socket socket=null;
         Protocol pr;
         Game g;
-        int gain;
+        
 
         
         File f = new File("deck.txt");
@@ -60,17 +60,16 @@ public class Server {
                     pr= new Protocol(socket); /* Associem un flux d'entrada/sortida amb el client */ 
                     
                     
-                    //TODO: game logic for server comes here
-                    g = new Game(d);
+                  
+                    g = new Game(d,10);
                     pr.recieveStart();
+                    
+                    //TODO:change the sarting bet value to argv[]
+                    pr.sendStartingBet(10);
                     g.getDeck().shuffle();
-                    char[] card = g.drawCard();
-                    g.updatePlayerScore(card[0]);
-                              
-                    pr.sendCard(card[0], card[1]);
-               
+                    
+                    char[] card;
                     boolean end = false;
-       
                     do{
                         String cmd = pr.readHeader();
                         switch(cmd){
@@ -82,8 +81,7 @@ public class Server {
                                 if (g.getPlayerScore() > 7.5f){
                                     pr.sendBusting();
                                     end = true;
-                                }
-                                
+                                }                               
                                 break;
                             case Protocol.ANTE:
                                 int raise = pr.recieveRaise();
@@ -95,20 +93,11 @@ public class Server {
                             default:
                                 break;
                         }
-         
                     } while(!end);
                     
-                    g.playBank();
-                    
-                    pr.sendBankScore(g.getHandBank().size(), g.getHandBank(), g.getBankScore());
-                    
-                    
-                    if(g.getPlayerScore() > g.getBankScore() && g.getPlayerScore() <= 7.5f) gain = g.getBet();
-                    else if(g.getPlayerScore() == g.getBankScore() && g.getPlayerScore() <= 7.5f) gain = 0;
-                    else gain = -1*g.getBet();
-                    
-                    pr.sendGains(gain);
-                    
+                    g.playBank();  
+                    pr.sendBankScore(g.getHandBank().size(), g.getHandBank(), g.getBankScore()); 
+                    pr.sendGains(g.computeGains());   
                 }
                 
             } catch (IOException ex) {

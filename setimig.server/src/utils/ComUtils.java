@@ -181,7 +181,6 @@ public class ComUtils {
     
     /**
      * Escriure un string mida variable
-     * @param size
      * @param str string a escriure.
      * @throws java.io.IOException
      */
@@ -191,7 +190,7 @@ public class ComUtils {
         byte buffer[]=new byte[len];
 
         for(int i=0; i<len; i++) {
-            //System.out.println(str.charAt(i) + "_");
+            System.out.print(str.charAt(i)+"_");
             buffer[i] = (byte) str.charAt(i);
         }
 
