@@ -42,7 +42,7 @@ public class Client {
         try{
             
             maquinaServidora = InetAddress.getByName(nomMaquina); /* Obtenim la IP de la maquina servidora */
-            socket = new Socket(maquinaServidora, numPort); /* Obrim una connexio amb el servidor */
+            socket = new Socket(/*maquinaServidora*/"10.111.66.40", numPort); /* Obrim una connexio amb el servidor */
             pr = new Protocol(socket);
             g = new Game();
             
@@ -70,6 +70,7 @@ public class Client {
                         break;
                         
                     case '2': 
+
                         int rise = console.enterRaise();
                         pr.sendAnte(rise);
                         pr.sendDraw();

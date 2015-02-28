@@ -58,16 +58,15 @@ public class Console {
     
     public int enterRaise(){
         System.out.print("► How much do you want to raise?: ");
-        
-        boolean end = false;
-        do{
-            if (in.hasNextInt()) {
-                int a = in.nextInt() ; 
-                return a;
-            } else {
-                System.out.println("► Sorry, couldn't understand you!");
-            }
-        } while(true); 
+        int raise = 0;
+        while(!in.hasNextInt()){
+            in.next();
+            System.out.print("\t► Please enter a valid numeric value: ");
+        }
+        raise = in.nextInt();
+
+        return raise;
+       
     }
     
     public void printNewCard(char[] card){
@@ -81,7 +80,7 @@ public class Console {
     
     public void printBankScore(ArrayList <String> game){
         System.out.println("░░░░░░░░░░░░ BANK GAME RESUME ░░░░░░░░░░░░");
-        for(int i=0; i <= game.size()-1; i++){
+        for(int i=0; i < game.size()-1; i++){
             char [] card = game.get(i).toCharArray();
             printNewCard(card);
         }
@@ -89,6 +88,7 @@ public class Console {
     }
     
     public void printGains(int gains){
+        //System.out.println("@printGains -> gains = " + gains);
         String feedback = "";
         if(gains>0) feedback = "You win!";
         else if (gains<0) feedback = "You lose...";

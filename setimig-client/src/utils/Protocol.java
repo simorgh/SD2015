@@ -115,11 +115,11 @@ public class Protocol extends utils.ComUtils{
 //////////////////////////////////////////////////////////////
     
     public int recieveStartingBet(){
-        int bet = 0;
+        int bet = -1;
         try {
             String cmd = read_string_command();
-            if(!(cmd.toUpperCase()).equals(Protocol.CARD)) return bet;
-            if( !(read_char() == ' ') ) return bet;
+            if(!(cmd.toUpperCase()).equals(Protocol.STARTING_BET)) return -2;
+            if( !(read_char() == ' ') ) return -3;
             
             // bet caption
             bet = read_int32();
@@ -170,7 +170,7 @@ public class Protocol extends utils.ComUtils{
             int i = read_int32();
             
             char[] card = new char[2];
-            for(int j = 0; j<i; j++){
+            for(int j = 0; j < i; j++){
                 card[0] = read_char();
                 card[1] = read_char();
                 bank_resume.add(new String(card)); 
