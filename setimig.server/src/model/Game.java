@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package model;
 
 import java.util.ArrayList;
@@ -13,7 +8,8 @@ import java.util.ArrayList;
  */
 
 public class Game {
-    private Deck deck;
+    private final Deck deck;
+    
     private ArrayList handBank;
     private ArrayList handPlayer;
     private float playerScore;
@@ -35,8 +31,7 @@ public class Game {
         this. gains = 0;
         this.bet = 0;
         
-        this.cont = 0;
-        
+        this.cont = 0;    
     }
 
     /**
@@ -171,11 +166,9 @@ public class Game {
             }
         }
     }
-
     
-        
     /**
-     * Draws a card from indicated position
+     * Draws a card from the deck
      * @return 
      */
     public char[] drawCard(){
@@ -184,10 +177,6 @@ public class Game {
         card[1] =  this.deck.getCards().get(cont).charAt(1);
         this.cont++;
         return card;
-    }
-    
-    public boolean playerWins(){
-        return (playerScore > bankScore && playerScore <= 7.5f);
     }
     
 }

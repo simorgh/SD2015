@@ -8,7 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.Deck;
 import model.Game;
-import utils.ComUtils;
 import utils.Protocol;
 
 /**
@@ -25,6 +24,8 @@ public class Server {
         Socket socket=null;
         Protocol pr;
         Game g;
+        int gain;
+
         
         File f = new File("deck.txt");
         
@@ -48,7 +49,7 @@ public class Server {
         if (args.length == 1)
             portServidor = Integer.parseInt(args[0]);
 
-            try {
+            try{
                 serverSocket = new ServerSocket(portServidor);  /* Creem el servidor */
                 System.out.println("Servidor socket preparat al port " + portServidor);
 
@@ -61,19 +62,15 @@ public class Server {
                     
                     //TODO: game logic for server comes here
                     g = new Game(d);
-                    
                     pr.recieveStart();
                     g.getDeck().shuffle();
                     char[] card = g.drawCard();
                     g.updatePlayerScore(card[0]);
-                    
-                   
+                              
                     pr.sendCard(card[0], card[1]);
-                    
-                    
+               
                     boolean end = false;
-                    
-                    
+       
                     do{
                         String cmd = pr.readHeader();
                         switch(cmd){
@@ -104,7 +101,7 @@ public class Server {
                     g.playBank();
                     
                     pr.sendBankScore(g.getHandBank().size(), g.getHandBank(), g.getBankScore());
-                    int gain = 0;
+                    
                     
                     if(g.getPlayerScore() > g.getBankScore() && g.getPlayerScore() <= 7.5f) gain = g.getBet();
                     else if(g.getPlayerScore() == g.getBankScore() && g.getPlayerScore() <= 7.5f) gain = 0;
