@@ -84,7 +84,7 @@ public class Protocol extends utils.ComUtils{
         sendHeader(Protocol.CARD);
         write_char(' ');
         write_char(D);
-        write_char(P);
+        write_char(Character.toLowerCase(P));
     }
     
     /**
@@ -121,10 +121,10 @@ public class Protocol extends utils.ComUtils{
         for (char[] c : cards) {
             System.out.print(c[0] +" "+ c[1] + " ");
             write_char(c[0]);
-            write_char(c[1]);
+            write_char(Character.toLowerCase(c[1]));
         }
        
-        System.out.println("\n@sendBankScore -> " + customFormat(score));
+        //System.out.println("\n@sendBankScore -> " + customFormat(score));
         sendHeader(customFormat(score));
     }
     

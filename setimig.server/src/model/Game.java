@@ -22,21 +22,17 @@ public class Game {
      * Class constructor 
      * 
      * @param deck 
+     * @param strt_bet 
      */
-    public Game(Deck deck, int bet){
+    public Game(Deck deck, int strt_bet){
         this.deck = deck;
+        this.bet = strt_bet;
+
+        // init game
         this.handBank = new ArrayList();
         this.handPlayer = new ArrayList();
-        
-        this.bet = bet; 
-        this.cont = 0;    
-    }
-
-    /**
-     * @return the deck
-     */
-    public Deck getDeck() {
-        return deck;
+        this.cont = 0;
+        this.deck.shuffle();
     }
 
     /**
@@ -172,5 +168,5 @@ public class Game {
         System.out.println("Gains sent from server: "+boost*this.getBet());
         return boost*this.getBet();
     }
-
+    
 }

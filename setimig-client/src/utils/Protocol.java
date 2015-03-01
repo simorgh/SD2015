@@ -139,7 +139,8 @@ public class Protocol extends utils.ComUtils{
             
             // card caption
             card = new char[2];
-            for(int i=0; i<2; i++) card[i] = read_char();
+            card[0] = read_char();
+            card[1] = Character.toLowerCase(read_char());
             
         } catch (IOException ex) {
             Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
@@ -171,8 +172,11 @@ public class Protocol extends utils.ComUtils{
             
             char[] card = new char[2];
             for(int j = 0; j < i; j++){
-                card[0] = read_char();
-                card[1] = read_char();
+                char D = read_char();
+                if(Character.isDigit(D)) card[0] = D;
+                else return null;    
+                card[1] = Character.toLowerCase(read_char());
+                
                 bank_resume.add(new String(card)); 
             }
             

@@ -41,7 +41,7 @@ public class Deck {
  
 	String line = null;
 	while ((line = br.readLine()) != null) {
-		System.out.println("Added card "+line);
+		System.out.println("\t- Added card "+line);
                 deck.add(line);
 	}
         

@@ -20,7 +20,7 @@ public class Client {
      */
     public static void main(String[] args) {
         String nomMaquina, str;
-        int numPort, value;
+        int port;
         Console console = new Console();
         Game g;
 
@@ -29,20 +29,20 @@ public class Client {
         Protocol pr;
 /*
         if (args.length != 2){
-            System.out.println("Us: java Client <maquina_servidora> <port>");
+            System.out.println("Us: java Client -s <maquina_servidora> -p <port> [-a topcard]");
             System.exit(1);
         }
 
         nomMaquina = args[0];
-        numPort    = Integer.parseInt(args[1]); 
-*/
+        port  = Integer.parseInt(args[1]); 
+*/        
         nomMaquina = "localhost";
-        numPort = 1234;
+        port = 1234;
         
         try{
-            
             maquinaServidora = InetAddress.getByName(nomMaquina); /* Obtenim la IP de la maquina servidora */
-            socket = new Socket(/*maquinaServidora*/"10.111.66.40", numPort); /* Obrim una connexio amb el servidor */
+            socket = new Socket(maquinaServidora/*"10.111.66.40"*/, port); /* Obrim una connexio amb el servidor */
+            console.showConnection(socket);
             pr = new Protocol(socket);
             g = new Game();
             
@@ -51,11 +51,15 @@ public class Client {
             int str_bet = pr.recieveStartingBet();
             console.printStartingBet(str_bet);
             
+            pr.sendDraw();  /* DRAW command is mandatory after a STARTING_BET is received */
+            char [] card = pr.recieveCard();
+            console.printNewCard(card);
+            g.updatePlayerScore(card[0]);
+            
             // game loop
             boolean end = false;
             do{
                 char opt = console.printInGameOptions(g.getPlayerScore());
-                char[] card;
                 switch(opt){
                     case '1': 
                         pr.sendDraw();
@@ -70,7 +74,6 @@ public class Client {
                         break;
                         
                     case '2': 
-
                         int rise = console.enterRaise();
                         pr.sendAnte(rise);
                         pr.sendDraw();

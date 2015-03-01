@@ -5,6 +5,7 @@
  */
 package view;
 
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -35,6 +36,10 @@ public class Console {
             "| :\\/: | :\\/: | (__) |'-.-.| :\\/: |'-.-.| :\\/: | :\\/: | :\\/: |\n" +
             "| '--'S| '--'E| '--'T| ((1)| '--'I| ((1)| '--'M| '--'I| '--'G|\n" +
             "`------`------`------'  '-'`------'  '-'`------`------`------'");
+    }
+    
+    public void showConnection(Socket socket){
+        System.out.println("socket received: " + socket.getLocalSocketAddress().toString());
     }
     
     public char printInGameOptions(float score){
