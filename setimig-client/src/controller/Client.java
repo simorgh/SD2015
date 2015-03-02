@@ -27,17 +27,20 @@ public class Client {
         InetAddress maquinaServidora;
         Socket socket = null;
         Protocol pr;
-/*
-        if (args.length != 2){
+        
+/* TODO: Uncomment to get args info    
+        if (args.length < 4 || args.length > 4 ){
             System.out.println("Us: java Client -s <maquina_servidora> -p <port> [-a topcard]");
             System.exit(1);
         }
 
         nomMaquina = args[0];
-        port  = Integer.parseInt(args[1]); 
-*/        
+        port  = Integer.parseInt(args[1]);  */
+        
+// <test values>
         nomMaquina = "localhost";
         port = 1234;
+// <test values>
         
         try{
             maquinaServidora = InetAddress.getByName(nomMaquina); /* Obtenim la IP de la maquina servidora */

@@ -28,7 +28,7 @@ public class Game {
         this.deck = deck;
         this.bet = strt_bet;
 
-        // init game
+        /* init game */
         this.handBank = new ArrayList();
         this.handPlayer = new ArrayList();
         this.cont = 0;
@@ -111,16 +111,16 @@ public class Game {
     public void playBank(){
         char[] card;
         
-        //Player hand busted
-        //Bank will draw once and pass
+        /* Player hand busted
+         * Bank will draw once and pass. */
         if (this.playerScore > 7.5f){
             card = this.drawCard();
             this.handBank.add(card);
             this.updateBankScore(card[0]);
         }
         
-        //Player reached 7.5 score
-        //Bank will draw until he reaches 7.5 or gets busted
+        /* Player reached 7.5 score
+         * Bank will draw until he reaches 7.5 or gets busted. */
         else if(this.playerScore == 7.5f) {
             while(this.bankScore < this.playerScore){
                 card = this.drawCard();
@@ -129,8 +129,8 @@ public class Game {
             }
         }
         
-        //Player drew less than 7.5
-        //bank will draw until he gets a higher score (or gets busted)
+        /* Player drew less than 7.5
+         * Bank will draw until he gets a higher score (or gets busted) */
         else {
             while(this.bankScore <= this.playerScore){
                 card = this.drawCard();
@@ -154,17 +154,15 @@ public class Game {
 
     public int computeGains(){
         Integer boost = null ;
-        // Player wins
-        if(this.playerScore == 7.5f && this.playerScore != this.bankScore) boost = 2;   // 7&half reached!
-        //else if (this.playerScore < 7.5f && this.playerScore > this.bankScore ) boost = 1; //Regular success
-        //else if (this.playerScore < 7.5f && this.bankScore > 7.5f) boost = 1;
-        else if(this.playerScore < 7.5f && (this.playerScore > this.bankScore || this.bankScore > 7.5f)) boost = 1; //Regular success
         
-        else if (this.playerScore == this.bankScore) boost = 0; //Tie
+        /* Player wins */
+        if(this.playerScore == 7.5f && this.playerScore != this.bankScore) boost = 2;   // 7half reached!
+        else if(this.playerScore < 7.5f && (this.playerScore > this.bankScore || this.bankScore > 7.5f)) boost = 1; // regular success
+        
+        else if (this.playerScore == this.bankScore) boost = 0; // tie
  
-        //Player loses
+        /* Player loses */
         else if (this.playerScore > 7.5|| (this.playerScore < 7.5 && this.playerScore < this.bankScore)) boost = -1;
-        //else if (this.playerScore < 7.5 && this.playerScore < this.bankScore) boost = -1;
         System.out.println("Gains sent from server: "+boost*this.getBet());
         return boost*this.getBet();
     }
