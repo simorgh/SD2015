@@ -160,29 +160,24 @@ public class Protocol extends utils.ComUtils{
     }
     
     public ArrayList <String> recieveBankScore(){
-        ArrayList <String> bank_resume = new ArrayList <>();
+        ArrayList <String> bank_resume = new ArrayList();
         
         try {
             String cmd = read_string_command();
             if(!(cmd.toUpperCase()).equals(Protocol.BANK_SCORE)) return null;
-            if( !(read_char() == ' ') ) return null;
+            if( read_char() != ' ' ) return null;
             
             // card caption
-            int i = read_int32();
-            
+            int i = read_int32(); 
             char[] card = new char[2];
             for(int j = 0; j < i; j++){
-                char D = read_char();
-                if(Character.isDigit(D)) card[0] = D;
-                else return null;    
+                card[0] = read_char();   
                 card[1] = Character.toLowerCase(read_char());
-                
                 bank_resume.add(new String(card)); 
             }
             
             String score = read_string_command();
             if(score.length() != 4) return null;
-    
             bank_resume.add(score);
             
         } catch (IOException ex) {

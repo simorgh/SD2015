@@ -6,6 +6,7 @@
 package view;
 
 import java.net.Socket;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -28,7 +29,8 @@ public class Console {
         }
         return instance;
     }
-    
+
+    /*
     public void printWelcome(){
         System.out.println(".------.------.------.     .------.     .------.------.------.\n" +
             "|S.--. |E.--. |T.--. |.-.  |I.--. |.-.  |M.--. |I.--. |G.--. |\n" +
@@ -37,6 +39,12 @@ public class Console {
             "| '--'S| '--'E| '--'T| ((1)| '--'I| ((1)| '--'M| '--'I| '--'G|\n" +
             "`------`------`------'  '-'`------'  '-'`------`------`------'");
     }
+*/    
+    public void printWelcome(){
+        System.out.println("    ╔═╗┌─┐┌┬┐  ╦  ╔╦╗┬┌─┐\n"
+                        +  "    ╚═╗├┤  │   ║  ║║║││ ┬\n"
+                        +  "    ╚═╝└─┘ ┴   ╩  ╩ ╩┴└─┘");
+    }
     
     public void showConnection(Socket socket){
         System.out.println("socket received: " + socket.getLocalSocketAddress().toString());
@@ -44,10 +52,11 @@ public class Console {
     
     public char printInGameOptions(float score){
         System.out.println(
-            " SCORE: " + String.format("%2.1f", score) + "\n" +
             "╔════════════════════╦═══════════╦═══════════╦═══════════╗\n" +
-            "║░░░Player Actions░░░║  1. Draw  ║  2. Ante  ║  3. Pass  ║\n" +
-            "╚════════════════════╩═══════════╩═══════════╩═══════════╝\n");
+            "║░  Player Actions  ░║  1. Draw  ║  2. Ante  ║  3. Pass  ║\n" +
+            "╟────────────────────╨───────────╨───────────╨───────────╢\n" +
+            "║░░░               Player Score: " + customFormat(score) + "                 ░░░║\n" +        
+            "╚════════════════════════════════════════════════════════╝\n");
         System.out.print("► Select action number: ");
         return in.next().charAt(0);
     }
@@ -100,5 +109,17 @@ public class Console {
         else if (gains==0) feedback = "Tie!!";
             
         System.out.println("► GAINS: " + gains + " "+ feedback);
+    }
+    
+    
+    /**
+     * Desc. Customizes the format of the float to %2.1 
+     * @param value
+     * @return Formatted float as a String
+     */
+    private String customFormat( float value ) {
+        DecimalFormat myFormatter = new DecimalFormat("00.0");
+        String output = myFormatter.format(value);
+        return output;
     }
 }

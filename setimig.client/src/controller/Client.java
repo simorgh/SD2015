@@ -101,7 +101,10 @@ public class Client {
             } while(!end);
             
             ArrayList <String> bank_score = pr.recieveBankScore();
-            console.printBankScore(bank_score);
+            if(bank_score != null) console.printBankScore(bank_score);
+            else{
+                System.err.print("Error al rebre BKSC!");
+            }
             
             int gain = pr.recieveGains();
             console.printGains(gain);

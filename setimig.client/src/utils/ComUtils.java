@@ -149,8 +149,8 @@ public class ComUtils {
         char cStr[]=new char[numBytes];
         bStr = read_bytes(numBytes);
         for(int i=0;i<numBytes;i++)
-                cStr[i]=(char)bStr[i];
-        
+            cStr[i]=(char)bStr[i];
+
         return String.valueOf(cStr);
     }
     
@@ -192,7 +192,6 @@ public class ComUtils {
         byte buffer[]=new byte[len];
 
         for(int i=0; i<len; i++) {
-            //System.out.println(str.charAt(i) + "_");
             buffer[i] = (byte) str.charAt(i);
         }
 

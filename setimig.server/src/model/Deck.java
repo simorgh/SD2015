@@ -13,18 +13,29 @@ import java.util.Collections;
  *
  * @author simorgh & dzigor92
  */
-
 public class Deck {
     private ArrayList<String> cards;
     
     /**
-     * Class constructor
+     * Deck constructor.
+     * Called once when server it's created. Following threads should use second constructor.
      * @param file
      * @throws IOException 
      */
     public Deck(File file) throws IOException{
         this.cards = readDeckFile(file);
     } 
+    
+    /**
+     * Deck "New Game" constructor.
+     * Called every time a new Client it's connected. Deep copy from original
+     * static Deck it's done, then it's shuffled to ensure new deck order.
+     * @param cards 
+     */
+    public Deck(ArrayList <String> cards){
+        this.cards = cards;
+    }
+    
     
     /**
      * Method that reads the deck file and saves the values on the "cards" parameter
@@ -62,4 +73,6 @@ public class Deck {
     public ArrayList<String> getCards() {
         return cards;
     }
+    
+   
 }

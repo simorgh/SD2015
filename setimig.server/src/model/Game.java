@@ -21,11 +21,11 @@ public class Game {
     /**
      * Class constructor 
      * 
-     * @param deck 
+     * @param deck deep copy from Deck
      * @param strt_bet 
      */
     public Game(Deck deck, int strt_bet){
-        this.deck = deck;
+        this.deck = deepCopy(deck);
         this.bet = strt_bet;
 
         /* init game */
@@ -163,8 +163,23 @@ public class Game {
  
         /* Player loses */
         else if (this.playerScore > 7.5|| (this.playerScore < 7.5 && this.playerScore < this.bankScore)) boost = -1;
-        System.out.println("Gains sent from server: "+boost*this.getBet());
+
         return boost*this.getBet();
+    }
+    
+    
+   /**
+    * Clones Deck ArrayList and also clone its contents.
+    * We will need to iterate on the items, and clone them one by one,
+    * putting the clones in a result array as we go.
+    *
+    * @param source
+    * @return full copy
+    */  
+    private Deck deepCopy(Deck source) {
+        ArrayList <String> clone = new ArrayList();
+        for (String card : source.getCards()) clone.add(card);
+        return new Deck(clone);  
     }
     
 }

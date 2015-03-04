@@ -119,7 +119,7 @@ public class Protocol extends utils.ComUtils{
         write_int32(number);
         
         for (char[] c : cards) {
-            System.out.print(c[0] +" "+ c[1] + " ");
+            System.out.print(c[0] + "" + c[1] + " ");
             write_char(c[0]);
             write_char(Character.toLowerCase(c[1]));
         }
@@ -182,7 +182,7 @@ public class Protocol extends utils.ComUtils{
      */  
     public String readHeader() throws IOException{
         String header = read_string_command();
-        System.out.println(header);
+        System.out.println("\nRECEIVED: " + header);
         
         return header;
     }
