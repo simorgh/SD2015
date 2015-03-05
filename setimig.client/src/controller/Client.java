@@ -23,7 +23,6 @@ public class Client {
         int port;
         Console console = new Console();
         Game g;
-        //boolean autoplay = true;
         InetAddress maquinaServidora;
         Socket socket = null;
         Protocol pr;
@@ -123,10 +122,12 @@ public class Client {
     } // fi del main
     
     /**
-     * Autoplay option 
-     * @param currentScore
-     * @param autoplay
-     * @return 
+     * Autoplay option choser. The method implements the behaviour that the automatic Client will
+     * follow when topcard option is activated.
+     * 
+     * @param currentScore Current client's score.
+     * @param autoplay The score to reach by client.
+     * @return Option to chose. If the desired score is reached, the method will return 'Pass' option. If not, the method will return 'Draw'. 
      */
     
     private static char choseOptionAutoplay(float currentScore, float autoplay){

@@ -38,10 +38,20 @@ public class Protocol extends utils.ComUtils{
     private final String ERR_SYNTAX = "Syntax error";
     //TODO more ERR definitions comes here...
     
+    /**
+     * Class constructor. Uses a file.
+     * @param file
+     * @throws IOException 
+     */
     public Protocol(File file) throws IOException {
         super(file); 
     }
     
+    /**
+     * Class constructor. Uses a socket.
+     * @param socket
+     * @throws IOException 
+     */
     public Protocol(Socket socket) throws IOException {
         super(socket);
     }
@@ -176,8 +186,8 @@ public class Protocol extends utils.ComUtils{
 //////////////////////////////////////////////////////////////
     
     /**
-     *
-     * @return
+     * Protocol command header reading.
+     * @return The read header.
      * @throws IOException
      */  
     public String readHeader() throws IOException{
@@ -187,6 +197,11 @@ public class Protocol extends utils.ComUtils{
         return header;
     }
     
+    /**
+     * Start command reception.
+     * 1. STRT header is expected.
+     * @return True if the header has been received correctly. Returns false otherwise.
+     */
     public boolean recieveStart(){
         try {
             String cmd = read_string_command();
@@ -197,7 +212,13 @@ public class Protocol extends utils.ComUtils{
         return false;
     }
 
-    
+    /**
+     * Raise command reception. The Server receives the card as indicated by the defined communication protocol.
+     * 1. ANTE header is expected.
+     * 2. SP is expected (' ').
+     * 3. NUMBER value representing the value of the raise is expected.
+     * @return The raise value that is read.
+     */
     public int recieveRaise(){
         int raise = 0;
         try {

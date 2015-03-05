@@ -36,6 +36,7 @@ public class Game {
     }
 
     /**
+     * Bank Hand getter.
      * @return the handBank
      */
     public ArrayList getHandBank() {
@@ -43,6 +44,7 @@ public class Game {
     }
 
     /**
+     * Player hand getter.
      * @return the handPlayer
      */
     public ArrayList getHandPlayer() {
@@ -50,6 +52,7 @@ public class Game {
     }
 
     /**
+     * Starting bet getter.
      * @return the bet
      */
     public int getBet() {
@@ -57,7 +60,7 @@ public class Game {
     }
     
     /**
-     * Calculates the value of the card 
+     * Calculates the value of the card.
      * @param D The draw card 
      * @return The value of the card
      */
@@ -78,7 +81,7 @@ public class Game {
     }
     
     /**
-     * Adds the value of the drawn card to bank's score
+     * Adds the value of the drawn card to bank's score.
      * @param D 
      */
     public void updateBankScore(char D){
@@ -87,7 +90,7 @@ public class Game {
     }
     
     /**
-     * Raises the bet
+     * Raises the bet.
      * @param value 
      */
     public void raiseBet(int value){
@@ -95,6 +98,7 @@ public class Game {
     }
 
     /**
+     * Player score getter.
      * @return the playerScore
      */
     public float getPlayerScore() {
@@ -102,12 +106,18 @@ public class Game {
     }
 
     /**
+     * Bank score getter.
      * @return the bankScore
      */
     public float getBankScore() {
         return bankScore;
     }
     
+    /**
+     * Bank IA. The method plays the game, trying to beat the score achieved 
+     * by the player. 
+     * 
+     */
     public void playBank(){
         char[] card;
         
@@ -141,8 +151,8 @@ public class Game {
     }
     
     /**
-     * Draws a card from the deck
-     * @return 
+     * Draws a card from the deck.
+     * @return The card drawn from the deck.
      */
     public char[] drawCard(){
         char[] card = new char[2];
@@ -152,6 +162,10 @@ public class Game {
         return card;
     }
 
+    /**
+     * Method that compares the bank's  and the player's score and calculates players earnings.
+     * @return The player's gains.
+     */
     public int computeGains(){
         Integer boost = null ;
         
@@ -173,8 +187,8 @@ public class Game {
     * We will need to iterate on the items, and clone them one by one,
     * putting the clones in a result array as we go.
     *
-    * @param source
-    * @return full copy
+    * @param source Deck to copy.
+    * @return full deep copy of the source.
     */  
     private Deck deepCopy(Deck source) {
         ArrayList <String> clone = new ArrayList();
