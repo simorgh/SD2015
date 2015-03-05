@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import model.Game;
+import utils.ClientCLI;
 import utils.Protocol;
 import view.Console;
 
@@ -14,7 +15,8 @@ import view.Console;
  */
 public class Client {
     private static final String ERROR_OPT = "!! Wrong option. Please enter a valid action.";
-    
+     private static ClientCLI cli;
+     
     /**
      * @param args the command line arguments
      */
@@ -28,23 +30,14 @@ public class Client {
         Socket socket = null;
         Protocol pr;
         
-/* TODO: Uncomment to get args info    
-        if (args.length < 4 || args.length > 4 ){
-            System.out.println("Us: java Client -s <maquina_servidora> -p <port> [-a topcard]");
-            System.exit(1);
-        }
-
-        nomMaquina = args[0];
-        port  = Integer.parseInt(args[1]);  */
-        
-// <test values>
-        nomMaquina = "localhost";
-        port = 1234;
-// <test values>
+        /* Command Line arguments threatment */
+        cli = new ClientCLI(args);
+        nomMaquina = cli.getServer();
+        port = cli.getPort();
         
         try{
-            maquinaServidora = InetAddress.getByName(nomMaquina); /* Obtenim la IP de la maquina servidora */
-            socket = new Socket(maquinaServidora/*"10.111.66.40"*/, port); /* Obrim una connexio amb el servidor */
+            //maquinaServidora = InetAddress.getByName(nomMaquina); /* Obtenim la IP de la maquina servidora */
+            socket = new Socket(nomMaquina/*maquinaServidora*/, port); /* Obrim una connexio amb el servidor */
             console.showConnection(socket);
             pr = new Protocol(socket);
             g = new Game();

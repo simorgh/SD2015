@@ -22,7 +22,7 @@ nbproject/*
 *.lock
 
 # Package Files #
-*.jar
+#*.jar
 *.war
 *.ear
 
