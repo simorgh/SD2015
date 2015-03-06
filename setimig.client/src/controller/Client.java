@@ -15,28 +15,25 @@ import view.Console;
  */
 public class Client {
     private static final String ERROR_OPT = "!! Wrong option. Please enter a valid action.";
-    private static ClientCLI cli;
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        String nomMaquina, str;
-        int port;
         Console console = new Console();
         Game g;
-        InetAddress maquinaServidora;
         Socket socket = null;
         Protocol pr;
         
+        
         /* Command Line arguments threatment */
-        cli = new ClientCLI(args);
-        nomMaquina = cli.getServer();
-        port = cli.getPort();
+        ClientCLI cli = new ClientCLI(args);
+        String nomMaquina = cli.getServer();
+        int port = cli.getPort();
+        float topcard = cli.getTopCard();
         
         try{
-            //maquinaServidora = InetAddress.getByName(nomMaquina); /* Obtenim la IP de la maquina servidora */
-            socket = new Socket(nomMaquina/*maquinaServidora*/, port); /* Obrim una connexio amb el servidor */
+            socket = new Socket(InetAddress.getByName(nomMaquina), port); // Obrim una connexio amb el servidor
             console.showConnection(socket);
             pr = new Protocol(socket);
             g = new Game();
@@ -55,8 +52,8 @@ public class Client {
             boolean end = false;
             do{
                 char opt;
-                if(Client.topcard == 0.0f) opt = console.printInGameOptions(g.getPlayerScore());
-                else opt = choseOptionAutoplay(g.getPlayerScore(), Client.topcard);
+                if(topcard == 0.0f) opt = console.printInGameOptions(g.getPlayerScore());
+                else opt = choseOptionAutoplay(g.getPlayerScore(), topcard);
                 switch(opt){
                     case '1': 
                         pr.sendDraw();
@@ -113,6 +110,7 @@ public class Client {
             } // fi del catch    
         }
     } // fi del main
+  
     
     /**
      * Autoplay option choser. The method implements the behaviour that the automatic Client will
@@ -122,7 +120,6 @@ public class Client {
      * @param autoplay The score to reach by client.
      * @return Option to chose. If the desired score is reached, the method will return 'Pass' option. If not, the method will return 'Draw'. 
      */
-    
     private static char choseOptionAutoplay(float currentScore, float autoplay){
         char opt = '0';
         if(currentScore >= autoplay) opt = '3';  

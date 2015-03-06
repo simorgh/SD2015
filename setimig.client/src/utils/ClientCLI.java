@@ -118,7 +118,7 @@ public class ClientCLI  {
         return this.port;
     }
     
-    public float topCard(){
+    public float getTopCard(){
         return this.topcard;
     }
     
