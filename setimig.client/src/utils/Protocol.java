@@ -33,15 +33,29 @@ public class Protocol extends utils.ComUtils{
     public static final String ERROR = "ERRO";
 
 
+    /**
+     * Class constructor. Constructs the Protocol using a file.
+     * @param file
+     * @throws IOException 
+     */
     public Protocol(File file) throws IOException {
         super(file);    
     }
     
+    /**
+     * Class constructor. Constructs the  Protocol using a socket.
+     * @param socket
+     * @throws IOException 
+     */
     public Protocol(Socket socket) throws IOException {
         super(socket);
     }
     
-    /* support method */
+    /**
+     * Support method to send a header through the connection.
+     * @param str The header to send.
+     * @throws IOException 
+     */
     private void sendHeader(String str) throws IOException{ 
         write_string_command(str);
     }
@@ -114,6 +128,14 @@ public class Protocol extends utils.ComUtils{
 //               SERVER RECEPTIONS VERIFICATION
 //////////////////////////////////////////////////////////////
     
+    /**
+     * Starting bet reception. The Client receives the starting bet as indicated by the defined communication protocol.
+     * 1. STBT header is expected.
+     * 2. SP is expected (' ').
+     * 3. Integer value , indicating the value of the starting bet is expected.
+     * 
+     * @return The received value of the starting bet.
+     */
     public int recieveStartingBet(){
         int bet = -1;
         try {
@@ -129,7 +151,13 @@ public class Protocol extends utils.ComUtils{
         return bet;
     }
     
-    
+    /**
+     * Card reception. The Client receives the card as indicated by the defined communication protocol.
+     * 1. CARD header is expected.
+     * 2. SP is expected (' ').
+     * 3. The string with value of the card is expected.
+     * @return The card that has been received.
+     */
     public char[] recieveCard(){
         char[] card = null;
         try {
@@ -148,7 +176,12 @@ public class Protocol extends utils.ComUtils{
         
         return card;
     }
-    
+
+    /**
+     * Busting reception.
+     * 1. BSTG header is expected.
+     * @return True if the header has been received correctly. Returns false otherwise.
+     */
     public boolean recieveBusting(){
         try {
             String cmd = read_string_command();
@@ -159,6 +192,15 @@ public class Protocol extends utils.ComUtils{
         return false;
     }
     
+    /**
+     * Bank Score Reception.  The Client receives the bank score as indicated by the defined communication protocol.
+     * 1. BNSC header is expected.
+     * 2. SP is expected (' ').
+     * 3. NUMBER indicating the number of cards to be sent is expected.
+     * 4. STRING representing a car is expected as many times as indicated by NUMBER received previously.
+     * 5. FLOAT indicating the score that the bank has hit is expected.
+     * @return ArrayList containing the list of cards and the bank score as a String. 
+     */
     public ArrayList <String> recieveBankScore(){
         ArrayList <String> bank_resume = new ArrayList();
         
@@ -187,6 +229,13 @@ public class Protocol extends utils.ComUtils{
         return bank_resume;
     }
     
+    /**
+     * Bank Score Reception.  The Client receives the gains as indicated by the defined communication protocol.
+     * 1. GAIN header is expected.
+     * 2. SP is expected (' ').
+     * 3. INTEGER representing the value of the gains of client is expected.
+     * @return The value of the gains.
+     */
     public int recieveGains(){
         int gains = -1;
         try {
@@ -200,6 +249,10 @@ public class Protocol extends utils.ComUtils{
         return gains;
     }
     
+    /**
+     * ERROR reception.  
+     * @return True if Message received properly. False otherwise.
+     */
     public boolean recieveError(){
         try {
             String cmd = read_string_command();

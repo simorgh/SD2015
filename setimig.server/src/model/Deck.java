@@ -1,3 +1,7 @@
+/**
+ * Deck. The class represents an abstraction of  the deck with which "Seven and a half" game
+ * is played with.
+ */
 package model;
 
 import java.io.BufferedReader;
@@ -61,13 +65,14 @@ public class Deck {
     }
     
     /**
-     * Shuffles the deck
+     * Shuffles the deck.
      */
     public void shuffle(){
         Collections.shuffle(getCards());
     }
 
     /**
+     * Gets the list of card that the deck contains.
      * @return the cards
      */
     public ArrayList<String> getCards() {

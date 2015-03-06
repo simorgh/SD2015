@@ -15,8 +15,8 @@ import view.Console;
  */
 public class Client {
     private static final String ERROR_OPT = "!! Wrong option. Please enter a valid action.";
-     private static ClientCLI cli;
-     
+    private static ClientCLI cli;
+
     /**
      * @param args the command line arguments
      */
@@ -25,7 +25,6 @@ public class Client {
         int port;
         Console console = new Console();
         Game g;
-
         InetAddress maquinaServidora;
         Socket socket = null;
         Protocol pr;
@@ -55,7 +54,9 @@ public class Client {
             // game loop
             boolean end = false;
             do{
-                char opt = console.printInGameOptions(g.getPlayerScore());
+                char opt;
+                if(Client.topcard == 0.0f) opt = console.printInGameOptions(g.getPlayerScore());
+                else opt = choseOptionAutoplay(g.getPlayerScore(), Client.topcard);
                 switch(opt){
                     case '1': 
                         pr.sendDraw();
@@ -112,5 +113,21 @@ public class Client {
             } // fi del catch    
         }
     } // fi del main
+    
+    /**
+     * Autoplay option choser. The method implements the behaviour that the automatic Client will
+     * follow when topcard option is activated.
+     * 
+     * @param currentScore Current client's score.
+     * @param autoplay The score to reach by client.
+     * @return Option to chose. If the desired score is reached, the method will return 'Pass' option. If not, the method will return 'Draw'. 
+     */
+    
+    private static char choseOptionAutoplay(float currentScore, float autoplay){
+        char opt = '0';
+        if(currentScore >= autoplay) opt = '3';  
+        else opt = '1';
+        return opt;
+    }
     
 }
