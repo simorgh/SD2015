@@ -56,8 +56,8 @@ public class Deck {
  
 	String line = null;
 	while ((line = br.readLine()) != null) {
-		System.out.println("\t- Added card "+line);
-                deck.add(line);
+            System.out.println("\t- Added card "+line);
+            deck.add(line);
 	}
         
 	br.close();
@@ -65,7 +65,8 @@ public class Deck {
     }
     
     /**
-     * Shuffles the deck.
+     * Shuffles the deck. This method is meant to create a unique game for every client.
+     * Unused on this delivery due to the testing issues (we want to create all the games identically equal). 
      */
     public void shuffle(){
         Collections.shuffle(getCards());

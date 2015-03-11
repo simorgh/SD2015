@@ -41,19 +41,27 @@ public class ClientCLI  {
     private final Pattern pattern = Pattern.compile(IPADDRESS_PATTERN);
     private Matcher matcher;
     
+    /**
+     * Class constructor.
+     * Here we add all the CLI required arguments as a keys for the hash map. After that the parse
+     * is automatically executed to verify all the associated argument values.  
+     * @param args 
+     */
     public ClientCLI (String[] args) {
         this.options = new Options();
         this.args = args;
         options.addOption("h", "help", false, "show help.");
         options.addOption("s", "server", true, "Ipv4 of the server to establish connection at" );
         options.addOption("p", "port", true, "specifies the 'port' for the connection");
-        options.addOption("a", "auto", true, "optional param which specifies client-autoplay goal score");
+        options.addOption("a", "auto", true, "optional param which specifies client-autoplay goal score. The value must be within range [1.0, 7.5]");
         
         parse(); // starts parsing args into inner HashTable
     }
     
     /**
-     * 
+     * Command line argument parser from org.apache.commons.
+     * Used  to patch each value as hash key-value.
+     * It allows us to put arguments in any order.
      */
     private void parse() {
         CommandLineParser parser = new BasicParser();
@@ -81,7 +89,7 @@ public class ClientCLI  {
             }
             
             /* validate that 'starting bet' has been set */
-            if(cmd.hasOption("p")) {
+            if(cmd.hasOption("p")) { 
                 this.port = Integer.parseInt(cmd.getOptionValue("p"));
             } else {
                 log.log(Level.SEVERE, "Missing 'port' option");
@@ -91,16 +99,24 @@ public class ClientCLI  {
             /* validate that 'starting bet' has been set */
             if(cmd.hasOption("a")) {
                 this.topcard = Float.parseFloat(cmd.getOptionValue("a"));
+
+                if(this.topcard < 1.0 || this.topcard > 7.5 ) {
+                    log.log(Level.SEVERE, "The value of 'auto' must be within range [1, 7.5]");
+                    System.exit(2);
+                }
             }
+        }catch (NumberFormatException e){
+            log.log(Level.SEVERE, "Failed to convert arg to Number. Make sure your input is correct.");
+            System.exit(1);
             
         } catch(ParseException e) {
-            log.log(Level.SEVERE, "Failed to parse comand line properties", e);
+            log.log(Level.SEVERE, "Failed to parse comand line properties");
             help();
         }
     }
 
     /**
-     * Prints out some help (Usage)
+     * Prints out some help (Usage).
      */
     private void help() {
         HelpFormatter formater = new HelpFormatter();
@@ -109,15 +125,26 @@ public class ClientCLI  {
         System.exit(0);
     }
     
-    
+    /**
+     * Server getter.
+     * @return The IPv4 or the name of the server that the client is connected to.
+     */
     public String getServer(){
         return this.server;
     }
     
+    /**
+     * Port getter.
+     * @return The port through which the connection is established.
+     */
     public int getPort(){
         return this.port;
     }
     
+    /**
+     * Topcard getter.
+     * @return The score that the IA will try to reach when autoplay mode is enabled.
+     */
     public float getTopCard(){
         return this.topcard;
     }

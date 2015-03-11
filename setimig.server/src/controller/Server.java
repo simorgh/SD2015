@@ -75,7 +75,9 @@ public class Server implements Runnable {
             }
 
         } catch (IOException ex) {
-            System.out.println("Els errors han de ser tractats correctament pel vostre programa");
+            System.out.println("Unable to establish connection through the port: "+Server.port
+                    + ": Port might be protected or already being used.\n"
+                    + "Run 'netstat -an | grep " + Server.port + "' on your shell to spot that connection");
         } finally {
             /* Tanquem la comunicacio amb el client */
             try {

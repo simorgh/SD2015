@@ -30,11 +30,20 @@ public class ServerCLI {
     private String[] args = null;
     private final Options options;
     
+    private static final int MINPORT = 1024;
+    private static final int MAXPORT = 65535;
+    
     /* variables to be returned */
     private File deckfile;
     private int port;
     private int bet;
 
+    /**
+     * Class constructor.
+     * Here we add all the CLI required arguments as a keys for the hash map. After that the parse
+     * is automatically executed to verify all the associated argument values.  
+     * @param args 
+     */
     public ServerCLI (String[] args) {
         this.options = new Options();
         this.args = args;
@@ -47,7 +56,9 @@ public class ServerCLI {
     }
     
     /**
-     * 
+     * Command line argument parser from org.apache.commons.
+     * Used  to patch each value as hash key-value.
+     * It allows us to put arguments in any order.
      */
     private void parse() {
         CommandLineParser parser = new BasicParser();
@@ -62,6 +73,10 @@ public class ServerCLI {
             /* validate that 'port' has been set */
             if (cmd.hasOption("p")) {
                 this.port = Integer.parseInt(cmd.getOptionValue("p"));
+                if(this.port < MINPORT ||this.port > MAXPORT){
+                    log.log(Level.SEVERE, "Port value out of range: "+ this.port);
+                    System.exit(4);   
+                }
             } else {
                 log.log(Level.SEVERE, "Missing 'port' option");
                 help();
@@ -70,6 +85,10 @@ public class ServerCLI {
             /* validate that 'starting bet' has been set */
             if(cmd.hasOption("b")) {
                 this.bet = Integer.parseInt(cmd.getOptionValue("b"));
+                if(this.bet < 0){
+                     log.log(Level.SEVERE, "Starting bet must be a positive value");
+                     System.exit(3);
+                }
             } else {
                 log.log(Level.SEVERE, "Missing 'starting_bet' option");
                 help();
@@ -81,21 +100,25 @@ public class ServerCLI {
                 deckfile = new File(cmd.getOptionValue("f"));
                 if(!deckfile.exists() || deckfile.isDirectory()) {
                     log.log(Level.SEVERE, "Wrong filename path: {0}", cmd.getOptionValue("f"));
+                    System.exit(2);
                 }
                 
             } else {
                 log.log(Level.SEVERE, "Missing 'deckfile' option");
                 help();
             }
-            
+        
+        } catch (NumberFormatException e){
+            log.log(Level.SEVERE, "Failed to convert arg to Number. Make sure your input is correct.");
+            System.exit(1);    
         } catch(ParseException e) {
-            log.log(Level.SEVERE, "Failed to parse comand line properties", e);
+            log.log(Level.SEVERE, "Failed to parse comand line properties");
             help();
         }
     }
 
     /**
-     * Prints out some help (Usage)
+     * Prints out some help (Usage).
      */
     private void help() {
         HelpFormatter formater = new HelpFormatter();
@@ -104,15 +127,27 @@ public class ServerCLI {
         System.exit(0);
     }
     
-    
+    /**
+     * Deckfile getter.
+     * 
+     * @return Returns a file, the deck is read from. 
+     */
     public File getDeckfile(){
         return this.deckfile;
     }
     
+    /**
+     * Connection port getter.
+     * @return Returns the port to establish connection at.
+     */
     public int getPort(){
         return this.port;
     }
     
+    /**
+     * Starting bet getter.
+     * @return Returns the value of the starting bet binded to the server. 
+     */
     public int getStartingBet(){
         return this.bet;
     }
