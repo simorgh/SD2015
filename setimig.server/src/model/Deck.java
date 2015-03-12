@@ -51,23 +51,24 @@ public class Deck {
      * @return
      * @throws IOException 
      */
+
     private ArrayList readDeckFile(File fin) throws IOException, InvalidDeckFileException {
-        ArrayList deck = new ArrayList();
-	FileInputStream fis = new FileInputStream(fin);
- 
-	//Construct BufferedReader from InputStreamReader
-	BufferedReader br = new BufferedReader(new InputStreamReader(fis));
- 
-	String line = null;
-	while ((line = br.readLine()) != null) {
-            if (line.matches(DECK_REGEX)){
-                System.out.println("\t- Added card "+line);
-                deck.add(line);
-            }else throw new InvalidDeckFileException();
-	}
-        
-	br.close();
-        return deck; 
+        ArrayList <String> deck = new ArrayList();
+		FileInputStream fis = new FileInputStream(fin);
+	 
+		//Construct BufferedReader from InputStreamReader
+		BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+	 
+		String line;
+		while ((line = br.readLine()) != null) {
+				if (line.matches(DECK_REGEX)){
+					System.out.println("\t- Added card "+line);
+					deck.add(line);
+				}else throw new InvalidDeckFileException();
+		}
+			
+		br.close();
+		return deck; 
     }
     
     /**

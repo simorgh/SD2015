@@ -5,7 +5,6 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import model.Game;
-import utils.ClientCLI;
 import utils.Protocol;
 import view.Console;
 
@@ -13,25 +12,41 @@ import view.Console;
  *
  * @author simorgh & dzigor92
  */
-public class Client {
+public class ClientController {
     private static final String ERROR_OPT = "!! Wrong option. Please enter a valid action.";
-
+    
+    /* Client constant arg-relationed variables */
+    private final String nomMaquina;
+    private final int port;
+    private final float topcard;
+    
+    
     /**
-     * @param args the command line arguments
+     * Default main Constructor.
+     * -------------------------
+     * Gets overrided org.apache.commonds.CLI implementation 'ClientCLI'
+     * to parse and control over all possible arguements as a HashMap.
+     * @param server
+     * @param port
+     * @param topcard
+     * @see src/controller/ClientCLI.java
      */
-    public static void main(String[] args) {
+    public ClientController(String server, int port, float topcard){
+        this.nomMaquina = server;
+        this.port = port;
+        this.topcard = topcard;
+    }
+    
+    
+    /**
+     * starts a new client connection
+     */
+    public void start() {
         Console console = new Console();
         Game g;
         Socket socket = null;
         Protocol pr;
-        
-        
-        /* Command Line arguments threatment */
-        ClientCLI cli = new ClientCLI(args);
-        String nomMaquina = cli.getServer();
-        int port = cli.getPort();
-        float topcard = cli.getTopCard();
-        
+
         try{
             socket = new Socket(InetAddress.getByName(nomMaquina), port); // Obrim una connexio amb el servidor
             console.showConnection(socket);
@@ -86,7 +101,7 @@ public class Client {
                         end = true;
                         break;
                     default: 
-                        console.printError(Client.ERROR_OPT);
+                        console.printError(ClientController.ERROR_OPT);
                         break;
                 }  
             } while(!end);
@@ -113,7 +128,7 @@ public class Client {
   
     
     /**
-     * Autoplay option choser. The method implements the behaviour that the automatic Client will
+     * Autoplay option choser. The method implements the behaviour that the automatic ClientController will
      * follow when topcard option is activated.
      * 
      * @param currentScore Current client's score.

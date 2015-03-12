@@ -167,7 +167,7 @@ public class Protocol extends utils.ComUtils{
             
             // card caption
             card = new char[2];
-            card[0] = read_char();
+            card[0] = Character.toLowerCase(read_char());
             card[1] = Character.toLowerCase(read_char());
             
         } catch (IOException ex) {
@@ -213,7 +213,7 @@ public class Protocol extends utils.ComUtils{
             int i = read_int32(); 
             char[] card = new char[2];
             for(int j = 0; j < i; j++){
-                card[0] = read_char();   
+                card[0] = Character.toLowerCase(read_char());   
                 card[1] = Character.toLowerCase(read_char());
                 bank_resume.add(new String(card)); 
             }
