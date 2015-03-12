@@ -75,7 +75,7 @@ public class Server implements Runnable {
             }
 
         } catch (IOException ex) {
-            System.out.println("Unable to establish connection through the port: "+Server.port
+            System.out.println("Unable to establish connection through the port: " + Server.port
                     + ": Port might be protected or already being used.\n"
                     + "Run 'netstat -an | grep " + Server.port + "' on your shell to spot that connection");
         } finally {
@@ -94,7 +94,7 @@ public class Server implements Runnable {
     @Override
     public void run() {
         try {
-            this.pr = new Protocol(this.csocket); /* Associem un flux d'entrada/sortida amb el client */
+            this.pr = new Protocol(this.csocket, true); /* Associem un flux d'entrada/sortida amb el client */
         } catch (IOException ex) {
             Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
         }

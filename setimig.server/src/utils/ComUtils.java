@@ -7,8 +7,8 @@ public class ComUtils {
     /* Mida d'una cadena de caracters */
     private final int STRSIZE = 40;
     /* Objectes per escriure i llegir dades */
-    private DataInputStream dis;
-    private DataOutputStream dos;
+    private final DataInputStream dis;
+    private final DataOutputStream dos;
 
     public ComUtils(File file) throws IOException {
         dis = new DataInputStream(new FileInputStream(file));
@@ -190,7 +190,6 @@ public class ComUtils {
         byte buffer[]=new byte[len];
 
         for(int i=0; i<len; i++) {
-            System.out.print(str.charAt(i));
             buffer[i] = (byte) str.charAt(i);
         }
 

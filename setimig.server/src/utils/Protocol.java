@@ -8,11 +8,13 @@
  */
 package utils;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,6 +24,7 @@ import java.util.logging.Logger;
  * @author simorgh & dzigor92
  */
 public class Protocol extends utils.ComUtils{
+    
     /* Protocol Commands Semantics */
     public static final String START = "STRT";
     public static final String DRAW = "DRAW";
@@ -38,22 +41,20 @@ public class Protocol extends utils.ComUtils{
     private final String ERR_SYNTAX = "Syntax error";
     //TODO more ERR definitions comes here...
     
-    /**
-     * Class constructor. Uses a file.
-     * @param file
-     * @throws IOException 
-     */
-    public Protocol(File file) throws IOException {
-        super(file); 
-    }
+    private boolean verbose = false;
+    private PrintWriter log_writer;
     
     /**
      * Class constructor. Uses a socket.
      * @param socket
+     * @param verbose  if true, it will create a verbose log which offers full trace information about the S/C communication.
      * @throws IOException 
      */
-    public Protocol(Socket socket) throws IOException {
+    public Protocol(Socket socket, boolean verbose) throws IOException {
         super(socket);
+        if(this.verbose = verbose){
+            this.log_writer = new PrintWriter("Server"+Thread.currentThread().getName()+".log", "UTF-8");
+        }
     }
     
     /* support method */
@@ -78,6 +79,7 @@ public class Protocol extends utils.ComUtils{
         sendHeader(Protocol.STARTING_BET);
         write_char(' ');
         write_int32(bet);
+        if(verbose) this.log_writer.print("\nS: " + Protocol.STARTING_BET + ' ' + bet);
     }
     
    /**
@@ -95,6 +97,7 @@ public class Protocol extends utils.ComUtils{
         write_char(' ');
         write_char(D);
         write_char(Character.toLowerCase(P));
+        if(verbose) this.log_writer.print("\nS: " + Protocol.CARD + ' ' + D + Character.toLowerCase(P));
     }
     
     /**
@@ -108,6 +111,7 @@ public class Protocol extends utils.ComUtils{
      */
     public void sendBusting() throws IOException{
        sendHeader(Protocol.BUSTING);
+       if(verbose) this.log_writer.print("\nS: " + Protocol.BUSTING);
     }
     
     /**
@@ -128,14 +132,15 @@ public class Protocol extends utils.ComUtils{
         write_char(' ');
         write_int32(number);
         
+        if(verbose) this.log_writer.print("\nS: " + Protocol.BANK_SCORE + ' ' + number);
         for (char[] c : cards) {
-            System.out.print(c[0] + "" + c[1] + " ");
+            if(verbose) this.log_writer.print(c[0] + "" + c[1]);
             write_char(c[0]);
             write_char(Character.toLowerCase(c[1]));
         }
-       
-        //System.out.println("\n@sendBankScore -> " + customFormat(score));
+        
         sendHeader(customFormat(score));
+        if(verbose) this.log_writer.print(' ' + customFormat(score));
     }
     
     /**
@@ -156,6 +161,10 @@ public class Protocol extends utils.ComUtils{
         sendHeader(Protocol.GAINS);
         write_char(' ');
         write_int32(gains);
+        if(verbose){
+            this.log_writer.print("\nS: " + Protocol.GAINS + ' ' + gains);
+            this.log_writer.close();
+        }
     }
     
     /**
@@ -172,8 +181,6 @@ public class Protocol extends utils.ComUtils{
      * @throws java.io.IOException
      */
     public void sendError(int code) throws IOException{
-        //TODO Define & Switch for error codes
-        
         sendHeader(Protocol.ERROR);
         write_char(' ');
         write_string_variable(2, this.ERR_SYNTAX);
@@ -189,11 +196,10 @@ public class Protocol extends utils.ComUtils{
      * Protocol command header reading.
      * @return The read header.
      * @throws IOException
-     */  
+     */
     public String readHeader() throws IOException{
         String header = read_string_command();
-        System.out.println("\nRECEIVED: " + header);
-        
+        if(verbose) this.log_writer.print("\nC: " + header);
         return header;
     }
     
@@ -204,7 +210,7 @@ public class Protocol extends utils.ComUtils{
      */
     public boolean recieveStart(){
         try {
-            String cmd = read_string_command();
+            String cmd = readHeader();
             if((cmd.toUpperCase()).equals(Protocol.START)) return true;
         } catch (IOException ex) {
             Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
@@ -224,6 +230,7 @@ public class Protocol extends utils.ComUtils{
         try {
             if( !(read_char() == ' ') ) return -1;
             raise = read_int32();
+            if(verbose) this.log_writer.print(" " + raise);
         } catch (IOException ex) {
             Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -236,10 +243,12 @@ public class Protocol extends utils.ComUtils{
      * @return Formatted float as a String
      */
     private String customFormat( float value ) {
-        DecimalFormat myFormatter = new DecimalFormat("00.0");
+        DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.ENGLISH);
+        otherSymbols.setDecimalSeparator('.');
+        DecimalFormat myFormatter = new DecimalFormat("00.0", otherSymbols);
         String output = myFormatter.format(value);
+        
         return output;
     }
-
 
 }
