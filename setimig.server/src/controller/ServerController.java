@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.Deck;
 import model.Game;
+import utils.InvalidDeckFileException;
 import utils.Protocol;
 
 
@@ -77,6 +78,8 @@ public class ServerController implements Runnable {
         try {
             this.deck = new Deck(this.deckfile);
         } catch (IOException ex) {
+            Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidDeckFileException ex) {
             Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null, ex);
         }
         
