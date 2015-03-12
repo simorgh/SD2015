@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import utils.InvalidDeckFileException;
 
 
 /**
@@ -20,13 +21,16 @@ import java.util.Collections;
 public class Deck {
     private ArrayList<String> cards;
     
+    private final String DECK_REGEX = "[1-7cCrRsS][oOcCeEbB]";
+    
     /**
      * Deck constructor.
      * Called once when server it's created. Following threads should use second constructor.
      * @param file
      * @throws IOException 
+     * @throws utils.InvalidDeckFileException 
      */
-    public Deck(File file) throws IOException{
+    public Deck(File file) throws IOException, InvalidDeckFileException{
         this.cards = readDeckFile(file);
     } 
     
@@ -47,7 +51,7 @@ public class Deck {
      * @return
      * @throws IOException 
      */
-    private ArrayList readDeckFile(File fin) throws IOException {
+    private ArrayList readDeckFile(File fin) throws IOException, InvalidDeckFileException {
         ArrayList deck = new ArrayList();
 	FileInputStream fis = new FileInputStream(fin);
  
@@ -56,8 +60,10 @@ public class Deck {
  
 	String line = null;
 	while ((line = br.readLine()) != null) {
-            System.out.println("\t- Added card "+line);
-            deck.add(line);
+            if (line.matches(DECK_REGEX)){
+                System.out.println("\t- Added card "+line);
+                deck.add(line);
+            }else throw new InvalidDeckFileException();
 	}
         
 	br.close();
