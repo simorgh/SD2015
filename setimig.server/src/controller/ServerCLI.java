@@ -7,7 +7,7 @@
  * 
  */
 
-package utils;
+package controller;
 
 import java.io.File;
 import java.util.logging.Level;
@@ -30,8 +30,8 @@ public class ServerCLI {
     private String[] args = null;
     private final Options options;
     
-    private static final int MINPORT = 1024;
-    private static final int MAXPORT = 65535;
+    private final int MINPORT = 1024;
+    private final int MAXPORT = 65535;
     
     /* variables to be returned */
     private File deckfile;
@@ -45,6 +45,8 @@ public class ServerCLI {
      * @param args 
      */
     public ServerCLI (String[] args) {
+        //this.port = 1212; /* As protocol specefies let's assume by default we'll be working on 1212 port */
+        
         this.options = new Options();
         this.args = args;
         options.addOption("h", "help", false, "show help.");
@@ -64,7 +66,7 @@ public class ServerCLI {
         CommandLineParser parser = new BasicParser();
         
         // parse the command line arguments
-        CommandLine cmd = null;
+        CommandLine cmd;
         try {
             cmd = parser.parse(options, args);
             
@@ -74,7 +76,7 @@ public class ServerCLI {
             if (cmd.hasOption("p")) {
                 this.port = Integer.parseInt(cmd.getOptionValue("p"));
                 if(this.port < MINPORT ||this.port > MAXPORT){
-                    log.log(Level.SEVERE, "Port value out of range: "+ this.port);
+                    log.log(Level.SEVERE, "Port value out of range: {0}", this.port);
                     System.exit(4);   
                 }
             } else {

@@ -7,7 +7,7 @@
  * 
  */
 
-package utils;
+package controller;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

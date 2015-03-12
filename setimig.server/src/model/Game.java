@@ -6,12 +6,11 @@ import java.util.ArrayList;
  *
  * @author simorgh & dzigor92
  */
-
 public class Game {
-    private final Deck deck;
+    private Deck deck;
     
-    private ArrayList handBank;
-    private ArrayList handPlayer;
+    private final ArrayList handBank;
+    private final ArrayList handPlayer;
     private float playerScore;
     private float bankScore;
     private int bet;
@@ -32,7 +31,7 @@ public class Game {
         this.handBank = new ArrayList();
         this.handPlayer = new ArrayList();
         this.cont = 0;
-        //this.deck.shuffle(); //unused due to testing issues
+        //this.deck.shuffle(); /* unused due to testing issues */
     }
 
     /**
@@ -66,9 +65,7 @@ public class Game {
      */
     private float getCardValue(char D){
         if (Character.isDigit(D)) return (float)Character.getNumericValue(D);
-        else{
-            return (float)0.5;
-        }      
+        else return (float)0.5;  
     }
     
     /**
@@ -94,7 +91,7 @@ public class Game {
      * @param value 
      */
     public void raiseBet(int value){
-        this.bet+= value;
+        this.bet += value;
     }
 
     /**
@@ -193,7 +190,7 @@ public class Game {
     private Deck deepCopy(Deck source) {
         ArrayList <String> clone = new ArrayList();
         for (String card : source.getCards()) clone.add(card);
-        return new Deck(clone);  
+        return new Deck(clone);
     }
     
 }

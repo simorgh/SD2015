@@ -48,13 +48,13 @@ public class Deck {
      * @throws IOException 
      */
     private ArrayList readDeckFile(File fin) throws IOException {
-        ArrayList deck = new ArrayList();
+        ArrayList <String> deck = new ArrayList();
 	FileInputStream fis = new FileInputStream(fin);
  
 	//Construct BufferedReader from InputStreamReader
 	BufferedReader br = new BufferedReader(new InputStreamReader(fis));
  
-	String line = null;
+	String line;
 	while ((line = br.readLine()) != null) {
             System.out.println("\t- Added card "+line);
             deck.add(line);

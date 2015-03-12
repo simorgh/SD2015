@@ -95,9 +95,9 @@ public class Protocol extends utils.ComUtils{
     public void sendCard(char D, char P) throws IOException{
         sendHeader(Protocol.CARD);
         write_char(' ');
-        write_char(D);
+        write_char(Character.toLowerCase(D));
         write_char(Character.toLowerCase(P));
-        if(verbose) this.log_writer.print("\nS: " + Protocol.CARD + ' ' + D + Character.toLowerCase(P));
+        if(verbose) this.log_writer.print("\nS: " + Protocol.CARD + ' ' + Character.toLowerCase(D) + Character.toLowerCase(P));
     }
     
     /**
@@ -135,7 +135,7 @@ public class Protocol extends utils.ComUtils{
         if(verbose) this.log_writer.print("\nS: " + Protocol.BANK_SCORE + ' ' + number);
         for (char[] c : cards) {
             if(verbose) this.log_writer.print(c[0] + "" + c[1]);
-            write_char(c[0]);
+            write_char(Character.toLowerCase(c[0]));
             write_char(Character.toLowerCase(c[1]));
         }
         
