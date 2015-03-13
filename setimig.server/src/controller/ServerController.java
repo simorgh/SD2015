@@ -1,12 +1,13 @@
 /**
- * MultiThreat Server.
- *
+ * MultiThreat Server Controller
  */
 
 package controller;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 //import java.util.concurrent.TimeoutException;
@@ -63,8 +64,8 @@ public class ServerController implements Runnable {
      * @see src/controller/ServerCLI.java
      */
     public ServerController(int strt_bet, int port, File deckfile ){
-        this.strt_bet = strt_bet;
-        this.port = port;
+        ServerController.strt_bet = strt_bet;
+        ServerController.port = port;
         this.deckfile = deckfile;
     }
         
@@ -76,16 +77,15 @@ public class ServerController implements Runnable {
         ServerSocket serverSocket = null;
         
         try {
-            this.deck = new Deck(this.deckfile);
-        } catch (IOException ex) {
+            ServerController.deck = new Deck(this.deckfile);
+        } catch (IOException | InvalidDeckFileException ex) {
             Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InvalidDeckFileException ex) {
-            Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(1);
         }
         
         try{
-            serverSocket = new ServerSocket(this.port);  /* Creem el servidor */
-            System.out.println("Servidor socket preparat al port " + this.port);
+            serverSocket = new ServerSocket(ServerController.port);  /* Creem el servidor */
+            System.out.println("Servidor socket preparat al port " + ServerController.port);
 
             while (true) {
                 System.out.println("Esperant una connexio d'un client...");
@@ -97,9 +97,9 @@ public class ServerController implements Runnable {
             }
 
         } catch (IOException ex) {
-            System.out.println("Unable to establish connection through the port: " + this.port
+            System.out.println("Unable to establish connection through the port: " + ServerController.port
                     + ": Port might be protected or already being used.\n"
-                    + "Run 'netstat -an | grep " + this.port + "' on your shell to spot that connection");
+                    + "Run 'netstat -an | grep " + ServerController.port + "' on your shell to spot that connection");
         } finally {
             /* Tanquem la comunicacio amb el client */
             try {
@@ -109,7 +109,6 @@ public class ServerController implements Runnable {
             }
         }
         
-
     } // fi del main
 
     
@@ -117,16 +116,18 @@ public class ServerController implements Runnable {
     
     @Override
     public void run() {
+        OutputStream logout;
         try {
-            this.pr = new Protocol(this.csocket, true); /* Associem un flux d'entrada/sortida amb el client */
+            logout = new FileOutputStream("Server"+Thread.currentThread().getName()+".log");
+            this.pr = new Protocol(this.csocket, logout); /* Associem un flux d'entrada/sortida amb el client */
         } catch (IOException ex) {
             Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        this.g = new Game(this.deck, this.strt_bet); /* creates new (shuffled) game */
+        this.g = new Game(ServerController.deck, ServerController.strt_bet); /* creates new (shuffled) game */
         this.pr.recieveStart();
         try {
-            this.pr.sendStartingBet(this.strt_bet);
+            this.pr.sendStartingBet(ServerController.strt_bet);
         } catch (IOException ex) {
             Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
@@ -143,7 +144,7 @@ public class ServerController implements Runnable {
         /* game loop */       
         this.end = false;
         do{
-            String cmd = null;
+            String cmd = "";
             if(this.csocket.isClosed()) this.end = true;
             try {
                 cmd = this.pr.readHeader();
@@ -216,5 +217,5 @@ public class ServerController implements Runnable {
     
     
     
-    
+
 }

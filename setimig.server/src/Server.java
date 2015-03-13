@@ -1,9 +1,15 @@
+////////////////////////////////////////////////////
+//  Distributed Computing Software (UB) [TASK 1]  //
+// ---------------------------------------------- //
+//   'seven and a half' - Multithreading Server   //
+////////////////////////////////////////////////////
+
 import controller.ServerCLI;
 import controller.ServerController;
 
 /**
  *
- * @author simorgh
+ * @author simorgh & dzigor92
  */
 public class Server {
 

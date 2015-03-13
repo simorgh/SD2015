@@ -1,3 +1,7 @@
+/**
+ * Client Controller
+ */
+
 package controller;
 
 import java.io.IOException;
@@ -9,7 +13,6 @@ import utils.Protocol;
 import view.Console;
 
 /**
- *
  * @author simorgh & dzigor92
  */
 public class ClientController {

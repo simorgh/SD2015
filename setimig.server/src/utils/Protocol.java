@@ -9,6 +9,7 @@
 package utils;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.text.DecimalFormat;
@@ -30,31 +31,29 @@ public class Protocol extends utils.ComUtils{
     public static final String DRAW = "DRAW";
     public static final String ANTE = "ANTE";
     public static final String PASS = "PASS";
-    public static final String STARTING_BET = "STBT";        
+    public static final String STARTING_BET = "STBT";
     public static final String CARD = "CARD";
     public static final String BUSTING = "BSTG";
     public static final String BANK_SCORE = "BKSC";
     public static final String GAINS = "GAIN";
     public static final String ERROR = "ERRO";
 
+    
     /* Protocol Error Messages */
     private final String ERR_SYNTAX = "Syntax error";
     //TODO more ERR definitions comes here...
     
-    private boolean verbose = false;
-    private PrintWriter log_writer;
+    private final PrintWriter log;
     
     /**
-     * Class constructor. Uses a socket.
+     * Class constructor.
      * @param socket
-     * @param verbose  if true, it will create a verbose log which offers full trace information about the S/C communication.
+     * @param out - OutputStream used to write trace information about S/C communication.
      * @throws IOException 
      */
-    public Protocol(Socket socket, boolean verbose) throws IOException {
+    public Protocol(Socket socket, OutputStream out) throws IOException {
         super(socket);
-        if(this.verbose = verbose){
-            this.log_writer = new PrintWriter("Server"+Thread.currentThread().getName()+".log", "UTF-8");
-        }
+        this.log = new PrintWriter(out, true); /* autoflushing enabled */
     }
     
     /* support method */
@@ -79,7 +78,8 @@ public class Protocol extends utils.ComUtils{
         sendHeader(Protocol.STARTING_BET);
         write_char(' ');
         write_int32(bet);
-        if(verbose) this.log_writer.print("\nS: " + Protocol.STARTING_BET + ' ' + bet);
+        
+        this.log.println("\nS: " + Protocol.STARTING_BET + ' ' + bet);
     }
     
    /**
@@ -97,7 +97,8 @@ public class Protocol extends utils.ComUtils{
         write_char(' ');
         write_char(Character.toLowerCase(D));
         write_char(Character.toLowerCase(P));
-        if(verbose) this.log_writer.print("\nS: " + Protocol.CARD + ' ' + Character.toLowerCase(D) + Character.toLowerCase(P));
+        
+        this.log.println("\nS: " + Protocol.CARD + ' ' + Character.toLowerCase(D) + Character.toLowerCase(P));
     }
     
     /**
@@ -111,7 +112,7 @@ public class Protocol extends utils.ComUtils{
      */
     public void sendBusting() throws IOException{
        sendHeader(Protocol.BUSTING);
-       if(verbose) this.log_writer.print("\nS: " + Protocol.BUSTING);
+       this.log.println("\nS: " + Protocol.BUSTING);
     }
     
     /**
@@ -132,15 +133,16 @@ public class Protocol extends utils.ComUtils{
         write_char(' ');
         write_int32(number);
         
-        if(verbose) this.log_writer.print("\nS: " + Protocol.BANK_SCORE + ' ' + number);
+        this.log.print("\nS: " + Protocol.BANK_SCORE + ' ' + number);
         for (char[] c : cards) {
-            if(verbose) this.log_writer.print(c[0] + "" + c[1]);
+            this.log.print(c[0] + "" + c[1]);
             write_char(Character.toLowerCase(c[0]));
             write_char(Character.toLowerCase(c[1]));
         }
         
         sendHeader(customFormat(score));
-        if(verbose) this.log_writer.print(' ' + customFormat(score));
+        this.log.println(' ' + customFormat(score));
+        
     }
     
     /**
@@ -161,10 +163,8 @@ public class Protocol extends utils.ComUtils{
         sendHeader(Protocol.GAINS);
         write_char(' ');
         write_int32(gains);
-        if(verbose){
-            this.log_writer.print("\nS: " + Protocol.GAINS + ' ' + gains);
-            this.log_writer.close();
-        }
+        
+        this.log.println("S: " + Protocol.GAINS + ' ' + gains);
     }
     
     /**
@@ -199,7 +199,8 @@ public class Protocol extends utils.ComUtils{
      */
     public String readHeader() throws IOException{
         String header = read_string_command();
-        if(verbose) this.log_writer.print("\nC: " + header);
+        this.log.print("C: " + header);
+
         return header;
     }
     
@@ -230,7 +231,7 @@ public class Protocol extends utils.ComUtils{
         try {
             if( !(read_char() == ' ') ) return -1;
             raise = read_int32();
-            if(verbose) this.log_writer.print(" " + raise);
+            this.log.println(" " + raise);
         } catch (IOException ex) {
             Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
         }

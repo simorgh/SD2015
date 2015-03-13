@@ -1,10 +1,15 @@
+////////////////////////////////////////////////////
+//  Distributed Computing Software (UB) [TASK 1]  //
+// ---------------------------------------------- //
+//         'seven and a half' - Client            //
+////////////////////////////////////////////////////
+
 import controller.ClientCLI;
 import controller.ClientController;
 
-
 /**
  *
- * @author simorgh
+ * @author simorgh & dzigor92
  */
 public class Client {
 
