@@ -17,11 +17,12 @@ import java.util.Scanner;
 public class Console {
     
     /* View error messages */
-    public static final String ERR_01 =  "ERROR: Wrong option. Please enter a valid action.";
-    public static final String ERR_02 =     "ERROR: There was a problem trying to close the socket connection.";
-    public static final String ERR_03 =     "ERROR: The last card has been received before. The game is now aborted.";
-    public static final String ERR_04 =     "ERROR: A problem with the server appeared - Closing now the connection.";
-    public static final String ERR_05 =     "ERROR: Cannot communicate the message to the server. Connection interrupted.";        
+    public static final String ERR_01 = "ERROR: Wrong option. Please enter a valid action.";
+    public static final String ERR_02 = "ERROR: There was a problem trying to close the socket connection.";
+    public static final String ERR_03 = "ERROR: The last card has been received before. The game is now aborted.";
+    public static final String ERR_04 = "ERROR: A problem with the server appeared - Closing now the connection.";
+    public static final String ERR_05 = "ERROR: Cannot communicate the message to the server. Connection interrupted.";        
+    public static final String ERR_06 = "ERROR: Syntax error detected - Proceding to comunicate to server.";
     
     /* SingleTone pattern */
     private static Console instance = null; 
@@ -44,18 +45,7 @@ public class Console {
             instance = new Console();
         }
         return instance;
-    }
-
-    /*
-    public void printWelcome(){
-        System.out.println(".------.------.------.     .------.     .------.------.------.\n" +
-            "|S.--. |E.--. |T.--. |.-.  |I.--. |.-.  |M.--. |I.--. |G.--. |\n" +
-            "| :/\\: | (\\/) | :/\\: ((5)) | (\\/) ((5)) | (\\/) | (\\/) | :/\\: |\n" +
-            "| :\\/: | :\\/: | (__) |'-.-.| :\\/: |'-.-.| :\\/: | :\\/: | :\\/: |\n" +
-            "| '--'S| '--'E| '--'T| ((1)| '--'I| ((1)| '--'M| '--'I| '--'G|\n" +
-            "`------`------`------'  '-'`------'  '-'`------`------`------'");
-    }
-*/    
+    }  
     
     /**
      * Method to print the predefined welcome message.
@@ -162,7 +152,6 @@ public class Console {
             
         System.out.println("► GAINS: " + gains + " "+ feedback);
     }
-    
     
     /**
      * Desc. Customizes the format of the float to %2.1 

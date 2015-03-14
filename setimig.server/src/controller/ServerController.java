@@ -15,9 +15,8 @@ import java.util.logging.Logger;
 import model.Deck;
 import model.Game;
 import utils.InvalidDeckFileException;
-import utils.Protocol;
+import utils.ServerProtocol;
 //import java.util.concurrent.TimeoutException;
-
 
 /**
  * @author simorgh & dzigor92
@@ -36,7 +35,7 @@ public class ServerController implements Runnable {
     
     /* Game encapsulated fields */
     private Game g;
-    private Protocol pr;
+    private ServerProtocol pr;
     private Boolean end;
     
     /** 
@@ -121,9 +120,9 @@ public class ServerController implements Runnable {
         OutputStream logout = null;
         try {
             logout = new FileOutputStream("Server"+Thread.currentThread().getName()+".log");
-            this.pr = new Protocol(this.csocket, logout); /* binding IO stream to client */
+            this.pr = new ServerProtocol(this.csocket, logout); /* binding IO stream to client */
         } catch (IOException ex) {
-            this.pr.sendError(Protocol.ERR_SSE);
+            this.pr.sendError(ServerProtocol.ERR_SSE);
             System.out.println("ERROR: Failed to open logfile OutputStream. - Connection aborted.");
             try {
                 this.csocket.close();
@@ -137,7 +136,7 @@ public class ServerController implements Runnable {
         try {
             String aux;
             aux = this.pr.receiveStart();
-            if( aux.equals(Protocol.ERROR) ){
+            if( aux.equals(ServerProtocol.ERROR) ){
                 this.pr.receiveErrorDescription();
                 closeAll(logout);
             }
@@ -145,15 +144,15 @@ public class ServerController implements Runnable {
             this.pr.sendStartingBet(ServerController.strt_bet);
             aux = this.pr.readHeader();
             switch (aux) {
-                case Protocol.DRAW:
+                case ServerProtocol.DRAW:
                     serveCard(); /* if the protocol is followed, normal flow should get here */
                     break;
-                case Protocol.ERROR:
+                case ServerProtocol.ERROR:
                     this.pr.receiveErrorDescription();
                     closeAll(logout);
                     break;
                 default:    /* any other valid 'header' is received -> the protocol is broken! */
-                    this.pr.sendError(Protocol.ERR_SYNTAX);
+                    this.pr.sendError(ServerProtocol.ERR_SYNTAX);
                     closeAll(logout);
                     break;
             }
@@ -166,26 +165,27 @@ public class ServerController implements Runnable {
                 
                 cmd = this.pr.readHeader();
                 switch(cmd) {
-                    case Protocol.DRAW:
+                    case ServerProtocol.DRAW:
                         serveCard(); 
                         break;
 
-                    case Protocol.ANTE:
+                    case ServerProtocol.ANTE:
                         int raise = pr.receiveRaise();
                         this.g.raiseBet(raise);
                         break;
 
-                    case Protocol.PASS:
+                    case ServerProtocol.PASS:
                         this.end = true;
                         break;
                     
-                    case Protocol.ERROR:
+                    case ServerProtocol.ERROR:
                         this.pr.receiveErrorDescription();
+                        System.out.println("ERROR Message received. Connection closed");
                         closeAll(logout);
                         break;
                         
                     default:    /* other valid 'header' (STRT) is received -> the protocol is broken! */
-                        this.pr.sendError(Protocol.ERR_SYNTAX);
+                        this.pr.sendError(ServerProtocol.ERR_SYNTAX);
                         closeAll(logout);
                         break;
                 }
@@ -200,6 +200,8 @@ public class ServerController implements Runnable {
         /* syntax error treatment */
         } catch (IOException ex) {
             System.out.println("ERROR: Client message has Syntax Error - Connection aborted.");
+            this.pr.sendError(ServerProtocol.ERR_SYNTAX);
+            //ex.printStackTrace();
         } finally {
             closeAll(logout);
         }

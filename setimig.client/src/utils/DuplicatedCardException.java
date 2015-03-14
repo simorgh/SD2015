@@ -1,7 +1,6 @@
 package utils;
 
 /**
- *
  * @author simorgh & dzigor92
  */
 public class DuplicatedCardException extends Exception {

@@ -20,9 +20,9 @@ import java.util.Locale;
 /**
  * @author simorgh & dzigor92
  */
-public class Protocol extends utils.ComUtils{
+public class ServerProtocol extends utils.ComUtils{
     
-    /* Protocol Commands Semantics */
+    /* ServerProtocol Commands Semantics */
     public static final String START = "STRT";
     public static final String DRAW = "DRAW";
     public static final String ANTE = "ANTE";
@@ -34,7 +34,7 @@ public class Protocol extends utils.ComUtils{
     public static final String GAINS = "GAIN";
     public static final String ERROR = "ERRO";
 
-    /* Protocol Error Messages */
+    /* ServerProtocol Error Messages */
     public static final String ERR_SYNTAX = "Syntax error";
     public static final String ERR_TIMEOUT = "Timeout exceeded";
     public static final String ERR_SSE = "Server-side error";
@@ -48,7 +48,7 @@ public class Protocol extends utils.ComUtils{
      * @param out - OutputStream used to write trace information about S/C communication.
      * @throws IOException 
      */
-    public Protocol(Socket socket, OutputStream out) throws IOException {
+    public ServerProtocol(Socket socket, OutputStream out) throws IOException {
         super(socket);
         this.log = new PrintWriter(out, true); /* autoflushing enabled */
     }
@@ -75,10 +75,10 @@ public class Protocol extends utils.ComUtils{
      */
     public boolean sendStartingBet(int bet) {
         try {
-            sendHeader(Protocol.STARTING_BET);
+            sendHeader(ServerProtocol.STARTING_BET);
             write_char(' ');
             write_int32(bet);
-            this.log.println("\nS: " + Protocol.STARTING_BET + ' ' + bet);
+            this.log.println("\nS: " + ServerProtocol.STARTING_BET + ' ' + bet);
         } catch (IOException ex) {
             return false;
         }
@@ -97,11 +97,11 @@ public class Protocol extends utils.ComUtils{
     */
     public boolean sendCard(char D, char P) {
         try {
-            sendHeader(Protocol.CARD);
+            sendHeader(ServerProtocol.CARD);
             write_char(' ');
             write_char(Character.toLowerCase(D));
             write_char(Character.toLowerCase(P));
-            this.log.println("\nS: " + Protocol.CARD + ' ' + Character.toLowerCase(D) + Character.toLowerCase(P));
+            this.log.println("\nS: " + ServerProtocol.CARD + ' ' + Character.toLowerCase(D) + Character.toLowerCase(P));
         } catch (IOException ex) {
             return false;
         }
@@ -119,8 +119,8 @@ public class Protocol extends utils.ComUtils{
      */
     public boolean sendBusting() {
         try {
-            sendHeader(Protocol.BUSTING);
-            this.log.println("\nS: " + Protocol.BUSTING);
+            sendHeader(ServerProtocol.BUSTING);
+            this.log.println("\nS: " + ServerProtocol.BUSTING);
         } catch (IOException ex) {
             return false;
         }
@@ -142,11 +142,11 @@ public class Protocol extends utils.ComUtils{
      */
     public boolean sendBankScore(int number, ArrayList <char[]> cards, float score) {
         try {
-            sendHeader(Protocol.BANK_SCORE);
+            sendHeader(ServerProtocol.BANK_SCORE);
             write_char(' ');
             write_int32(number);
             
-            this.log.print("\nS: " + Protocol.BANK_SCORE + ' ' + number);
+            this.log.print("\nS: " + ServerProtocol.BANK_SCORE + ' ' + number);
             for (char[] c : cards) {
                 this.log.print(c[0] + "" + c[1]);
                 write_char(Character.toLowerCase(c[0]));
@@ -177,10 +177,10 @@ public class Protocol extends utils.ComUtils{
      */
     public boolean sendGains(int gains) {
         try {
-            sendHeader(Protocol.GAINS);
+            sendHeader(ServerProtocol.GAINS);
             write_char(' ');
             write_int32(gains);
-            this.log.println("S: " + Protocol.GAINS + ' ' + gains);
+            this.log.println("S: " + ServerProtocol.GAINS + ' ' + gains);
         } catch (IOException ex) {
             return false;
         }
@@ -202,10 +202,10 @@ public class Protocol extends utils.ComUtils{
      */
     public boolean sendError(String err) {
         try {
-            sendHeader(Protocol.ERROR);
+            sendHeader(ServerProtocol.ERROR);
             write_char(' ');
             write_string_variable(2, err);
-            this.log.println("S: " + Protocol.ERROR + " " + String.format("%02d", err.length()) + err);
+            this.log.println("\nS: " + ServerProtocol.ERROR + " " + String.format("%02d", err.length()) + err);
         } catch (IOException ex) {
             return false;
         }
@@ -219,7 +219,7 @@ public class Protocol extends utils.ComUtils{
 //////////////////////////////////////////////////////////////
     
     /**
-     * Protocol command header reading.
+     * ServerProtocol command header reading.
      * 
      * @return read header
      * @throws IOException
@@ -241,7 +241,7 @@ public class Protocol extends utils.ComUtils{
      */
     public String receiveStart() throws IOException {
         String cmd = readHeader().toUpperCase();
-        if(!cmd.equals(Protocol.START) && !cmd.equals(Protocol.ERROR) ) throw new IOException();
+        if(!cmd.equals(ServerProtocol.START) && !cmd.equals(ServerProtocol.ERROR) ) throw new IOException();
         return cmd;
     }
 
@@ -274,14 +274,9 @@ public class Protocol extends utils.ComUtils{
      */ 
     public void receiveErrorDescription() throws IOException {
         if(!(read_char() == ' ')) throw new IOException();
-        char d1 = read_char();
-        char d2 = read_char();
-        if( !(Character.isDigit(d1)) || !(Character.isDigit(d2)) ) throw new IOException();
         
-        int len = Integer.parseInt("" + d1 + d2);
-        String des = "";
-        for(int i=0; i<len; i++) des += read_char();
-        this.log.print(" " + d1 + d2 + des);
+        String des = read_string_variable(2);
+        this.log.println(" " + String.format("%02d", des.length()) + des);
     }
     
     
@@ -309,15 +304,15 @@ public class Protocol extends utils.ComUtils{
      */
     private boolean isValidHeader(String header){
         switch (header.toUpperCase()) {
-            case Protocol.START:
+            case ServerProtocol.START:
                 return true;
-            case Protocol.DRAW:
+            case ServerProtocol.DRAW:
                 return true;
-            case Protocol.ANTE:
+            case ServerProtocol.ANTE:
                 return true;
-            case Protocol.PASS:
+            case ServerProtocol.PASS:
                 return true;
-            case Protocol.ERROR:
+            case ServerProtocol.ERROR:
                 return true;
             default: return false;
         } 

@@ -2,6 +2,7 @@ package utils;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Arrays;
 
 public class ComUtils {
     /* Mida d'una cadena de caracters */
@@ -121,7 +122,7 @@ public class ComUtils {
      * @param size
      * @return 
      */
-    public String read_string_variable(int size) throws IOException{
+    public String read_string_variable(int size) throws IOException {
         byte bHeader[]=new byte[size];
         char cHeader[]=new char[size];
         int numBytes=0;
@@ -129,7 +130,8 @@ public class ComUtils {
         // Llegim els bytes que indiquen la mida de l'string
         bHeader = read_bytes(size);
         // La mida de l'string ve en format text, per tant creem un string i el parsejem
-        for(int i=0;i<size;i++) cHeader[i]=(char)bHeader[i];
+        for(int i=0;i<size;i++) 
+            cHeader[i]=(char)bHeader[i];
         numBytes=Integer.parseInt(new String(cHeader));
 
         // Llegim l'string
@@ -137,7 +139,8 @@ public class ComUtils {
         char cStr[]=new char[numBytes];
         bStr = read_bytes(numBytes);
         for(int i=0;i<numBytes;i++)
-                cStr[i]=(char)bStr[i];
+            cStr[i]=(char)bStr[i];
+        
         return String.valueOf(cStr);
     }
     
@@ -147,7 +150,7 @@ public class ComUtils {
         // Llegim l'string
         char cStr[]=new char[numBytes];
         byte bStr[] = read_bytes(numBytes);
-        for(int i=0;i<numBytes;i++)
+        for(int i=0; i<numBytes; i++)
             cStr[i]=(char)bStr[i];
         
         return String.valueOf(cStr);

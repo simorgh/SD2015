@@ -16,8 +16,8 @@ import java.util.ArrayList;
 /**
  * @author simorgh & dzigor92
  */
-public class Protocol extends utils.ComUtils{
-    /* Protocol Commands Semantics */
+public class ClientProtocol extends utils.ComUtils{
+    /* ClientProtocol Commands Semantics */
     public static final String START = "STRT";
     public static final String DRAW = "DRAW";
     public static final String ANTE = "ANTE";
@@ -29,7 +29,7 @@ public class Protocol extends utils.ComUtils{
     public static final String GAINS = "GAIN";
     public static final String ERROR = "ERRO";
 
-    /* Protocol Error Messages */
+    /* ClientProtocol Error Messages */
     public static final String ERR_SYNTAX = "Syntax error";
     public static final String ERR_TIMEOUT = "Timeout exceeded";
     public static final String ERR_CARD = "Card already received";
@@ -39,7 +39,7 @@ public class Protocol extends utils.ComUtils{
      * @param file
      * @throws IOException 
      */
-    public Protocol(File file) throws IOException {
+    public ClientProtocol(File file) throws IOException {
         super(file);    
     }
     
@@ -48,7 +48,7 @@ public class Protocol extends utils.ComUtils{
      * @param socket
      * @throws IOException 
      */
-    public Protocol(Socket socket) throws IOException {
+    public ClientProtocol(Socket socket) throws IOException {
         super(socket);
     }
     
@@ -75,7 +75,7 @@ public class Protocol extends utils.ComUtils{
      */           
     public boolean sendStart() {
         try {
-            sendHeader(Protocol.START);
+            sendHeader(ClientProtocol.START);
         } catch (IOException ex) {
            return false;
         }
@@ -98,7 +98,7 @@ public class Protocol extends utils.ComUtils{
      */           
     public boolean sendDraw() {
         try {
-            sendHeader(Protocol.DRAW);
+            sendHeader(ClientProtocol.DRAW);
         } catch (IOException ex) {
             return false;
         }
@@ -116,7 +116,7 @@ public class Protocol extends utils.ComUtils{
      */
     public boolean sendAnte(int raise) {
         try {
-            sendHeader(Protocol.ANTE);
+            sendHeader(ClientProtocol.ANTE);
             write_char(' ');
             write_int32(raise);
         } catch (IOException ex) {
@@ -136,7 +136,7 @@ public class Protocol extends utils.ComUtils{
      */
     public boolean sendPass() {
         try {
-            sendHeader(Protocol.PASS);
+            sendHeader(ClientProtocol.PASS);
         } catch (IOException ex){
             return false;
         }
@@ -158,7 +158,7 @@ public class Protocol extends utils.ComUtils{
      */
     public boolean sendError(String err) {
         try {
-            sendHeader(Protocol.ERROR);
+            sendHeader(ClientProtocol.ERROR);
             write_char(' ');
             write_string_variable(2, err);
         } catch (IOException ex) {
@@ -180,15 +180,16 @@ public class Protocol extends utils.ComUtils{
      * 
      * @throws java.io.IOException
      * @throws utils.ProtocolErrorException
+     * @throws utils.SyntaxErrorException
      * @return The received value of the starting bet.
      */
-    public int receiveStartingBet() throws IOException, ProtocolErrorException {
+    public int receiveStartingBet() throws IOException, ProtocolErrorException, SyntaxErrorException {
         int bet;
         
         String cmd = read_string_command().toUpperCase();
-        if( cmd.equals(Protocol.ERROR) ) throw new ProtocolErrorException();
-        if(!cmd.equals(Protocol.STARTING_BET)) throw new IOException();
-        if( !(read_char() == ' ') ) throw new IOException();
+        if( cmd.equals(ClientProtocol.ERROR) ) throw new ProtocolErrorException();
+        if(!cmd.equals(ClientProtocol.STARTING_BET)) throw new SyntaxErrorException();
+        if( !(read_char() == ' ') ) throw new SyntaxErrorException();
         
         // bet caption
         bet = read_int32();
@@ -204,15 +205,16 @@ public class Protocol extends utils.ComUtils{
      * 
      * @throws java.io.IOException
      * @throws utils.ProtocolErrorException
+     * @throws utils.SyntaxErrorException
      * @return The card that has been received.
      */
-    public char[] receiveCard() throws IOException, ProtocolErrorException {
+    public char[] receiveCard() throws IOException, ProtocolErrorException, SyntaxErrorException {
         char[] card;
 
         String cmd = read_string_command().toUpperCase();
-        if( cmd.equals(Protocol.ERROR) ) throw new ProtocolErrorException();
-        if(!cmd.equals(Protocol.CARD)) throw new IOException();
-        if( !(read_char() == ' ') ) throw new IOException();
+        if( cmd.equals(ClientProtocol.ERROR) ) throw new ProtocolErrorException();
+        if(!cmd.equals(ClientProtocol.CARD)) throw new SyntaxErrorException();
+        if( !(read_char() == ' ') ) throw new SyntaxErrorException();
 
         // card caption
         card = new char[2];
@@ -228,11 +230,12 @@ public class Protocol extends utils.ComUtils{
      * 
      * @throws java.io.IOException
      * @throws utils.ProtocolErrorException
+     * @throws utils.SyntaxErrorException
      */
-    public void receiveBusting() throws IOException, ProtocolErrorException {
+    public void receiveBusting() throws IOException, ProtocolErrorException, SyntaxErrorException {
         String cmd = read_string_command().toUpperCase();
-        if( cmd.equals(Protocol.ERROR) ) throw new ProtocolErrorException();
-        if(!cmd.equals(Protocol.BUSTING)) throw new IOException();
+        if( cmd.equals(ClientProtocol.ERROR) ) throw new ProtocolErrorException();
+        if(!cmd.equals(ClientProtocol.BUSTING)) throw new SyntaxErrorException();
     }
     
     /**
@@ -245,19 +248,20 @@ public class Protocol extends utils.ComUtils{
      * 5. FLOAT indicating the score that the bank has hit is expected.
      * 
      * @throws java.io.IOException
-     * @throws utils.ProtocolErrorException 
+     * @throws utils.ProtocolErrorException
+     * @throws utils.SyntaxErrorException 
      * @return ArrayList containing the list of cards and the bank score as a String. 
      */
-    public ArrayList <String> receiveBankScore() throws IOException, ProtocolErrorException {
+    public ArrayList <String> receiveBankScore() throws IOException, ProtocolErrorException, SyntaxErrorException {
         ArrayList <String> bank_resume = new ArrayList();
         
         String cmd = read_string_command().toUpperCase();
-        if( cmd.equals(Protocol.ERROR) ) throw new ProtocolErrorException();
-        if(!cmd.equals(Protocol.BANK_SCORE)) throw new IOException();
-        if( read_char() != ' ' ) throw new IOException();
+        if( cmd.equals(ClientProtocol.ERROR) ) throw new ProtocolErrorException();
+        if(!cmd.equals(ClientProtocol.BANK_SCORE)) throw new SyntaxErrorException();
+        if( read_char() != ' ' ) throw new SyntaxErrorException();
 
         // card caption
-        int i = read_int32(); 
+        int i = read_int32();
         char[] card = new char[2];
         for(int j = 0; j < i; j++){
             card[0] = Character.toLowerCase(read_char());
@@ -266,7 +270,7 @@ public class Protocol extends utils.ComUtils{
         }
 
         String score = read_string_command();
-        if(score.length() != 4) throw new IOException();
+        if(score.length() != 4) throw new SyntaxErrorException();
         bank_resume.add(score);
 
         return bank_resume;
@@ -281,15 +285,16 @@ public class Protocol extends utils.ComUtils{
      * 
      * @throws java.io.IOException
      * @throws utils.ProtocolErrorException 
+     * @throws utils.SyntaxErrorException
      * @return The value of the gains.
      */
-    public int receiveGains() throws IOException, ProtocolErrorException {
+    public int receiveGains() throws IOException, ProtocolErrorException, SyntaxErrorException {
         int gains;
 
         String cmd = read_string_command().toUpperCase();
-        if( cmd.equals(Protocol.ERROR) ) throw new ProtocolErrorException();
-        if(!cmd.equals(Protocol.GAINS)) throw new IOException();
-        if( !(read_char() == ' ') ) throw new IOException();
+        if( cmd.equals(ClientProtocol.ERROR) ) throw new ProtocolErrorException();
+        if(!cmd.equals(ClientProtocol.GAINS)) throw new SyntaxErrorException();
+        if( !(read_char() == ' ') ) throw new SyntaxErrorException();
         gains = read_int32();
        
         return gains;
@@ -300,19 +305,13 @@ public class Protocol extends utils.ComUtils{
      * whitespace followed by 2char-digit determining lenght of the message is expected 
      * 
      * @throws java.io.IOException
+     * @throws utils.SyntaxErrorException
      * @return error description
      */
-    public String receiveErrorDescription() throws IOException {
-        String des = "";
-        
-        if(!(read_char() == ' ')) throw new IOException();
-        char d1 = read_char();
-        char d2 = read_char();
-        if( !(Character.isDigit(d1)) || !(Character.isDigit(d2)) ) throw new IOException();
-        
-        int len = Integer.parseInt("" + d1 + d2);
-        for(int i=0; i<len; i++) des += read_char();
-        return(" " + d1 + d2 + des);
+    public String receiveErrorDescription() throws IOException, SyntaxErrorException {  
+        if(!(read_char() == ' ')) throw new SyntaxErrorException();
+        String des = read_string_variable(2);
+        return(" " + String.format("%02d", des.length()) + des);
     }
 
 }

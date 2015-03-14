@@ -11,8 +11,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import model.Game;
 import utils.DuplicatedCardException;
-import utils.Protocol;
+import utils.ClientProtocol;
 import utils.ProtocolErrorException;
+import utils.SyntaxErrorException;
 import view.Console;
 
 /**
@@ -68,12 +69,12 @@ public class ClientController {
         Console console = new Console();
         Game g;
         Socket socket = null;
-        Protocol pr = null;
+        ClientProtocol pr = null;
 
         try{
             socket = new Socket(InetAddress.getByName(nomMaquina), port); // Obrim una connexio amb el servidor
             console.showConnection(socket);
-            pr = new Protocol(socket);
+            pr = new ClientProtocol(socket);
             g = new Game();
             
             console.printWelcome();
@@ -137,19 +138,21 @@ public class ClientController {
             int gain = pr.receiveGains();
             console.printGains(gain);
               
-        } catch(ProtocolErrorException e){
+        } catch(ProtocolErrorException e){ /* Error message has been sent - let's read the description and close con. */
             try {
                 String des = pr.receiveErrorDescription();
-                console.printError(Protocol.ERROR + des);
-            } catch (IOException ex) {
+                console.printError(ClientProtocol.ERROR + des);
+            } catch (IOException | SyntaxErrorException ex) {
                 console.printError(Console.ERR_02);
             }     
-        } catch(DuplicatedCardException e){
+        } catch(DuplicatedCardException e) {
             console.printError(Console.ERR_03);
-            if(!pr.sendError(Protocol.ERR_CARD)) console.printError(Console.ERR_05);
-        } catch(IOException e) {
-            console.printError(Console.ERR_04);
-            if(!pr.sendError(Protocol.ERR_SYNTAX)) console.printError(Console.ERR_05);
+            if(!pr.sendError(ClientProtocol.ERR_CARD)) console.printError(Console.ERR_05);
+        } catch(SyntaxErrorException e) { /* syntax error problem - sends Message to Server */
+            console.printError(Console.ERR_06);
+            if(!pr.sendError(ClientProtocol.ERR_SYNTAX)) console.printError(Console.ERR_05);
+        } catch(IOException e) { /* socket closed */
+            console.printError(Console.ERR_05);
         } finally {
             try {
                 if(socket != null) socket.close();
