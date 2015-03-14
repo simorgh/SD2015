@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Arrays;
 import model.Game;
+import utils.DuplicatedCardException;
 import utils.Protocol;
 import utils.ProtocolErrorException;
 import view.Console;
@@ -19,7 +19,7 @@ import view.Console;
  * @author simorgh & dzigor92
  */
 public class ClientController {
-    private static final String ERROR_OPT = "ERROR: Wrong option. Please enter a valid action.";
+    
     
     /* Client constant arg-relationed variables */
     private final String nomMaquina;
@@ -83,9 +83,9 @@ public class ClientController {
             
             pr.sendDraw();  /* DRAW command is mandatory after a STARTING_BET is received */
             char [] card = pr.receiveCard();
+            g.updateHandPlayer(Arrays.toString(card));
             console.printNewCard(card);
-            g.updatePlayerScore(card[0]);
-            
+                
             // game loop
             boolean end = false;
             do{
@@ -96,8 +96,9 @@ public class ClientController {
                     case '1': 
                         pr.sendDraw();
                         card = pr.receiveCard();
+                        g.updateHandPlayer(Arrays.toString(card));
                         console.printNewCard(card);
-                        g.updatePlayerScore(card[0]);
+                        
                          
                         if(g.isBusted()){ 
                             pr.receiveBusting();
@@ -110,8 +111,9 @@ public class ClientController {
                         pr.sendAnte(rise);
                         pr.sendDraw();
                         card = pr.receiveCard();
+                        g.updateHandPlayer(Arrays.toString(card));
                         console.printNewCard(card);
-                        g.updatePlayerScore(card[0]);
+                        
                         
                         if(g.isBusted()){ 
                             pr.receiveBusting();
@@ -124,16 +126,13 @@ public class ClientController {
                         end = true;
                         break;
                     default: 
-                        console.printError(ClientController.ERROR_OPT);
+                        console.printError(Console.ERR_01);
                         break;
                 }  
             } while(!end);
             
             ArrayList <String> bank_score = pr.receiveBankScore();
-            if(bank_score != null) console.printBankScore(bank_score);
-            else{
-                System.err.print("Error al rebre BKSC!");
-            }
+            console.printBankScore(bank_score);
             
             int gain = pr.receiveGains();
             console.printGains(gain);
@@ -143,16 +142,19 @@ public class ClientController {
                 String des = pr.receiveErrorDescription();
                 console.printError(Protocol.ERROR + des);
             } catch (IOException ex) {
-                console.printError("ERROR: There was a problem trying to close the socket connection.");
+                console.printError(Console.ERR_02);
             }     
+        } catch(DuplicatedCardException e){
+            console.printError(Console.ERR_03);
+            if(!pr.sendError(Protocol.ERR_CARD)) console.printError(Console.ERR_05);
         } catch(IOException e) {
-            console.printError("ERROR: A problem with the server appeared - Closing now the connection.");
-            if(pr.sendError(ERROR_OPT)) console.printError("ERROR: cannot communicate the message to the server.");
+            console.printError(Console.ERR_04);
+            if(!pr.sendError(Protocol.ERR_SYNTAX)) console.printError(Console.ERR_05);
         } finally {
             try {
                 if(socket != null) socket.close();
             } catch (IOException ex) {
-                console.printError("ERROR: There was a problem trying to close the socket connection.");
+                console.printError(Console.ERR_02);
             } // fi del catch    
         }
     } // fi del main

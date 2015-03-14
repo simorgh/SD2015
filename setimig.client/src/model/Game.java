@@ -7,6 +7,8 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import utils.DuplicatedCardException;
 
 /**
  *
@@ -42,7 +44,7 @@ public class Game {
      * Adds the value of the drawn card to player's score.
      * @param D The representation of  the card to add.
      */
-    public void updatePlayerScore(char D){
+    private void updatePlayerScore(char D){
         float value = this.getCardValue(D);
         this.playerScore += value;
     }
@@ -63,9 +65,17 @@ public class Game {
         return handPlayer;
     }
     
-    public void updateHandPlayer(String card){
-        this.handPlayer.add(card);
-    }
+    /**
+     * Method to update player's score. Called every time a new card is received.
+     * @param card The received card.
+     * @throws DuplicatedCardException An exception is thrown when  the same card is received more than one time in the same game. 
+     */
+    public void updateHandPlayer(String card) throws DuplicatedCardException{
+        if(!handPlayer.contains(card)){
+            this.handPlayer.add(card);
+            updatePlayerScore(card.charAt(0));
+        } else throw new DuplicatedCardException();
+    }    
 
     /**
      * Method to check if player has overcome the maximum allowed score. 

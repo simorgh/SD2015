@@ -15,7 +15,16 @@ import java.util.Scanner;
  * @author simorgh & dzigor92
  */
 public class Console {
-    private static Console instance = null; /* SingleTone pattern */
+    
+    /* View error messages */
+    public static final String ERR_01 =  "ERROR: Wrong option. Please enter a valid action.";
+    public static final String ERR_02 =     "ERROR: There was a problem trying to close the socket connection.";
+    public static final String ERR_03 =     "ERROR: The last card has been received before. The game is now aborted.";
+    public static final String ERR_04 =     "ERROR: A problem with the server appeared - Closing now the connection.";
+    public static final String ERR_05 =     "ERROR: Cannot communicate the message to the server. Connection interrupted.";        
+    
+    /* SingleTone pattern */
+    private static Console instance = null; 
     Scanner in;
     
     /**
