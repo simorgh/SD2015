@@ -8,36 +8,56 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.Game;
 import utils.Protocol;
+import utils.ProtocolErrorException;
 import view.Console;
 
 /**
  * @author simorgh & dzigor92
  */
 public class ClientController {
-    private static final String ERROR_OPT = "!! Wrong option. Please enter a valid action.";
+    private static final String ERROR_OPT = "ERROR: Wrong option. Please enter a valid action.";
     
     /* Client constant arg-relationed variables */
     private final String nomMaquina;
     private final int port;
-    private final float topcard;
+    private float topcard;
+    private final boolean autoplay;
     
     
     /**
-     * Default main Constructor.
+     * Autoplay Enabled Constructor.
      * -------------------------
      * Gets overrided org.apache.commonds.CLI implementation 'ClientCLI'
-     * to parse and control over all possible arguements as a HashMap.
+     * to parse and control over all possible arguments as a HashMap.
+     * 
      * @param server
      * @param port
      * @param topcard
-     * @see src/controller/ClientCLI.java
      */
-    public ClientController(String server, int port, float topcard){
+    public ClientController(String server, int port, float topcard) {
         this.nomMaquina = server;
         this.port = port;
         this.topcard = topcard;
+        this.autoplay = true;
+    }
+    
+    /**
+     * Autoplay Disabled Constructor.
+     * -------------------------
+     * Gets overrided org.apache.commonds.CLI implementation 'ClientCLI'
+     * to parse and control over all possible arguments as a HashMap.
+     * 
+     * @param server
+     * @param port
+     */
+    public ClientController(String server, int port) {
+        this.nomMaquina = server;
+        this.port = port;
+        this.autoplay = false;
     }
     
     
@@ -48,7 +68,7 @@ public class ClientController {
         Console console = new Console();
         Game g;
         Socket socket = null;
-        Protocol pr;
+        Protocol pr = null;
 
         try{
             socket = new Socket(InetAddress.getByName(nomMaquina), port); // Obrim una connexio amb el servidor
@@ -58,11 +78,11 @@ public class ClientController {
             
             console.printWelcome();
             pr.sendStart();
-            int str_bet = pr.recieveStartingBet();
+            int str_bet = pr.receiveStartingBet();
             console.printStartingBet(str_bet);
             
             pr.sendDraw();  /* DRAW command is mandatory after a STARTING_BET is received */
-            char [] card = pr.recieveCard();
+            char [] card = pr.receiveCard();
             console.printNewCard(card);
             g.updatePlayerScore(card[0]);
             
@@ -70,17 +90,17 @@ public class ClientController {
             boolean end = false;
             do{
                 char opt;
-                if(topcard == 0.0f) opt = console.printInGameOptions(g.getPlayerScore());
+                if(!autoplay) opt = console.printInGameOptions(g.getPlayerScore());
                 else opt = choseOptionAutoplay(g.getPlayerScore(), topcard);
                 switch(opt){
                     case '1': 
                         pr.sendDraw();
-                        card = pr.recieveCard();
+                        card = pr.receiveCard();
                         console.printNewCard(card);
                         g.updatePlayerScore(card[0]);
                          
                         if(g.isBusted()){ 
-                            pr.recieveBusting();
+                            pr.receiveBusting();
                             end = true;
                         }
                         break;
@@ -89,12 +109,12 @@ public class ClientController {
                         int rise = console.enterRaise();
                         pr.sendAnte(rise);
                         pr.sendDraw();
-                        card = pr.recieveCard();
+                        card = pr.receiveCard();
                         console.printNewCard(card);
                         g.updatePlayerScore(card[0]);
                         
                         if(g.isBusted()){ 
-                            pr.recieveBusting();
+                            pr.receiveBusting();
                             end = true;
                         } 
                         break;
@@ -109,26 +129,35 @@ public class ClientController {
                 }  
             } while(!end);
             
-            ArrayList <String> bank_score = pr.recieveBankScore();
+            ArrayList <String> bank_score = pr.receiveBankScore();
             if(bank_score != null) console.printBankScore(bank_score);
             else{
                 System.err.print("Error al rebre BKSC!");
             }
             
-            int gain = pr.recieveGains();
+            int gain = pr.receiveGains();
             console.printGains(gain);
               
-        } catch (IOException e) {
-            System.out.println("Els errors han de ser tractats correctament en el vostre programa.");
+        } catch(ProtocolErrorException e){
+            try {
+                String des = pr.receiveErrorDescription();
+                console.printError(Protocol.ERROR + des);
+            } catch (IOException ex) {
+                console.printError("ERROR: There was a problem trying to close the socket connection.");
+            }     
+        } catch(IOException e) {
+            console.printError("ERROR: A problem with the server appeared - Closing now the connection.");
+            if(pr.sendError(ERROR_OPT)) console.printError("ERROR: cannot communicate the message to the server.");
         } finally {
             try {
                 if(socket != null) socket.close();
             } catch (IOException ex) {
-                System.out.println("Els errors han de ser tractats correctament pel vostre programa");
+                console.printError("ERROR: There was a problem trying to close the socket connection.");
             } // fi del catch    
         }
     } // fi del main
   
+    
     
     /**
      * Autoplay option choser. The method implements the behaviour that the automatic ClientController will

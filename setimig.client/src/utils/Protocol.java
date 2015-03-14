@@ -12,11 +12,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- *
  * @author simorgh & dzigor92
  */
 public class Protocol extends utils.ComUtils{
@@ -32,7 +29,11 @@ public class Protocol extends utils.ComUtils{
     public static final String GAINS = "GAIN";
     public static final String ERROR = "ERRO";
 
-
+    /* Protocol Error Messages */
+    public static final String ERR_SYNTAX = "Syntax error";
+    public static final String ERR_TIMEOUT = "Timeout exceeded";
+    public static final String ERR_CARD = "Card already received";
+    
     /**
      * Class constructor. Constructs the Protocol using a file.
      * @param file
@@ -56,7 +57,7 @@ public class Protocol extends utils.ComUtils{
      * @param str The header to send.
      * @throws IOException 
      */
-    private void sendHeader(String str) throws IOException{ 
+    private void sendHeader(String str) throws IOException { 
         write_string_command(str);
     }
     
@@ -70,10 +71,15 @@ public class Protocol extends utils.ComUtils{
      * This command is used for starting a new game. Once this command
      * is sent a STARTING_BET message is expected.
      * 
-     * @throws IOException 
+     * @return true if sent correctly, false otherwise.
      */           
-    public void sendStart() throws IOException{
-        sendHeader(Protocol.START);
+    public boolean sendStart() {
+        try {
+            sendHeader(Protocol.START);
+        } catch (IOException ex) {
+           return false;
+        }
+        return true;
     }
     
     /**
@@ -88,10 +94,15 @@ public class Protocol extends utils.ComUtils{
      * after the player sends a PASS command, thus a BANK_SCORE and
      * GAINS message are expected.
      * 
-     * @throws java.io.IOException
+     * @return true if sent correctly, false otherwise.
      */           
-    public void sendDraw() throws IOException{
-        sendHeader(Protocol.DRAW);
+    public boolean sendDraw() {
+        try {
+            sendHeader(Protocol.DRAW);
+        } catch (IOException ex) {
+            return false;
+        }
+        return true;
     }
     
     /**
@@ -101,12 +112,17 @@ public class Protocol extends utils.ComUtils{
      * command. It is used for increasing the bet for this game.
      * 
      * @param raise
-     * @throws IOException 
+     * @return true if sent correctly, false otherwise.
      */
-    public void sendAnte(int raise) throws IOException{
-        sendHeader(this.ANTE);
-        write_char(' ');
-        write_int32(raise);
+    public boolean sendAnte(int raise) {
+        try {
+            sendHeader(Protocol.ANTE);
+            write_char(' ');
+            write_int32(raise);
+        } catch (IOException ex) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -116,63 +132,92 @@ public class Protocol extends utils.ComUtils{
      * used instead of a DRAW command. Once this command is sent a
      * BANK_SCORE message and GAINS message are expected.
      *
-     * @throws IOException 
+     * @return true if sent correctly, false otherwise.
      */
-    public void sendPass() throws IOException{
-        sendHeader(Protocol.PASS);
+    public boolean sendPass() {
+        try {
+            sendHeader(Protocol.PASS);
+        } catch (IOException ex){
+            return false;
+        }
+        return true;
     }
-    
-    
+
+    /**
+     * ERROR. - ERRO SP/d/d/c*
+     * 
+     * Each side can issue a special error command any time instead of
+     * normal command. This command has an argument field with the
+     * explanation of the error. The length of the message can be from 0
+     * to 99. In order to determine the length of the message, two digits
+     * must to be placed prior to the message.  If no message is provided
+     * two digits ’0’ have to be used.
+     * 
+     * @param err description of the error to be sent - should be one of the static ERR_* defined in this class - Limited to 99 char
+     * @return true if message has been successfully sent, false otherwise. 
+     */
+    public boolean sendError(String err) {
+        try {
+            sendHeader(Protocol.ERROR);
+            write_char(' ');
+            write_string_variable(2, err);
+        } catch (IOException ex) {
+            return false;
+        }
+        return true;
+    }
     
 //////////////////////////////////////////////////////////////
 //               SERVER RECEPTIONS VERIFICATION
 //////////////////////////////////////////////////////////////
     
     /**
-     * Starting bet reception. The Client receives the starting bet as indicated by the defined communication protocol.
+     * Starting bet reception.
+     * The Client receives the starting bet as indicated by the defined communication protocol.
      * 1. STBT header is expected.
      * 2. SP is expected (' ').
      * 3. Integer value , indicating the value of the starting bet is expected.
      * 
+     * @throws java.io.IOException
+     * @throws utils.ProtocolErrorException
      * @return The received value of the starting bet.
      */
-    public int recieveStartingBet(){
-        int bet = -1;
-        try {
-            String cmd = read_string_command();
-            if(!(cmd.toUpperCase()).equals(Protocol.STARTING_BET)) return -2;
-            if( !(read_char() == ' ') ) return -3;
-            
-            // bet caption
-            bet = read_int32();
-        } catch (IOException ex) {
-            Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    public int receiveStartingBet() throws IOException, ProtocolErrorException {
+        int bet;
+        
+        String cmd = read_string_command().toUpperCase();
+        if( cmd.equals(Protocol.ERROR) ) throw new ProtocolErrorException();
+        if(!cmd.equals(Protocol.STARTING_BET)) throw new IOException();
+        if( !(read_char() == ' ') ) throw new IOException();
+        
+        // bet caption
+        bet = read_int32();
         return bet;
     }
     
     /**
-     * Card reception. The Client receives the card as indicated by the defined communication protocol.
+     * Card reception. 
+     * The Client receives the card as indicated by the defined communication protocol.
      * 1. CARD header is expected.
      * 2. SP is expected (' ').
      * 3. The string with value of the card is expected.
+     * 
+     * @throws java.io.IOException
+     * @throws utils.ProtocolErrorException
      * @return The card that has been received.
      */
-    public char[] recieveCard(){
-        char[] card = null;
-        try {
-            String cmd = read_string_command();
-            if(!(cmd.toUpperCase()).equals(Protocol.CARD)) return null;
-            if( !(read_char() == ' ') ) return null;
-            
-            // card caption
-            card = new char[2];
-            card[0] = Character.toLowerCase(read_char());
-            card[1] = Character.toLowerCase(read_char());
-            
-        } catch (IOException ex) {
-            Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    public char[] receiveCard() throws IOException, ProtocolErrorException {
+        char[] card;
+
+        String cmd = read_string_command().toUpperCase();
+        if( cmd.equals(Protocol.ERROR) ) throw new ProtocolErrorException();
+        if(!cmd.equals(Protocol.CARD)) throw new IOException();
+        if( !(read_char() == ' ') ) throw new IOException();
+
+        // card caption
+        card = new char[2];
+        card[0] = Character.toLowerCase(read_char());
+        card[1] = Character.toLowerCase(read_char());
         
         return card;
     }
@@ -180,87 +225,94 @@ public class Protocol extends utils.ComUtils{
     /**
      * Busting reception.
      * 1. BSTG header is expected.
-     * @return True if the header has been received correctly. Returns false otherwise.
+     * 
+     * @throws java.io.IOException
+     * @throws utils.ProtocolErrorException
      */
-    public boolean recieveBusting(){
-        try {
-            String cmd = read_string_command();
-            if((cmd.toUpperCase()).equals(Protocol.BUSTING)) return true;
-        } catch (IOException ex) {
-            Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return false;
+    public void receiveBusting() throws IOException, ProtocolErrorException {
+        String cmd = read_string_command().toUpperCase();
+        if( cmd.equals(Protocol.ERROR) ) throw new ProtocolErrorException();
+        if(!cmd.equals(Protocol.BUSTING)) throw new IOException();
     }
     
     /**
-     * Bank Score Reception.  The Client receives the bank score as indicated by the defined communication protocol.
+     * Bank Score Reception.  
+     * The Client receives the bank score as indicated by the defined communication protocol.
      * 1. BNSC header is expected.
      * 2. SP is expected (' ').
      * 3. NUMBER indicating the number of cards to be sent is expected.
      * 4. STRING representing a car is expected as many times as indicated by NUMBER received previously.
      * 5. FLOAT indicating the score that the bank has hit is expected.
+     * 
+     * @throws java.io.IOException
+     * @throws utils.ProtocolErrorException 
      * @return ArrayList containing the list of cards and the bank score as a String. 
      */
-    public ArrayList <String> recieveBankScore(){
+    public ArrayList <String> receiveBankScore() throws IOException, ProtocolErrorException {
         ArrayList <String> bank_resume = new ArrayList();
         
-        try {
-            String cmd = read_string_command();
-            if(!(cmd.toUpperCase()).equals(Protocol.BANK_SCORE)) return null;
-            if( read_char() != ' ' ) return null;
-            
-            // card caption
-            int i = read_int32(); 
-            char[] card = new char[2];
-            for(int j = 0; j < i; j++){
-                card[0] = Character.toLowerCase(read_char());   
-                card[1] = Character.toLowerCase(read_char());
-                bank_resume.add(new String(card)); 
-            }
-            
-            String score = read_string_command();
-            if(score.length() != 4) return null;
-            bank_resume.add(score);
-            
-        } catch (IOException ex) {
-            Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
+        String cmd = read_string_command().toUpperCase();
+        if( cmd.equals(Protocol.ERROR) ) throw new ProtocolErrorException();
+        if(!cmd.equals(Protocol.BANK_SCORE)) throw new IOException();
+        if( read_char() != ' ' ) throw new IOException();
+
+        // card caption
+        int i = read_int32(); 
+        char[] card = new char[2];
+        for(int j = 0; j < i; j++){
+            card[0] = Character.toLowerCase(read_char());
+            card[1] = Character.toLowerCase(read_char());
+            bank_resume.add(new String(card));
         }
-        
+
+        String score = read_string_command();
+        if(score.length() != 4) throw new IOException();
+        bank_resume.add(score);
+
         return bank_resume;
     }
     
     /**
-     * Bank Score Reception.  The Client receives the gains as indicated by the defined communication protocol.
+     * Bank Score Reception.
+     * The Client receives the gains as indicated by the defined communication protocol.
      * 1. GAIN header is expected.
      * 2. SP is expected (' ').
      * 3. INTEGER representing the value of the gains of client is expected.
+     * 
+     * @throws java.io.IOException
+     * @throws utils.ProtocolErrorException 
      * @return The value of the gains.
      */
-    public int recieveGains(){
-        int gains = -1;
-        try {
-            String cmd = read_string_command();
-            if(!(cmd.toUpperCase()).equals(Protocol.GAINS)) return gains;
-            if( !(read_char() == ' ') ) return gains;
-            gains = read_int32();
-        } catch (IOException ex) {
-            Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    public int receiveGains() throws IOException, ProtocolErrorException {
+        int gains;
+
+        String cmd = read_string_command().toUpperCase();
+        if( cmd.equals(Protocol.ERROR) ) throw new ProtocolErrorException();
+        if(!cmd.equals(Protocol.GAINS)) throw new IOException();
+        if( !(read_char() == ' ') ) throw new IOException();
+        gains = read_int32();
+       
         return gains;
     }
     
     /**
-     * ERROR reception.  
-     * @return True if Message received properly. False otherwise.
+     * ERROR paramaters reception.
+     * whitespace followed by 2char-digit determining lenght of the message is expected 
+     * 
+     * @throws java.io.IOException
+     * @return error description
      */
-    public boolean recieveError(){
-        try {
-            String cmd = read_string_command();
-            if((cmd.toUpperCase()).equals(Protocol.ERROR)) return true;
-        } catch (IOException ex) {
-            Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return false;
+    public String receiveErrorDescription() throws IOException {
+        String des = "";
+        
+        if(!(read_char() == ' ')) throw new IOException();
+        char d1 = read_char();
+        char d2 = read_char();
+        if( !(Character.isDigit(d1)) || !(Character.isDigit(d2)) ) throw new IOException();
+        
+        int len = Integer.parseInt("" + d1 + d2);
+        for(int i=0; i<len; i++) des += read_char();
+        return(" " + d1 + d2 + des);
     }
 
 }

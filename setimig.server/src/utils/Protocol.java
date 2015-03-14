@@ -16,12 +16,8 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 
 /**
- *
  * @author simorgh & dzigor92
  */
 public class Protocol extends utils.ComUtils{
@@ -38,11 +34,12 @@ public class Protocol extends utils.ComUtils{
     public static final String GAINS = "GAIN";
     public static final String ERROR = "ERRO";
 
-    
     /* Protocol Error Messages */
-    private final String ERR_SYNTAX = "Syntax error";
-    //TODO more ERR definitions comes here...
+    public static final String ERR_SYNTAX = "Syntax error";
+    public static final String ERR_TIMEOUT = "Timeout exceeded";
+    public static final String ERR_SSE = "Server-side error";
     
+    /* Log Trace Writer */
     private final PrintWriter log;
     
     /**
@@ -56,7 +53,9 @@ public class Protocol extends utils.ComUtils{
         this.log = new PrintWriter(out, true); /* autoflushing enabled */
     }
     
-    /* support method */
+    /**
+     * - support method -
+     */
     private void sendHeader(String str) throws IOException{ 
         write_string_command(str);
     }
@@ -72,14 +71,18 @@ public class Protocol extends utils.ComUtils{
      * field is required and means the minimum bet for playing.
      * 
      * @param bet Integer over the net: 4bytes BE.
-     * @throws IOException 
+     * @return true if sent correctly, false otherwise.
      */
-    public void sendStartingBet(int bet) throws IOException{
-        sendHeader(Protocol.STARTING_BET);
-        write_char(' ');
-        write_int32(bet);
-        
-        this.log.println("\nS: " + Protocol.STARTING_BET + ' ' + bet);
+    public boolean sendStartingBet(int bet) {
+        try {
+            sendHeader(Protocol.STARTING_BET);
+            write_char(' ');
+            write_int32(bet);
+            this.log.println("\nS: " + Protocol.STARTING_BET + ' ' + bet);
+        } catch (IOException ex) {
+            return false;
+        }
+        return true;
     }
     
    /**
@@ -89,16 +92,20 @@ public class Protocol extends utils.ComUtils{
     * field is required and means the card drawn.
     *
     * @param D "1" | "2" | "3" | "4" | "5" | "6" | "7" | "s" | "c" | "r" | "S" | "C" | "R"
-    * @param P "o" | "c" | "e" | "b" | "O" | "C" | "E" | "B" 
-    * @throws java.io.IOException
+    * @param P "o" | "c" | "e" | "b" | "O" | "C" | "E" | "B"
+    * @return true if sent correctly, false otherwise.
     */
-    public void sendCard(char D, char P) throws IOException{
-        sendHeader(Protocol.CARD);
-        write_char(' ');
-        write_char(Character.toLowerCase(D));
-        write_char(Character.toLowerCase(P));
-        
-        this.log.println("\nS: " + Protocol.CARD + ' ' + Character.toLowerCase(D) + Character.toLowerCase(P));
+    public boolean sendCard(char D, char P) {
+        try {
+            sendHeader(Protocol.CARD);
+            write_char(' ');
+            write_char(Character.toLowerCase(D));
+            write_char(Character.toLowerCase(P));
+            this.log.println("\nS: " + Protocol.CARD + ' ' + Character.toLowerCase(D) + Character.toLowerCase(P));
+        } catch (IOException ex) {
+            return false;
+        }
+        return true;
     }
     
     /**
@@ -108,11 +115,16 @@ public class Protocol extends utils.ComUtils{
      * score of the player is over seven and a half. It has no
      * arguments.
      * 
-     * @throws java.io.IOException
+     * @return true if sent correctly, false otherwise.
      */
-    public void sendBusting() throws IOException{
-       sendHeader(Protocol.BUSTING);
-       this.log.println("\nS: " + Protocol.BUSTING);
+    public boolean sendBusting() {
+        try {
+            sendHeader(Protocol.BUSTING);
+            this.log.println("\nS: " + Protocol.BUSTING);
+        } catch (IOException ex) {
+            return false;
+        }
+        return true;
     }
     
     /**
@@ -125,24 +137,28 @@ public class Protocol extends utils.ComUtils{
      * 
      * @param number
      * @param cards
-     * @param score 
-     * @throws java.io.IOException 
+     * @param score
+     * @return true if sent correctly, false otherwise.
      */
-    public void sendBankScore(int number, ArrayList <char[]> cards, float score) throws IOException{
-        sendHeader(Protocol.BANK_SCORE);
-        write_char(' ');
-        write_int32(number);
-        
-        this.log.print("\nS: " + Protocol.BANK_SCORE + ' ' + number);
-        for (char[] c : cards) {
-            this.log.print(c[0] + "" + c[1]);
-            write_char(Character.toLowerCase(c[0]));
-            write_char(Character.toLowerCase(c[1]));
+    public boolean sendBankScore(int number, ArrayList <char[]> cards, float score) {
+        try {
+            sendHeader(Protocol.BANK_SCORE);
+            write_char(' ');
+            write_int32(number);
+            
+            this.log.print("\nS: " + Protocol.BANK_SCORE + ' ' + number);
+            for (char[] c : cards) {
+                this.log.print(c[0] + "" + c[1]);
+                write_char(Character.toLowerCase(c[0]));
+                write_char(Character.toLowerCase(c[1]));
+            }
+            
+            sendHeader(customScoreFormat(score));
+            this.log.println(' ' + customScoreFormat(score));
+        } catch (IOException ex) {
+            return false;
         }
-        
-        sendHeader(customFormat(score));
-        this.log.println(' ' + customFormat(score));
-        
+        return true;
     }
     
     /**
@@ -157,14 +173,18 @@ public class Protocol extends utils.ComUtils{
      * number equals to the double of the current bet.
      * 
      * @param gains
-     * @throws java.io.IOException
+     * @return true if gains has been sent correctly, false otherwise.
      */
-    public void sendGains(int gains) throws IOException{
-        sendHeader(Protocol.GAINS);
-        write_char(' ');
-        write_int32(gains);
-        
-        this.log.println("S: " + Protocol.GAINS + ' ' + gains);
+    public boolean sendGains(int gains) {
+        try {
+            sendHeader(Protocol.GAINS);
+            write_char(' ');
+            write_int32(gains);
+            this.log.println("S: " + Protocol.GAINS + ' ' + gains);
+        } catch (IOException ex) {
+            return false;
+        }
+        return true;
     }
     
     /**
@@ -177,13 +197,19 @@ public class Protocol extends utils.ComUtils{
      * must to be placed prior to the message.  If no message is provided
      * two digits ’0’ have to be used.
      * 
-     * @param code
-     * @throws java.io.IOException
+     * @param err description of the error to be sent - should be one of the static ERR_* defined in this class - Limited to 99 char
+     * @return true if message has been successfully sent, false otherwise. 
      */
-    public void sendError(int code) throws IOException{
-        sendHeader(Protocol.ERROR);
-        write_char(' ');
-        write_string_variable(2, this.ERR_SYNTAX);
+    public boolean sendError(String err) {
+        try {
+            sendHeader(Protocol.ERROR);
+            write_char(' ');
+            write_string_variable(2, err);
+            this.log.println("S: " + Protocol.ERROR + " " + String.format("%02d", err.length()) + err);
+        } catch (IOException ex) {
+            return false;
+        }
+        return true;
     }
     
     
@@ -194,29 +220,29 @@ public class Protocol extends utils.ComUtils{
     
     /**
      * Protocol command header reading.
-     * @return The read header.
+     * 
+     * @return read header
      * @throws IOException
      */
-    public String readHeader() throws IOException{
+    public String readHeader() throws IOException {
         String header = read_string_command();
         this.log.print("C: " + header);
-
+        if(!isValidHeader(header)) throw new IOException();
+        
         return header;
     }
     
     /**
      * Start command reception.
      * 1. STRT header is expected.
-     * @return True if the header has been received correctly. Returns false otherwise.
+     * 
+     * @throws java.io.IOException
+     * @return 
      */
-    public boolean recieveStart(){
-        try {
-            String cmd = readHeader();
-            if((cmd.toUpperCase()).equals(Protocol.START)) return true;
-        } catch (IOException ex) {
-            Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return false;
+    public String receiveStart() throws IOException {
+        String cmd = readHeader().toUpperCase();
+        if(!cmd.equals(Protocol.START) && !cmd.equals(Protocol.ERROR) ) throw new IOException();
+        return cmd;
     }
 
     /**
@@ -224,32 +250,77 @@ public class Protocol extends utils.ComUtils{
      * 1. ANTE header is expected.
      * 2. SP is expected (' ').
      * 3. NUMBER value representing the value of the raise is expected.
-     * @return The raise value that is read.
+     * 
+     * @return if an error occoured -1 is returned, otherwise returns raise value.
      */
-    public int recieveRaise(){
-        int raise = 0;
+    public int receiveRaise() {
+        int raise;
         try {
-            if( !(read_char() == ' ') ) return -1;
+            if( !(read_char() == ' ') ) throw new IOException();
             raise = read_int32();
+            if(raise < 0) throw new IOException();
+            
             this.log.println(" " + raise);
+            return raise;
         } catch (IOException ex) {
-            Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
+            return -1;
         }
-        return raise;
     }
 
     /**
+     * Error command reception.
+     * 1. STRT header is expected.
+     * @throws java.io.IOException
+     */ 
+    public void receiveErrorDescription() throws IOException {
+        if(!(read_char() == ' ')) throw new IOException();
+        char d1 = read_char();
+        char d2 = read_char();
+        if( !(Character.isDigit(d1)) || !(Character.isDigit(d2)) ) throw new IOException();
+        
+        int len = Integer.parseInt("" + d1 + d2);
+        String des = "";
+        for(int i=0; i<len; i++) des += read_char();
+        this.log.print(" " + d1 + d2 + des);
+    }
+    
+    
+    /**
+     * - Support method -
+     * 
      * Desc. Customizes the format of the float to %2.1 
      * @param value
      * @return Formatted float as a String
      */
-    private String customFormat( float value ) {
+    private String customScoreFormat( float value ) {
         DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.ENGLISH);
         otherSymbols.setDecimalSeparator('.');
         DecimalFormat myFormatter = new DecimalFormat("00.0", otherSymbols);
         String output = myFormatter.format(value);
         
         return output;
+    }
+    
+    /**
+     * - Support method -
+     * 
+     * @param header Receivend command-string to be checked
+     * @return true if cmd is any of the expected command string, false otherwise.
+     */
+    private boolean isValidHeader(String header){
+        switch (header.toUpperCase()) {
+            case Protocol.START:
+                return true;
+            case Protocol.DRAW:
+                return true;
+            case Protocol.ANTE:
+                return true;
+            case Protocol.PASS:
+                return true;
+            case Protocol.ERROR:
+                return true;
+            default: return false;
+        } 
     }
 
 }

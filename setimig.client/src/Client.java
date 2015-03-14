@@ -17,7 +17,11 @@ public class Client {
         
        /* Command Line arguments threatment */
        ClientCLI cli = new ClientCLI(args);
-       ClientController controller = new ClientController(cli.getServer(), cli.getPort(),  cli.getTopCard());
+       
+       ClientController controller; /* autoplay mode determines constructor call */
+       if(cli.isAutoplayEnabled()) controller = new ClientController(cli.getServer(), cli.getPort(),  cli.getTopCard());
+       else controller = new ClientController(cli.getServer(), cli.getPort());
+       
        controller.start();
     }
 }

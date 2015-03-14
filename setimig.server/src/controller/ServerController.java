@@ -10,21 +10,20 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-//import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.Deck;
 import model.Game;
 import utils.InvalidDeckFileException;
 import utils.Protocol;
+//import java.util.concurrent.TimeoutException;
 
 
 /**
- *
  * @author simorgh & dzigor92
  */
 public class ServerController implements Runnable {
-    private final int TIMEOUT = 500; /* Socket timeout in miliseconds */ 
+    private final int TIMEOUT = 3000; /* Socket timeout in miliseconds */ 
     
     /* ServerController initial attributes */
     private Socket csocket;
@@ -78,129 +77,163 @@ public class ServerController implements Runnable {
         
         try {
             ServerController.deck = new Deck(this.deckfile);
-        } catch (IOException | InvalidDeckFileException ex) {
-            Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidDeckFileException ex) {
+            System.out.println("ERROR: " + this.deckfile.getName() + " doesn't contain the deck or has an incorrect format");
+            System.exit(2);
+        } catch (IOException ex) {
+            Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null);
             System.exit(1);
         }
         
-        try{
-            serverSocket = new ServerSocket(ServerController.port);  /* Creem el servidor */
+        try {
+            serverSocket = new ServerSocket(ServerController.port);
             System.out.println("Servidor socket preparat al port " + ServerController.port);
 
             while (true) {
                 System.out.println("Esperant una connexio d'un client...");
-                Socket socket = serverSocket.accept(); /* Esperem a que un client es connecti amb el servidor */
+                Socket socket = serverSocket.accept(); /* blocking instr. awaits until client requested connection */
                 //socket.setSoTimeout(TIMEOUT);
                 System.out.println("Connexio acceptada d'un client.");
                 
                 new Thread(new ServerController(socket)).start();
             }
-
         } catch (IOException ex) {
-            System.out.println("Unable to establish connection through the port: " + ServerController.port
+            System.out.println("ERROR: Unable to establish connection through the port: " + ServerController.port
                     + ": Port might be protected or already being used.\n"
                     + "Run 'netstat -an | grep " + ServerController.port + "' on your shell to spot that connection");
         } finally {
-            /* Tanquem la comunicacio amb el client */
+            /* closing connection */
             try {
                 if(serverSocket != null) serverSocket.close();
             } catch (IOException ex) {
-                System.out.println("Els errors han de ser tractats correctament pel vostre programa");
+                System.exit(1);
             }
         }
         
-    } // fi del main
+    } /* end main */
 
     
     
     
     @Override
     public void run() {
-        OutputStream logout;
+        /* establishing LogFile File stream */
+        OutputStream logout = null;
         try {
             logout = new FileOutputStream("Server"+Thread.currentThread().getName()+".log");
-            this.pr = new Protocol(this.csocket, logout); /* Associem un flux d'entrada/sortida amb el client */
+            this.pr = new Protocol(this.csocket, logout); /* binding IO stream to client */
         } catch (IOException ex) {
-            Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        this.g = new Game(ServerController.deck, ServerController.strt_bet); /* creates new (shuffled) game */
-        this.pr.recieveStart();
-        try {
-            this.pr.sendStartingBet(ServerController.strt_bet);
-        } catch (IOException ex) {
-            Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            /* Client calling DRAW command is mandatory after a STARTING_BET has been received */
+            this.pr.sendError(Protocol.ERR_SSE);
+            System.out.println("ERROR: Failed to open logfile OutputStream. - Connection aborted.");
             try {
-                if( (this.pr.readHeader()).equals(Protocol.DRAW)) serveCard();
-            } catch (IOException ex) {
-                Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null, ex);
-            }
+                this.csocket.close();
+            } catch (IOException ex1) { /* ... */ } finally { Thread.currentThread().stop(); }
         }
-  
         
-
-        /* game loop */       
-        this.end = false;
-        do{
-            String cmd = "";
-            if(this.csocket.isClosed()) this.end = true;
-            try {
-                cmd = this.pr.readHeader();
-            } catch (IOException ex) {
-                Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null, ex);
+        /* creates new (shuffled) game */
+        this.g = new Game(ServerController.deck, ServerController.strt_bet); 
+        
+        /* here comes the magic... */
+        try {
+            String aux;
+            aux = this.pr.receiveStart();
+            if( aux.equals(Protocol.ERROR) ){
+                this.pr.receiveErrorDescription();
+                closeAll(logout);
             }
             
-            switch(cmd){
+            this.pr.sendStartingBet(ServerController.strt_bet);
+            aux = this.pr.readHeader();
+            switch (aux) {
                 case Protocol.DRAW:
-                    serveCard(); 
+                    serveCard(); /* if the protocol is followed, normal flow should get here */
                     break;
-
-                case Protocol.ANTE:
-                    int raise = pr.recieveRaise();
-                    this.g.raiseBet(raise);
+                case Protocol.ERROR:
+                    this.pr.receiveErrorDescription();
+                    closeAll(logout);
                     break;
-
-                case Protocol.PASS:
-                    this.end = true;
+                default:    /* any other valid 'header' is received -> the protocol is broken! */
+                    this.pr.sendError(Protocol.ERR_SYNTAX);
+                    closeAll(logout);
                     break;
-
-                default: break;
             }
-        } while(!this.end);
+                
+            /* game loop */       
+            this.end = false;
+            do{
+                String cmd;
+                if(this.csocket.isClosed()) this.end = true;
+                
+                cmd = this.pr.readHeader();
+                switch(cmd) {
+                    case Protocol.DRAW:
+                        serveCard(); 
+                        break;
 
-        this.g.playBank(); 
-        try {
+                    case Protocol.ANTE:
+                        int raise = pr.receiveRaise();
+                        this.g.raiseBet(raise);
+                        break;
+
+                    case Protocol.PASS:
+                        this.end = true;
+                        break;
+                    
+                    case Protocol.ERROR:
+                        this.pr.receiveErrorDescription();
+                        closeAll(logout);
+                        break;
+                        
+                    default:    /* other valid 'header' (STRT) is received -> the protocol is broken! */
+                        this.pr.sendError(Protocol.ERR_SYNTAX);
+                        closeAll(logout);
+                        break;
+                }
+                
+            } while(!this.end);
+
+            /* endgame status messages */
+            this.g.playBank();
             this.pr.sendBankScore(this.g.getHandBank().size(), this.g.getHandBank(), this.g.getBankScore());
             this.pr.sendGains(this.g.computeGains());
+        
+        /* syntax error treatment */
+        } catch (IOException ex) {
+            System.out.println("ERROR: Client message has Syntax Error - Connection aborted.");
+        } finally {
+            closeAll(logout);
+        }
+        
+    } /* end Thread run() */
+    
+    
+    /**
+     * Terminates thread and closes client resources
+     */
+    private void closeAll(OutputStream out) {
+        try {
+            out.close();
+            this.csocket.close();
+            Thread.currentThread().stop();
         } catch (IOException ex) {
             Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null, ex);
         }
-    } // end Thread run()
+    }
     
     
-    
-    
+    /**
+     * - suport method -
+     */
     private void serveCard(){
         char[] card;
         
         card = this.g.drawCard();
         this.g.updatePlayerScore(card[0]);
-
-        try {
-            this.pr.sendCard(card[0], card[1]);
-        } catch (IOException ex) {
-            Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        this.pr.sendCard(card[0], card[1]);
 
         if (this.g.getPlayerScore() > 7.5f){
-            try {
-                this.pr.sendBusting();
-                this.end = true;
-            } catch (IOException ex) {
-                Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            this.pr.sendBusting();
+            this.end = true;
         }                              
     }
     

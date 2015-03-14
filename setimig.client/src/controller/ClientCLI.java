@@ -29,6 +29,7 @@ public class ClientCLI  {
     private static final Logger log = Logger.getLogger(ClientCLI.class.getName());
     private String[] args = null;
     private final Options options;
+    private boolean autoplay;
     
     /* variables to be returned */
     private float topcard;
@@ -67,7 +68,7 @@ public class ClientCLI  {
         CommandLineParser parser = new BasicParser();
         
         /* parse the command line arguments */
-        CommandLine cmd = null;
+        CommandLine cmd;
         try {
             cmd = parser.parse(options, args);
             
@@ -75,16 +76,14 @@ public class ClientCLI  {
             
             /* validate that 'port' has been set */
             if (cmd.hasOption("s")) {
-
                 this.matcher = pattern.matcher(cmd.getOptionValue("s")); // IPv4 verification
                 if(!matcher.matches()){
                     log.log(Level.SEVERE, "Introduced Server IPv4 is not a valid address");
                 } else {
                     this.server = cmd.getOptionValue("s");
                 }
-                
             } else {
-                log.log(Level.SEVERE, "Missing 'port' option");
+                log.log(Level.SEVERE, "Missing 'server' option");
                 help();
             }
             
@@ -98,13 +97,15 @@ public class ClientCLI  {
             
             /* validate that 'starting bet' has been set */
             if(cmd.hasOption("a")) {
+                this.autoplay = true;
                 this.topcard = Float.parseFloat(cmd.getOptionValue("a"));
 
                 if(this.topcard < 1.0 || this.topcard > 7.5 ) {
                     log.log(Level.SEVERE, "The value of 'auto' must be within range [1, 7.5]");
                     System.exit(2);
                 }
-            }
+            } else this.autoplay = false;
+            
         }catch (NumberFormatException e){
             log.log(Level.SEVERE, "Failed to convert arg to Number. Make sure your input is correct.");
             System.exit(1);
@@ -147,6 +148,14 @@ public class ClientCLI  {
      */
     public float getTopCard(){
         return this.topcard;
+    }
+    
+    /**
+     * Checks whether autoplay is enabled or not.
+     * @return true if autoplay is enabled, false otherwise.
+     */
+    public boolean isAutoplayEnabled(){
+        return this.autoplay;
     }
     
 }

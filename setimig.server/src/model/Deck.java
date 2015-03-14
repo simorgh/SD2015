@@ -61,10 +61,10 @@ public class Deck {
 	 
 		String line;
 		while ((line = br.readLine()) != null) {
-				if (line.matches(DECK_REGEX)){
-					System.out.println("\t- Added card "+line);
-					deck.add(line);
-				}else throw new InvalidDeckFileException();
+                    if (line.matches(DECK_REGEX)){
+                            System.out.println("\t- Added card "+line);
+                            deck.add(line);
+                    } else throw new InvalidDeckFileException();
 		}
 			
 		br.close();
