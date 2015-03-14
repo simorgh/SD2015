@@ -6,6 +6,8 @@
 
 package model;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author simorgh & dzigor92
@@ -13,6 +15,7 @@ package model;
 
 public class Game {
     private float playerScore;
+    private final ArrayList handPlayer;
     
     /**
      * Class constructor. 
@@ -20,6 +23,7 @@ public class Game {
      */
     public Game(){
         this.playerScore = 0.0f;
+        this.handPlayer = new ArrayList();
     }
     
     /**
@@ -44,11 +48,23 @@ public class Game {
     }
 
     /**
-     * Gets ther Player's score in  the game.
+     * Gets the Player's score in  the game.
      * @return The player's score.
      */
     public float getPlayerScore() {
         return playerScore;
+    }
+    
+    /**
+     * Player hand getter.
+     * @return the handPlayer
+     */
+    public ArrayList getHandPlayer() {
+        return handPlayer;
+    }
+    
+    public void updateHandPlayer(String card){
+        this.handPlayer.add(card);
     }
 
     /**
