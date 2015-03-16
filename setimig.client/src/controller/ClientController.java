@@ -5,6 +5,7 @@
 package controller;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ import view.Console;
  * @author simorgh & dzigor92
  */
 public class ClientController {
-    
+    private final int TIMEOUT = 3000; /* Socket timeout in miliseconds */
     
     /* Client constant arg-relationed variables */
     private final String nomMaquina;
@@ -73,6 +74,7 @@ public class ClientController {
 
         try{
             socket = new Socket(InetAddress.getByName(nomMaquina), port); // Obrim una connexio amb el servidor
+            socket.setSoTimeout(TIMEOUT);
             console.showConnection(socket);
             pr = new ClientProtocol(socket);
             g = new Game();
@@ -115,7 +117,6 @@ public class ClientController {
                         g.updateHandPlayer(Arrays.toString(card));
                         console.printNewCard(card);
                         
-                        
                         if(g.isBusted()){ 
                             pr.receiveBusting();
                             end = true;
@@ -137,7 +138,10 @@ public class ClientController {
             
             int gain = pr.receiveGains();
             console.printGains(gain);
-              
+        
+        } catch (InterruptedIOException iioe) {
+            console.printError(Console.ERR_00);
+             if(!pr.sendError(ClientProtocol.ERR_TIMEOUT)) console.printError(Console.ERR_05);
         } catch(ProtocolErrorException e){ /* Error message has been sent - let's read the description and close con. */
             try {
                 String des = pr.receiveErrorDescription();

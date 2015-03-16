@@ -17,6 +17,7 @@ import java.util.Scanner;
 public class Console {
     
     /* View error messages */
+    public static final String ERR_00 = "ERROR: Remote host timed out during read operation";
     public static final String ERR_01 = "ERROR: Wrong option. Please enter a valid action.";
     public static final String ERR_02 = "ERROR: There was a problem trying to close the socket connection.";
     public static final String ERR_03 = "ERROR: The last card has been received before. The game is now aborted.";
@@ -103,12 +104,18 @@ public class Console {
     public int enterRaise(){
         System.out.print("► How much do you want to raise?: ");
         int raise = 0;
-        while(!in.hasNextInt()){
-            in.next();
-            System.out.print("\t► Please enter a valid numeric value: ");
-        }
-        raise = in.nextInt();
-
+        boolean end = false;
+        do {
+            while(!in.hasNextInt()){
+                in.next();
+                System.out.print("\t► Please enter a valid numeric value: ");
+            }
+            raise = in.nextInt();
+            if (raise <= 0) System.out.print("\t► Raise must be greater than 0: ");
+            else  end=true;
+            
+        } while (!end);
+        
         return raise;
        
     }

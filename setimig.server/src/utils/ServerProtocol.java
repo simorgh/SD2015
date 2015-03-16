@@ -56,7 +56,7 @@ public class ServerProtocol extends utils.ComUtils{
     /**
      * - support method -
      */
-    private void sendHeader(String str) throws IOException{ 
+    private void sendHeader(String str) throws IOException { 
         write_string_command(str);
     }
     
@@ -221,13 +221,16 @@ public class ServerProtocol extends utils.ComUtils{
     /**
      * ServerProtocol command header reading.
      * 
-     * @return read header
      * @throws IOException
+     * @throws utils.SyntaxErrorException
+     * @throws utils.ProtocolErrorException
+     * @return read header
      */
-    public String readHeader() throws IOException {
-        String header = read_string_command();
+    public String readHeader() throws IOException, SyntaxErrorException, ProtocolErrorException {
+        String header = read_string_command().toUpperCase();
         this.log.print("C: " + header);
-        if(!isValidHeader(header)) throw new IOException();
+        if(!isValidHeader(header)) throw new SyntaxErrorException();
+        if(header.equals(ServerProtocol.ERROR)) throw new ProtocolErrorException();
         
         return header;
     }
@@ -237,12 +240,12 @@ public class ServerProtocol extends utils.ComUtils{
      * 1. STRT header is expected.
      * 
      * @throws java.io.IOException
-     * @return 
+     * @throws utils.SyntaxErrorException
+     * @throws utils.ProtocolErrorException 
      */
-    public String receiveStart() throws IOException {
-        String cmd = readHeader().toUpperCase();
-        if(!cmd.equals(ServerProtocol.START) && !cmd.equals(ServerProtocol.ERROR) ) throw new IOException();
-        return cmd;
+    public void receiveStart() throws IOException, SyntaxErrorException, ProtocolErrorException {
+        String cmd = readHeader();
+        if(!cmd.equals(ServerProtocol.START)) throw new SyntaxErrorException();
     }
 
     /**
@@ -251,29 +254,30 @@ public class ServerProtocol extends utils.ComUtils{
      * 2. SP is expected (' ').
      * 3. NUMBER value representing the value of the raise is expected.
      * 
+     * @throws java.io.IOException
+     * @throws utils.SyntaxErrorException
      * @return if an error occoured -1 is returned, otherwise returns raise value.
      */
-    public int receiveRaise() {
+    public int receiveRaise() throws IOException, SyntaxErrorException {
         int raise;
-        try {
-            if( !(read_char() == ' ') ) throw new IOException();
-            raise = read_int32();
-            if(raise < 0) throw new IOException();
+
+        if(!(read_char() == ' ')) throw new SyntaxErrorException();
+        raise = read_int32();
+        if(raise < 0) throw new SyntaxErrorException();
+        this.log.println(" " + raise);
             
-            this.log.println(" " + raise);
-            return raise;
-        } catch (IOException ex) {
-            return -1;
-        }
+        return raise;
     }
 
     /**
      * Error command reception.
      * 1. STRT header is expected.
+     * 
      * @throws java.io.IOException
+     * @throws utils.SyntaxErrorException
      */ 
-    public void receiveErrorDescription() throws IOException {
-        if(!(read_char() == ' ')) throw new IOException();
+    public void receiveErrorDescription() throws IOException, SyntaxErrorException {
+        if(!(read_char() == ' ')) throw new SyntaxErrorException();
         
         String des = read_string_variable(2);
         this.log.println(" " + String.format("%02d", des.length()) + des);
@@ -303,7 +307,7 @@ public class ServerProtocol extends utils.ComUtils{
      * @return true if cmd is any of the expected command string, false otherwise.
      */
     private boolean isValidHeader(String header){
-        switch (header.toUpperCase()) {
+        switch (header) {
             case ServerProtocol.START:
                 return true;
             case ServerProtocol.DRAW:

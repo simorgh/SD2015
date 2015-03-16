@@ -7,6 +7,7 @@ package controller;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -15,14 +16,16 @@ import java.util.logging.Logger;
 import model.Deck;
 import model.Game;
 import utils.InvalidDeckFileException;
+import utils.ProtocolErrorException;
 import utils.ServerProtocol;
+import utils.SyntaxErrorException;
 //import java.util.concurrent.TimeoutException;
 
 /**
  * @author simorgh & dzigor92
  */
 public class ServerController implements Runnable {
-    private final int TIMEOUT = 3000; /* Socket timeout in miliseconds */ 
+    private final int TIMEOUT = 10000; /* Socket timeout in miliseconds */ 
     
     /* ServerController initial attributes */
     private Socket csocket;
@@ -84,15 +87,16 @@ public class ServerController implements Runnable {
             System.exit(1);
         }
         
+        
         try {
             serverSocket = new ServerSocket(ServerController.port);
-            System.out.println("Servidor socket preparat al port " + ServerController.port);
+            System.out.println("Server socket ready at port " + ServerController.port);
 
             while (true) {
-                System.out.println("Esperant una connexio d'un client...");
+                System.out.println("Waiting for a connection...");
                 Socket socket = serverSocket.accept(); /* blocking instr. awaits until client requested connection */
-                //socket.setSoTimeout(TIMEOUT);
-                System.out.println("Connexio acceptada d'un client.");
+                socket.setSoTimeout(TIMEOUT);
+                System.out.println("Connection established! -> Creating new game.");
                 
                 new Thread(new ServerController(socket)).start();
             }
@@ -124,9 +128,7 @@ public class ServerController implements Runnable {
         } catch (IOException ex) {
             this.pr.sendError(ServerProtocol.ERR_SSE);
             System.out.println("ERROR: Failed to open logfile OutputStream. - Connection aborted.");
-            try {
-                this.csocket.close();
-            } catch (IOException ex1) { /* ... */ } finally { Thread.currentThread().stop(); }
+            closeAll(logout);
         }
         
         /* creates new (shuffled) game */
@@ -134,28 +136,14 @@ public class ServerController implements Runnable {
         
         /* here comes the magic... */
         try {
-            String aux;
-            aux = this.pr.receiveStart();
-            if( aux.equals(ServerProtocol.ERROR) ){
-                this.pr.receiveErrorDescription();
-                closeAll(logout);
-            }
-            
+            this.pr.receiveStart();
+           
+            /* a mandotry DRAW is expected after STBT, if not -> the protocol is broken! */
             this.pr.sendStartingBet(ServerController.strt_bet);
-            aux = this.pr.readHeader();
-            switch (aux) {
-                case ServerProtocol.DRAW:
-                    serveCard(); /* if the protocol is followed, normal flow should get here */
-                    break;
-                case ServerProtocol.ERROR:
-                    this.pr.receiveErrorDescription();
-                    closeAll(logout);
-                    break;
-                default:    /* any other valid 'header' is received -> the protocol is broken! */
-                    this.pr.sendError(ServerProtocol.ERR_SYNTAX);
-                    closeAll(logout);
-                    break;
-            }
+            String aux = this.pr.readHeader();
+            if(aux.equals(ServerProtocol.DRAW)) serveCard();
+            else throw new SyntaxErrorException();
+                
                 
             /* game loop */       
             this.end = false;
@@ -178,16 +166,8 @@ public class ServerController implements Runnable {
                         this.end = true;
                         break;
                     
-                    case ServerProtocol.ERROR:
-                        this.pr.receiveErrorDescription();
-                        System.out.println("ERROR Message received. Connection closed");
-                        closeAll(logout);
-                        break;
-                        
-                    default:    /* other valid 'header' (STRT) is received -> the protocol is broken! */
-                        this.pr.sendError(ServerProtocol.ERR_SYNTAX);
-                        closeAll(logout);
-                        break;
+                    /* other valid 'header' (STRT) is received -> the protocol is broken! */
+                    default: throw new SyntaxErrorException();    
                 }
                 
             } while(!this.end);
@@ -196,12 +176,22 @@ public class ServerController implements Runnable {
             this.g.playBank();
             this.pr.sendBankScore(this.g.getHandBank().size(), this.g.getHandBank(), this.g.getBankScore());
             this.pr.sendGains(this.g.computeGains());
-        
-        /* syntax error treatment */
-        } catch (IOException ex) {
+
+        } catch (InterruptedIOException iioe) {
+            System.out.println("ERROR: Remote host timed out during read operation");
+            if(!pr.sendError(ServerProtocol.ERR_TIMEOUT)) System.out.println("ERROR: Cannot communicate to the peer. Connection interrupted."); 
+        } catch (SyntaxErrorException e) {      /* syntax error treatment */
             System.out.println("ERROR: Client message has Syntax Error - Connection aborted.");
             this.pr.sendError(ServerProtocol.ERR_SYNTAX);
-            //ex.printStackTrace();
+        } catch (ProtocolErrorException e) {    /* ERRR header received */
+            try {
+                this.pr.receiveErrorDescription();
+            } catch (IOException | SyntaxErrorException ex) {
+                Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            System.out.println("ERROR Message received. Connection closed");
+        } catch (IOException ex) {              /* broken pipe */
+            System.out.println("ERROR: Cannot communicate to the peer. Connection interrupted.");
         } finally {
             closeAll(logout);
         }
@@ -214,7 +204,7 @@ public class ServerController implements Runnable {
      */
     private void closeAll(OutputStream out) {
         try {
-            out.close();
+            if(out!=null) out.close();
             this.csocket.close();
             Thread.currentThread().stop();
         } catch (IOException ex) {
