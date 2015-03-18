@@ -116,8 +116,8 @@ public class ClientProtocol extends utils.ComUtils{
      */
     public boolean sendAnte(int raise) {
         try {
-            sendHeader(ClientProtocol.ANTE + ' ');
-            //write_char(' ');
+            sendHeader(ClientProtocol.ANTE);
+            write_char(' ');
             write_int32(raise);
         } catch (IOException ex) {
             return false;

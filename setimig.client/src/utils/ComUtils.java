@@ -202,7 +202,7 @@ public class ComUtils {
     
             
     public void write_char(char c) throws IOException{
-        dos.writeChar((int) c);
+        dos.write(c);
     }
     
     public char read_char() throws IOException{

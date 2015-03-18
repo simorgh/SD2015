@@ -2,7 +2,6 @@ package utils;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Arrays;
 
 public class ComUtils {
     /* Mida d'una cadena de caracters */
@@ -202,8 +201,8 @@ public class ComUtils {
        
     
             
-    public void write_char(char c) throws IOException{
-        dos.writeChar((int) c);
+    public void write_char(char c) throws IOException {
+        dos.write(c);
     }
     
     public char read_char() throws IOException{
