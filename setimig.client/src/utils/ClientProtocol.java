@@ -116,8 +116,8 @@ public class ClientProtocol extends utils.ComUtils{
      */
     public boolean sendAnte(int raise) {
         try {
-            sendHeader(ClientProtocol.ANTE);
-            write_char(' ');
+            sendHeader(ClientProtocol.ANTE + ' ');
+            //write_char(' ');
             write_int32(raise);
         } catch (IOException ex) {
             return false;
@@ -215,7 +215,7 @@ public class ClientProtocol extends utils.ComUtils{
         if( cmd.equals(ClientProtocol.ERROR) ) throw new ProtocolErrorException();
         if(!cmd.equals(ClientProtocol.CARD)) throw new SyntaxErrorException();
         if( !(read_char() == ' ') ) throw new SyntaxErrorException();
-
+        
         // card caption
         card = new char[2];
         card[0] = Character.toLowerCase(read_char());
@@ -269,6 +269,7 @@ public class ClientProtocol extends utils.ComUtils{
             bank_resume.add(new String(card));
         }
 
+        if(read_char() != ' ') throw new SyntaxErrorException();
         String score = read_string_command();
         if(score.length() != 4) throw new SyntaxErrorException();
         bank_resume.add(score);

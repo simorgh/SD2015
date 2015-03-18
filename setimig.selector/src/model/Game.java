@@ -16,6 +16,7 @@ public class Game {
     private int bet;
     
     private int cont;
+    private boolean end;
     
     /**
      * Class constructor 
@@ -26,6 +27,7 @@ public class Game {
     public Game(Deck deck, int strt_bet){
         this.deck = deepCopy(deck);
         this.bet = strt_bet;
+        this.end = false;
 
         /* init game */
         this.handBank = new ArrayList();
@@ -108,6 +110,22 @@ public class Game {
      */
     public float getBankScore() {
         return bankScore;
+    }
+    
+    /**
+     * End-Game getter
+     * @return end state
+     */
+    public boolean isFinished(){
+        return end;
+    }
+    
+    /**
+     * End-Game setter
+     * @param end
+     */
+    public void setFinished(boolean end){
+        this.end = end;
     }
     
     /**

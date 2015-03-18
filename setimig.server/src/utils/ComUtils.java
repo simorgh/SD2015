@@ -207,7 +207,7 @@ public class ComUtils {
     }
     
     public char read_char() throws IOException{
-        return dis.readChar();
+        return (char) dis.read();
     }
     
     

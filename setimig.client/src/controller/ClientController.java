@@ -21,7 +21,7 @@ import view.Console;
  * @author simorgh & dzigor92
  */
 public class ClientController {
-    private final int TIMEOUT = 3000; /* Socket timeout in miliseconds */
+    private final int TIMEOUT = 10000; /* Socket timeout in miliseconds */
     
     /* Client constant arg-relationed variables */
     private final String nomMaquina;
@@ -86,11 +86,10 @@ public class ClientController {
             
             pr.sendDraw();  /* DRAW command is mandatory after a STARTING_BET is received */
             char [] card = pr.receiveCard();
-            g.updateHandPlayer(Arrays.toString(card));
+            g.updateHandPlayer(new String(card));
             console.printNewCard(card);
                 
             // game loop
-            boolean end = false;
             do{
                 char opt;
                 if(!autoplay) opt = console.printInGameOptions(g.getPlayerScore());
@@ -105,7 +104,7 @@ public class ClientController {
                          
                         if(g.isBusted()){ 
                             pr.receiveBusting();
-                            end = true;
+                            g.setFinished(true);
                         }
                         break;
                         
@@ -119,19 +118,19 @@ public class ClientController {
                         
                         if(g.isBusted()){ 
                             pr.receiveBusting();
-                            end = true;
+                            g.setFinished(true);
                         } 
                         break;
                         
                     case '3': 
                         pr.sendPass();
-                        end = true;
+                        g.setFinished(true);
                         break;
                     default: 
                         console.printError(Console.ERR_01);
                         break;
                 }  
-            } while(!end);
+            } while(!g.isFinished());
             
             ArrayList <String> bank_score = pr.receiveBankScore();
             console.printBankScore(bank_score);

@@ -75,8 +75,8 @@ public class ServerProtocol extends utils.ComUtils{
      */
     public boolean sendStartingBet(int bet) {
         try {
-            sendHeader(ServerProtocol.STARTING_BET);
-            write_char(' ');
+            sendHeader(ServerProtocol.STARTING_BET + ' ');
+            //write_char(' ');
             write_int32(bet);
             this.log.println("\nS: " + ServerProtocol.STARTING_BET + ' ' + bet);
         } catch (IOException ex) {
@@ -97,10 +97,11 @@ public class ServerProtocol extends utils.ComUtils{
     */
     public boolean sendCard(char D, char P) {
         try {
-            sendHeader(ServerProtocol.CARD);
-            write_char(' ');
-            write_char(Character.toLowerCase(D));
-            write_char(Character.toLowerCase(P));
+            sendHeader(ServerProtocol.CARD + ' ');
+            //write_char(' ');
+            write_string_command(Character.toLowerCase(D) + "" + Character.toLowerCase(P));
+            //write_char(Character.toLowerCase(D));
+            //write_char(Character.toLowerCase(P));
             this.log.println("\nS: " + ServerProtocol.CARD + ' ' + Character.toLowerCase(D) + Character.toLowerCase(P));
         } catch (IOException ex) {
             return false;
@@ -142,18 +143,19 @@ public class ServerProtocol extends utils.ComUtils{
      */
     public boolean sendBankScore(int number, ArrayList <char[]> cards, float score) {
         try {
-            sendHeader(ServerProtocol.BANK_SCORE);
-            write_char(' ');
+            sendHeader(ServerProtocol.BANK_SCORE + ' ');
+            //write_char(' ');
             write_int32(number);
             
             this.log.print("\nS: " + ServerProtocol.BANK_SCORE + ' ' + number);
             for (char[] c : cards) {
                 this.log.print(c[0] + "" + c[1]);
-                write_char(Character.toLowerCase(c[0]));
-                write_char(Character.toLowerCase(c[1]));
+                write_string_command(Character.toLowerCase(c[0]) + "" + Character.toLowerCase(c[1]));
+                //write_char(Character.toLowerCase(c[0]));
+                //write_char(Character.toLowerCase(c[1]));
             }
             
-            sendHeader(customScoreFormat(score));
+            sendHeader(' ' + customScoreFormat(score));
             this.log.println(' ' + customScoreFormat(score));
         } catch (IOException ex) {
             return false;
@@ -177,8 +179,8 @@ public class ServerProtocol extends utils.ComUtils{
      */
     public boolean sendGains(int gains) {
         try {
-            sendHeader(ServerProtocol.GAINS);
-            write_char(' ');
+            sendHeader(ServerProtocol.GAINS + ' ');
+            //write_char(' ');
             write_int32(gains);
             this.log.println("S: " + ServerProtocol.GAINS + ' ' + gains);
         } catch (IOException ex) {
@@ -202,8 +204,8 @@ public class ServerProtocol extends utils.ComUtils{
      */
     public boolean sendError(String err) {
         try {
-            sendHeader(ServerProtocol.ERROR);
-            write_char(' ');
+            sendHeader(ServerProtocol.ERROR + ' ');
+            //write_char(' ');
             write_string_variable(2, err);
             this.log.println("\nS: " + ServerProtocol.ERROR + " " + String.format("%02d", err.length()) + err);
         } catch (IOException ex) {

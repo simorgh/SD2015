@@ -7,7 +7,6 @@
 package model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import utils.DuplicatedCardException;
 
 /**
@@ -18,6 +17,7 @@ import utils.DuplicatedCardException;
 public class Game {
     private float playerScore;
     private final ArrayList handPlayer;
+    private boolean end;
     
     /**
      * Class constructor. 
@@ -26,6 +26,7 @@ public class Game {
     public Game(){
         this.playerScore = 0.0f;
         this.handPlayer = new ArrayList();
+        this.end = false;
     }
     
     /**
@@ -34,10 +35,8 @@ public class Game {
      * @return The value of the card
      */
     private float getCardValue(char D){
-        if (Character.isDigit(D)) return (float)Character.getNumericValue(D);
-        else{
-            return (float)0.5;
-        }      
+        if (Character.isDigit(D)) return (float) Character.getNumericValue(D);
+        else return (float)0.5;  
     }
     
     /**
@@ -55,6 +54,22 @@ public class Game {
      */
     public float getPlayerScore() {
         return playerScore;
+    }
+    
+    /**
+     * End-Game getter
+     * @return end state
+     */
+    public boolean isFinished(){
+        return end;
+    }
+    
+    /**
+     * End-Game setter
+     * @param end
+     */
+    public void setFinished(boolean end){
+        this.end = end;
     }
     
     /**

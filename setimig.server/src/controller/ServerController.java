@@ -25,7 +25,7 @@ import utils.SyntaxErrorException;
  * @author simorgh & dzigor92
  */
 public class ServerController implements Runnable {
-    private final int TIMEOUT = 10000; /* Socket timeout in miliseconds */ 
+    private final int TIMEOUT = 90000; /* Socket timeout in miliseconds */ 
     
     /* ServerController initial attributes */
     private Socket csocket;
@@ -39,7 +39,6 @@ public class ServerController implements Runnable {
     /* Game encapsulated fields */
     private Game g;
     private ServerProtocol pr;
-    private Boolean end;
     
     /** 
      * Constructor used on every new Runnable Thread.
@@ -49,7 +48,6 @@ public class ServerController implements Runnable {
      */
     ServerController(Socket csocket) {
         this.csocket = csocket;
-        this.end = false;
         this.pr = null;
         this.g = null;
     }
@@ -146,10 +144,9 @@ public class ServerController implements Runnable {
                 
                 
             /* game loop */       
-            this.end = false;
             do{
                 String cmd;
-                if(this.csocket.isClosed()) this.end = true;
+                if(this.csocket.isClosed()) this.g.setFinished(true);
                 
                 cmd = this.pr.readHeader();
                 switch(cmd) {
@@ -163,14 +160,14 @@ public class ServerController implements Runnable {
                         break;
 
                     case ServerProtocol.PASS:
-                        this.end = true;
+                        this.g.setFinished(true);
                         break;
                     
                     /* other valid 'header' (STRT) is received -> the protocol is broken! */
                     default: throw new SyntaxErrorException();    
                 }
                 
-            } while(!this.end);
+            } while(!this.g.isFinished());
 
             /* endgame status messages */
             this.g.playBank();
@@ -225,7 +222,7 @@ public class ServerController implements Runnable {
 
         if (this.g.getPlayerScore() > 7.5f){
             this.pr.sendBusting();
-            this.end = true;
+            this.g.setFinished(true);
         }                              
     }
     

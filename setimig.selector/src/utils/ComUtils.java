@@ -2,7 +2,6 @@ package utils;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Arrays;
 
 public class ComUtils {
     /* Mida d'una cadena de caracters */

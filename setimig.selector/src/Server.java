@@ -5,7 +5,7 @@
 ////////////////////////////////////////////////////
 
 import controller.SelectorCLI;
-import controller.SelectorController;
+import controller.Controller;
 
 /**
  *
@@ -17,7 +17,7 @@ public class Server {
             
            /* Command Line arguments threatment */
            SelectorCLI cli = new SelectorCLI(args);
-           SelectorController controller = new SelectorController(cli.getStartingBet(), cli.getPort(),  cli.getDeckfile());
+           Controller controller = new Controller(cli.getStartingBet(), cli.getPort(),  cli.getDeckfile());
            controller.start();
         }
 }
