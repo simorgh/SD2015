@@ -98,7 +98,7 @@ public class ClientController {
                     case '1': 
                         pr.sendDraw();
                         card = pr.receiveCard();
-                        g.updateHandPlayer(Arrays.toString(card));
+                        g.updateHandPlayer(new String(card));
                         console.printNewCard(card);
                         
                          
@@ -113,7 +113,7 @@ public class ClientController {
                         pr.sendAnte(rise);
                         pr.sendDraw();
                         card = pr.receiveCard();
-                        g.updateHandPlayer(Arrays.toString(card));
+                        g.updateHandPlayer(new String(card));
                         console.printNewCard(card);
                         
                         if(g.isBusted()){ 
