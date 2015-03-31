@@ -9,17 +9,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CharsetEncoder;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -100,7 +93,7 @@ public class Controller {
      * @param csocket
      * @return 
      */
-    public Protocol initClientSocket(Socket csocket){
+    public Protocol initClientSocket(SocketChannel csocket){
         OutputStream logout = null;
         Protocol pr = null;
         
@@ -161,7 +154,7 @@ public class Controller {
      /**
      * Terminates thread and closes client resources
      */
-    private void closeAll(OutputStream out, Socket csocket) {
+    private void closeAll(OutputStream out, SocketChannel csocket) {
         try {
             if(out!=null) out.close();
             csocket.close();
@@ -214,7 +207,7 @@ public class Controller {
                     SelectionKey clientkey = client.register(selector, SelectionKey.OP_READ); // read incoming stream
 
                     /* initializing new Game-model and socket */
-                    connMap.put(clientkey, initClientSocket(client.socket()) );
+                    connMap.put(clientkey, initClientSocket(client) );
                     clientkey.attach(new Game( this.deck, this.strt_bet) );
                 }
 
@@ -231,26 +224,40 @@ public class Controller {
                     //closeAll();
                 }
                 
+                // Mandatory Start comes here...
+                
+                
+                // game loop treatment
                 try {
-                    String cmd = pr.readHeader();
-                    switch(cmd) {
-                        case Protocol.DRAW:
-                            serveCard(g, pr); 
-                            break;
-
-                        case Protocol.ANTE:
-                            int raise = pr.receiveRaise();
-                            g.raiseBet(raise);
-                            break;
-
-                        case Protocol.PASS:
-                            g.setFinished(true);
-                            break;
-
-                        /* other valid 'header' (STRT) is received -> the protocol is broken! */
-                        default: throw new SyntaxErrorException();
-                    }
+                    String cmd = null;
+                    int raise = -1;
                     
+                    if( pr.isLastState(Protocol.ANTE) ){
+                        raise = pr.receiveRaise();
+                        if(raise != -1) cmd = Protocol.ANTE;
+                    } else {
+                        cmd = pr.readHeader();
+                        if(pr.isLastState(Protocol.ANTE)) raise = pr.receiveRaise();
+                    } 
+                    
+                    if(cmd != null) {
+                        switch(cmd) {
+                            case Protocol.DRAW:
+                                serveCard(g, pr); 
+                                break;
+
+                            case Protocol.ANTE:
+                                g.raiseBet(raise);
+                                break;
+
+                            case Protocol.PASS:
+                                g.setFinished(true);
+                                break;
+
+                            /* other valid 'header' (STRT) is received -> the protocol is broken! */
+                            default: throw new SyntaxErrorException();
+                        }
+                    } 
                 } catch (SyntaxErrorException e) {      // syntax error treatment
                     System.out.println("ERROR: Client message has Syntax Error - Connection aborted.");
                     pr.sendError(Protocol.ERR_SYNTAX);

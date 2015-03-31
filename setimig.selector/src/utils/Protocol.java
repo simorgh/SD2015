@@ -11,16 +11,19 @@ package utils;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.channels.SocketChannel;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 /**
  * @author simorgh & dzigor92
  */
-public class Protocol extends utils.ComUtils{
+public class Protocol{
     
     /* Protocol Commands Semantics */
     public static final String START = "STRT";
@@ -40,7 +43,13 @@ public class Protocol extends utils.ComUtils{
     public static final String ERR_SSE = "Server-side error";
     
     /* Log Trace Writer */
+    private final int BUFFER_SIZE = 512;
     private final PrintWriter log;
+    private final SocketChannel socket;
+    private final ByteBuffer buffer;
+    
+    private ArrayList<Byte> backup;
+    private String lastState = null;
     
     /**
      * Class constructor.
@@ -48,16 +57,29 @@ public class Protocol extends utils.ComUtils{
      * @param out - OutputStream used to write trace information about S/C communication.
      * @throws IOException 
      */
-    public Protocol(Socket socket, OutputStream out) throws IOException {
-        super(socket);
+    public Protocol(SocketChannel socket, OutputStream out) throws IOException {
+        this.buffer = ByteBuffer.allocate(BUFFER_SIZE);
+        this.socket = socket;
+        this.backup = new ArrayList<>();     
         this.log = new PrintWriter(out, true); /* autoflushing enabled */
+    }
+    
+    /**
+     * 
+     * @param state
+     * @return 
+     */
+    public boolean isLastState(String state){
+        return lastState.equals(state);
     }
     
     /**
      * - support method -
      */
-    private void sendHeader(String str) throws IOException { 
-        write_string_command(str);
+    private void sendHeader(String str) throws IOException {
+        buffer.clear();
+        buffer.put(str.getBytes());
+        socket.write(buffer);
     }
     
 //////////////////////////////////////////////////////////////
@@ -75,9 +97,11 @@ public class Protocol extends utils.ComUtils{
      */
     public boolean sendStartingBet(int bet) {
         try {
-            sendHeader(Protocol.STARTING_BET);
-            write_char(' ');
-            write_int32(bet);
+            buffer.clear();
+            buffer.put(Protocol.STARTING_BET.getBytes());
+            buffer.put( (byte) ' ');
+            buffer.putInt(bet);      
+            socket.write(buffer);
             this.log.println("\nS: " + Protocol.STARTING_BET + ' ' + bet);
         } catch (IOException ex) {
             return false;
@@ -97,10 +121,12 @@ public class Protocol extends utils.ComUtils{
     */
     public boolean sendCard(char D, char P) {
         try {
-            sendHeader(Protocol.CARD);
-            write_char(' ');
-            write_char(Character.toLowerCase(D));
-            write_char(Character.toLowerCase(P));
+            buffer.clear();
+            buffer.put(Protocol.CARD.getBytes());
+            buffer.put((byte)' ');
+            buffer.put((byte) Character.toLowerCase(D));
+            buffer.put((byte) Character.toLowerCase(P));
+            socket.write(buffer);
             this.log.println("\nS: " + Protocol.CARD + ' ' + Character.toLowerCase(D) + Character.toLowerCase(P));
         } catch (IOException ex) {
             return false;
@@ -142,18 +168,19 @@ public class Protocol extends utils.ComUtils{
      */
     public boolean sendBankScore(int number, ArrayList <char[]> cards, float score) {
         try {
-            sendHeader(Protocol.BANK_SCORE);
-            write_char(' ');
-            write_int32(number);
-            
+            buffer.clear();
+            buffer.put(Protocol.BANK_SCORE.getBytes());
+            buffer.put((byte) ' ');
+            buffer.putInt(number);
             this.log.print("\nS: " + Protocol.BANK_SCORE + ' ' + number);
             for (char[] c : cards) {
                 this.log.print(c[0] + "" + c[1]);
-                write_char(Character.toLowerCase(c[0]));
-                write_char(Character.toLowerCase(c[1]));
+                buffer.put((byte) Character.toLowerCase(c[0]));
+                buffer.put((byte) Character.toLowerCase(c[1]));
             }
-            
-            sendHeader(customScoreFormat(score));
+            buffer.put((byte) ' ');
+            buffer.put(customScoreFormat(score).getBytes());
+            socket.write(buffer);
             this.log.println(' ' + customScoreFormat(score));
         } catch (IOException ex) {
             return false;
@@ -177,9 +204,11 @@ public class Protocol extends utils.ComUtils{
      */
     public boolean sendGains(int gains) {
         try {
-            sendHeader(Protocol.GAINS);
-            write_char(' ');
-            write_int32(gains);
+            buffer.clear();
+            buffer.put(Protocol.GAINS.getBytes());
+            buffer.put((byte) ' ');
+            buffer.putInt(gains);
+            socket.write(buffer);
             this.log.println("S: " + Protocol.GAINS + ' ' + gains);
         } catch (IOException ex) {
             return false;
@@ -202,14 +231,31 @@ public class Protocol extends utils.ComUtils{
      */
     public boolean sendError(String err) {
         try {
-            sendHeader(Protocol.ERROR);
-            write_char(' ');
-            write_string_variable(2, err);
+            buffer.clear();
+            buffer.put(Protocol.ERROR.getBytes());
+            buffer.put((byte) ' ');
+            buffer.put(Integer.toString(err.length()).getBytes());
+            buffer.put(err.getBytes());
+            socket.write(buffer);
             this.log.println("\nS: " + Protocol.ERROR + " " + String.format("%02d", err.length()) + err);
         } catch (IOException ex) {
             return false;
         }
         return true;
+    }
+    
+    /**
+     * 
+     */
+    private byte[] readBytes() throws IOException{
+        buffer.clear();
+        int numBytes = socket.read(buffer);
+        if(numBytes == -1) throw new IOException("Broken Pipe");
+        
+        byte[] b = new byte[numBytes];
+        while(buffer.hasRemaining()) b[buffer.position()] = buffer.get();
+        
+        return b;
     }
     
     
@@ -227,13 +273,32 @@ public class Protocol extends utils.ComUtils{
      * @return read header
      */
     public String readHeader() throws IOException, SyntaxErrorException, ProtocolErrorException {
-        String header = read_string_command().toUpperCase();
+        byte[] bytes = readBytes();
+        for( byte b : bytes ) backup.add(b);
+        if(backup.size() < 4) return null; /* 4 bytes (command) */
+        
+        List <Byte> sub = backup.subList(0, 4);
+        backup.removeAll(sub);
+        String header = getStringRepresentation( toByteArray(sub) ).toUpperCase();
         this.log.print("C: " + header);
         if(!isValidHeader(header)) throw new SyntaxErrorException();
         if(header.equals(Protocol.ERROR)) throw new ProtocolErrorException();
         
         return header;
     }
+    
+    private byte[] toByteArray( List<Byte> list){
+        byte[] result = new byte[list.size()];
+        for(int i = 0; i < list.size(); i++) result[i] = list.get(i);
+        
+        return result;
+    }
+
+    private String getStringRepresentation(byte[] list){    
+        CharBuffer cBuffer = ByteBuffer.wrap(list).asCharBuffer();
+        return cBuffer.toString();
+    }
+     
     
     /**
      * Start command reception.
@@ -247,7 +312,8 @@ public class Protocol extends utils.ComUtils{
         String cmd = readHeader();
         if(!cmd.equals(Protocol.START)) throw new SyntaxErrorException();
     }
-
+    
+    
     /**
      * Raise command reception. The Server receives the card as indicated by the defined communication protocol.
      * 1. ANTE header is expected.
@@ -259,16 +325,38 @@ public class Protocol extends utils.ComUtils{
      * @return if an error occoured -1 is returned, otherwise returns raise value.
      */
     public int receiveRaise() throws IOException, SyntaxErrorException {
-        int raise;
-
-        if(!(read_char() == ' ')) throw new SyntaxErrorException();
-        raise = read_int32();
-        if(raise < 0) throw new SyntaxErrorException();
-        this.log.println(" " + raise);
+        byte[] bytes = readBytes();
+        for( byte b : bytes ) backup.add(b);
+        
+        if(backup.size() > 1){
+            byte b = backup.get(0);  
+            if((char)b != ' ') throw new SyntaxErrorException();
             
-        return raise;
+            if(backup.size() >= 5){
+                List <Byte> sub = backup.subList(1, 4);
+                backup.remove(0);
+                backup.removeAll(sub);
+                return bytesToInt32(toByteArray(sub), "be");
+            }
+        }
+        
+        return -1;
     }
 
+     /* Passar de bytes a enters */
+    private int bytesToInt32(byte bytes[], String endianess){
+        int number;
+
+        if("be".equals(endianess.toLowerCase())) number=((bytes[0] & 0xFF) << 24) | ((bytes[1] & 0xFF) << 16) | ((bytes[2] & 0xFF) << 8) | (bytes[3] & 0xFF);
+        else number=(bytes[0] & 0xFF) | ((bytes[1] & 0xFF) << 8) | ((bytes[2] & 0xFF) << 16) | ((bytes[3] & 0xFF) << 24);
+
+        return number;
+    }
+    
+    
+    
+    
+    
     /**
      * Error command reception.
      * 1. STRT header is expected.
@@ -277,10 +365,12 @@ public class Protocol extends utils.ComUtils{
      * @throws utils.SyntaxErrorException
      */ 
     public void receiveErrorDescription() throws IOException, SyntaxErrorException {
+/*
         if(!(read_char() == ' ')) throw new SyntaxErrorException();
         
         String des = read_string_variable(2);
         this.log.println(" " + String.format("%02d", des.length()) + des);
+*/ 
     }
     
     
@@ -309,17 +399,22 @@ public class Protocol extends utils.ComUtils{
     private boolean isValidHeader(String header){
         switch (header) {
             case Protocol.START:
+                lastState = Protocol.START;
                 return true;
             case Protocol.DRAW:
+                lastState = Protocol.DRAW;
                 return true;
             case Protocol.ANTE:
+                lastState = Protocol.ANTE;
                 return true;
             case Protocol.PASS:
+                lastState = Protocol.PASS;
                 return true;
             case Protocol.ERROR:
+                lastState = Protocol.ERROR;
                 return true;
             default: return false;
         } 
     }
-
+    
 }
