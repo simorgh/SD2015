@@ -9,7 +9,6 @@ import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import model.Game;
 import utils.DuplicatedCardException;
 import utils.ClientProtocol;

@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.channels.SocketChannel;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -49,7 +48,7 @@ public class Protocol{
     private final ByteBuffer buffer;
     
     private ArrayList<Byte> backup;
-    private String lastState = null;
+    private String lastState = "";
     
     /**
      * Class constructor.
@@ -73,12 +72,17 @@ public class Protocol{
         return lastState.equals(state);
     }
     
+    public boolean isDataReady(){
+        return (backup.size() > 4);
+    }
+    
     /**
      * - support method -
      */
     private void sendHeader(String str) throws IOException {
         buffer.clear();
         buffer.put(str.getBytes());
+        buffer.flip();
         socket.write(buffer);
     }
     
@@ -100,9 +104,12 @@ public class Protocol{
             buffer.clear();
             buffer.put(Protocol.STARTING_BET.getBytes());
             buffer.put( (byte) ' ');
-            buffer.putInt(bet);      
-            socket.write(buffer);
-            this.log.println("\nS: " + Protocol.STARTING_BET + ' ' + bet);
+            buffer.putInt(bet);
+            buffer.flip();
+            while(buffer.hasRemaining()) socket.write(buffer);
+            System.out.println("\nS: " + Protocol.STARTING_BET + ' ' + bet);
+            
+            //this.log.println("\nS: " + Protocol.STARTING_BET + ' ' + bet);
         } catch (IOException ex) {
             return false;
         }
@@ -126,8 +133,10 @@ public class Protocol{
             buffer.put((byte)' ');
             buffer.put((byte) Character.toLowerCase(D));
             buffer.put((byte) Character.toLowerCase(P));
+            buffer.flip();
             socket.write(buffer);
-            this.log.println("\nS: " + Protocol.CARD + ' ' + Character.toLowerCase(D) + Character.toLowerCase(P));
+            System.out.println("\nS: " + Protocol.CARD + ' ' + Character.toLowerCase(D) + Character.toLowerCase(P));
+            //this.log.println("\nS: " + Protocol.CARD + ' ' + Character.toLowerCase(D) + Character.toLowerCase(P));
         } catch (IOException ex) {
             return false;
         }
@@ -146,7 +155,8 @@ public class Protocol{
     public boolean sendBusting() {
         try {
             sendHeader(Protocol.BUSTING);
-            this.log.println("\nS: " + Protocol.BUSTING);
+            System.out.println("\nS: " + Protocol.BUSTING);
+            //this.log.println("\nS: " + Protocol.BUSTING);
         } catch (IOException ex) {
             return false;
         }
@@ -172,16 +182,20 @@ public class Protocol{
             buffer.put(Protocol.BANK_SCORE.getBytes());
             buffer.put((byte) ' ');
             buffer.putInt(number);
-            this.log.print("\nS: " + Protocol.BANK_SCORE + ' ' + number);
+            System.out.print("\nS: " + Protocol.BANK_SCORE + ' ' + number);
+            //this.log.print("\nS: " + Protocol.BANK_SCORE + ' ' + number);
             for (char[] c : cards) {
-                this.log.print(c[0] + "" + c[1]);
+                System.out.print(c[0] + "" + c[1]);
+                //this.log.print(c[0] + "" + c[1]);
                 buffer.put((byte) Character.toLowerCase(c[0]));
                 buffer.put((byte) Character.toLowerCase(c[1]));
             }
             buffer.put((byte) ' ');
             buffer.put(customScoreFormat(score).getBytes());
+            buffer.flip();
             socket.write(buffer);
-            this.log.println(' ' + customScoreFormat(score));
+            System.out.println(' ' + customScoreFormat(score));
+            //this.log.println(' ' + customScoreFormat(score));
         } catch (IOException ex) {
             return false;
         }
@@ -208,6 +222,7 @@ public class Protocol{
             buffer.put(Protocol.GAINS.getBytes());
             buffer.put((byte) ' ');
             buffer.putInt(gains);
+            buffer.flip();
             socket.write(buffer);
             this.log.println("S: " + Protocol.GAINS + ' ' + gains);
         } catch (IOException ex) {
@@ -236,6 +251,7 @@ public class Protocol{
             buffer.put((byte) ' ');
             buffer.put(Integer.toString(err.length()).getBytes());
             buffer.put(err.getBytes());
+            buffer.flip();
             socket.write(buffer);
             this.log.println("\nS: " + Protocol.ERROR + " " + String.format("%02d", err.length()) + err);
         } catch (IOException ex) {
@@ -251,10 +267,15 @@ public class Protocol{
         buffer.clear();
         int numBytes = socket.read(buffer);
         if(numBytes == -1) throw new IOException("Broken Pipe");
-        
+        System.out.println("TOTAL READ BYTES " + numBytes);
         byte[] b = new byte[numBytes];
-        while(buffer.hasRemaining()) b[buffer.position()] = buffer.get();
-        
+        buffer.flip();
+        while(buffer.hasRemaining()){
+            byte aux = buffer.get();
+            System.out.println("\t>> writing at postion " + buffer.position() + "\tvalue " + aux + ";\tchar " + (char) aux);
+            b[buffer.position()-1] = aux;
+        }
+                
         return b;
     }
     
@@ -273,14 +294,15 @@ public class Protocol{
      * @return read header
      */
     public String readHeader() throws IOException, SyntaxErrorException, ProtocolErrorException {
+        System.out.println("Entering readHeader()...");
         byte[] bytes = readBytes();
         for( byte b : bytes ) backup.add(b);
         if(backup.size() < 4) return null; /* 4 bytes (command) */
         
         List <Byte> sub = backup.subList(0, 4);
-        backup.removeAll(sub);
         String header = getStringRepresentation( toByteArray(sub) ).toUpperCase();
-        this.log.print("C: " + header);
+        backup.removeAll(sub);
+        //this.log.print("C: " + header);
         if(!isValidHeader(header)) throw new SyntaxErrorException();
         if(header.equals(Protocol.ERROR)) throw new ProtocolErrorException();
         
@@ -288,15 +310,19 @@ public class Protocol{
     }
     
     private byte[] toByteArray( List<Byte> list){
-        byte[] result = new byte[list.size()];
-        for(int i = 0; i < list.size(); i++) result[i] = list.get(i);
+        int size = list.size();
+        byte[] result = new byte[size];
+        for(int i = 0; i < size; i++) result[i] = list.get(i);
         
         return result;
     }
 
-    private String getStringRepresentation(byte[] list){    
-        CharBuffer cBuffer = ByteBuffer.wrap(list).asCharBuffer();
-        return cBuffer.toString();
+    private String getStringRepresentation(byte[] list){
+        String result = "";
+        for (byte b : list){
+            result += (char) b;
+        }
+        return result;
     }
      
     
@@ -325,6 +351,7 @@ public class Protocol{
      * @return if an error occoured -1 is returned, otherwise returns raise value.
      */
     public int receiveRaise() throws IOException, SyntaxErrorException {
+        System.out.println("Entering receiveRaise()...");
         byte[] bytes = readBytes();
         for( byte b : bytes ) backup.add(b);
         
@@ -333,10 +360,22 @@ public class Protocol{
             if((char)b != ' ') throw new SyntaxErrorException();
             
             if(backup.size() >= 5){
-                List <Byte> sub = backup.subList(1, 4);
-                backup.remove(0);
+                List <Byte> sub = backup.subList(1, 5);
+                int raise = bytesToInt32( toByteArray(sub), "be");
+                System.out.println("\t***** RAISE RECIEVED is " + raise);
+                lastState = "";
+                
                 backup.removeAll(sub);
-                return bytesToInt32(toByteArray(sub), "be");
+                backup.remove(0);
+                
+                /* Debug */
+                int i = 0; 
+                for( byte bb : backup ){
+                     System.out.println("\t>> backup postion " + i + "\tvalue " + bb + ";\tchar " + (char) bb);
+                     i++;
+                 }/* Debug */
+                
+                return raise;
             }
         }
         
@@ -365,12 +404,26 @@ public class Protocol{
      * @throws utils.SyntaxErrorException
      */ 
     public void receiveErrorDescription() throws IOException, SyntaxErrorException {
-/*
-        if(!(read_char() == ' ')) throw new SyntaxErrorException();
+        System.out.println("Entering receiveErrorDescription()...");
+        byte[] bytes = readBytes();
+        for( byte b : bytes ) backup.add(b);
         
-        String des = read_string_variable(2);
-        this.log.println(" " + String.format("%02d", des.length()) + des);
-*/ 
+        // description recovery
+        if(backup.size() < 3) return;
+        byte b = backup.get(0);  
+        if((char)b != ' ') return;
+            
+        byte d1 = backup.get(1);
+        byte d2 = backup.get(2);
+        List <Byte> sub1 = backup.subList(1, 3);
+        int len = Integer.parseInt( (char)sub1.get(0).byteValue() + "" + (char)sub1.get(1).byteValue() );
+       
+        List <Byte> sub2 = backup.subList(3, 3+len);
+        String des = getStringRepresentation( toByteArray(sub2) );
+        System.out.println("\t***** ERROR RECIEVED is " + des);
+        
+        backup.removeAll(sub1);
+        backup.removeAll(sub2);
     }
     
     
@@ -397,6 +450,13 @@ public class Protocol{
      * @return true if cmd is any of the expected command string, false otherwise.
      */
     private boolean isValidHeader(String header){
+        System.out.println("\t***** HEADER RECIEVED is " + header);
+        /* Debug */
+        int i = 0; 
+        for( byte bb : backup ){
+             System.out.println("\t>> backup postion " + i + "\tvalue " + bb + ";\tchar " + (char) bb);
+             i++;
+         }/* Debug */
         switch (header) {
             case Protocol.START:
                 lastState = Protocol.START;

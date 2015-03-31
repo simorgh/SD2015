@@ -73,7 +73,7 @@ public class Controller {
         loadDeck();
         initSelector();
         
-        /* game loop */
+        /* main loop */
         try {
             while(true) playTurn();
         } catch (InterruptedIOException iioe) {
@@ -82,7 +82,7 @@ public class Controller {
         } catch (IOException ex) {              // broken pipe
             System.out.println("ERROR: Cannot communicate to the peer. Connection interrupted.");
         } finally {
-            //closeAll(logout);
+            //closeAll();
         }
    
     } /* end start */
@@ -103,7 +103,7 @@ public class Controller {
         } catch (IOException ex) {
             pr.sendError(Protocol.ERR_SSE);
             System.out.println("ERROR: Failed to open logfile OutputStream. - Connection aborted.");
-            closeAll(logout, csocket);
+            closeClient(csocket);
         }
         
         return pr;
@@ -130,36 +130,46 @@ public class Controller {
     private void initSelector(){
         /* initialize ServerSocket &  Selector */
         try {
-            this.selector = Selector.open();
+            
             this.server = ServerSocketChannel.open();
-            this.server.socket().bind(new java.net.InetSocketAddress(this.port));
+            this.server.socket().bind(new java.net.InetSocketAddress("127.0.0.1", this.port));
             this.server.configureBlocking(false);
-            this.serverkey = server.register(selector, SelectionKey.OP_ACCEPT);
+           
+            this.selector = Selector.open();
+             this.serverkey = server.register(selector, SelectionKey.OP_ACCEPT);
+            System.out.println("Selector Initialized: \t[serverKey] := " + serverkey.toString() );
         } catch (IOException ex) {
             System.out.println("ERROR: Unable to establish connection through the port: " + this.port
                     + ": Port might be protected or already being used.\n"
                     + "Run 'netstat -an | grep " + this.port + "' on your shell to spot that connection");
         } finally {
             /* closing connection */
-            try {
-                if(this.server != null) this.server.close();
-            } catch (IOException ex) {
-                System.exit(1);
-            }
+            //closeAll();
+            
+        }
+    }
+ 
+    
+    /**
+     * Terminates thread and closes selector resources
+     */
+    private void closeAll(OutputStream out) {
+        try {
+            if(out!=null) out.close();
+            if(this.server != null) server.close();
+            selector.close();
+        } catch (IOException ex) {
+            //Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(1);
         }
     }
     
     
-    
      /**
-     * Terminates thread and closes client resources
+     * closes client resources
      */
-    private void closeAll(OutputStream out, SocketChannel csocket) {
-        try {
-            if(out!=null) out.close();
-            csocket.close();
-            Thread.currentThread().stop();
-        } catch (IOException ex) {
+    private void closeClient(SocketChannel csocket) {
+        try { csocket.close(); } catch (IOException ex) {
             Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -188,22 +198,25 @@ public class Controller {
      * @throws IOException 
      */
     private void playTurn() throws IOException {
-        
+        System.out.println("\n@playTurn()");
         selector.select();
-        Set keys = selector.selectedKeys();
+        
+        Set<SelectionKey> keys = selector.selectedKeys();
         for (Iterator i = keys.iterator(); i.hasNext();) {
             SelectionKey key = (SelectionKey) i.next();
+            System.out.print(">> Selected key: \t"+key.toString());
             i.remove();
 
             if (key == this.serverkey) {
+                System.out.println("\t[SERVER TURN]");
                 if (key.isAcceptable()) {
-                    System.out.println("Waiting for a connection...");
+                    System.out.println("\tWaiting for a connection...");
                     SocketChannel client = server.accept();
 
                     client.configureBlocking(false);
                     client.socket().setSoTimeout(TIMEOUT);
 
-                    System.out.println("Client Connected...");
+                    System.out.println("\tClient Connected...");
                     SelectionKey clientkey = client.register(selector, SelectionKey.OP_READ); // read incoming stream
 
                     /* initializing new Game-model and socket */
@@ -212,52 +225,57 @@ public class Controller {
                 }
 
             } else {
+                System.out.println("\t[CLIENT TURN]");
                 /* Client treatment */
                 Protocol pr = connMap.get(key);
                 Game g = (Game) key.attachment();
                 
-                if(g.isFinished()){
-                    /* endgame status messages */
-                    g.playBank();
-                    pr.sendBankScore(g.getHandBank().size(), g.getHandBank(), g.getBankScore());
-                    pr.sendGains(g.computeGains());
-                    //closeAll();
-                }
-                
-                // Mandatory Start comes here...
-                
-                
                 // game loop treatment
                 try {
-                    String cmd = null;
-                    int raise = -1;
                     
-                    if( pr.isLastState(Protocol.ANTE) ){
-                        raise = pr.receiveRaise();
-                        if(raise != -1) cmd = Protocol.ANTE;
-                    } else {
-                        cmd = pr.readHeader();
-                        if(pr.isLastState(Protocol.ANTE)) raise = pr.receiveRaise();
-                    } 
-                    
-                    if(cmd != null) {
-                        switch(cmd) {
-                            case Protocol.DRAW:
-                                serveCard(g, pr); 
-                                break;
+                    //do {
+                        String cmd = null;
+                        int raise = -1;
 
-                            case Protocol.ANTE:
-                                g.raiseBet(raise);
-                                break;
+                        if( pr.isLastState(Protocol.ANTE) ){
+                            raise = pr.receiveRaise();
+                            if(raise != -1) cmd = Protocol.ANTE;
+                        } else {
+                            cmd = pr.readHeader();
+                            if(pr.isLastState(Protocol.ANTE)) raise = pr.receiveRaise();
+                        } 
 
-                            case Protocol.PASS:
-                                g.setFinished(true);
-                                break;
+                        if(cmd != null) {
+                            switch(cmd) {
+                                case Protocol.DRAW:
+                                    serveCard(g, pr);
+                                    break;
 
-                            /* other valid 'header' (STRT) is received -> the protocol is broken! */
-                            default: throw new SyntaxErrorException();
-                        }
-                    } 
+                                case Protocol.ANTE:
+                                    g.raiseBet(raise);
+                                    //serveCard(g, pr);
+                                    break;
+
+                                case Protocol.PASS:
+                                    g.setFinished(true);
+                                    break;
+
+                                case Protocol.START:
+                                    pr.sendStartingBet(this.strt_bet);
+                                    break;
+                                /* other valid 'header' (STRT) is received -> the protocol is broken! */
+                                default: throw new SyntaxErrorException();
+                            }
+
+                            if(g.isFinished()){
+                                /* endgame status messages */
+                                g.playBank();
+                                pr.sendBankScore(g.getHandBank().size(), g.getHandBank(), g.getBankScore());
+                                pr.sendGains(g.computeGains());
+                                //closeAll();
+                            }
+                        } 
+                    //} while(pr.isDataReady());
                 } catch (SyntaxErrorException e) {      // syntax error treatment
                     System.out.println("ERROR: Client message has Syntax Error - Connection aborted.");
                     pr.sendError(Protocol.ERR_SYNTAX);
@@ -275,43 +293,5 @@ public class Controller {
     
     }
     
-    
-
-    
-///////////////////////////////////
-////    RESIDUOS DEL MULTITHREAD
-///////////////////////////////////
-//    
-//public void playTurn(Socket csocket) {
-//        
-//        
-//    /* here comes the magic... */
-//    try {
-//        this.pr.receiveStart();
-//
-//        /* a mandotry DRAW is expected after STBT, if not -> the protocol is broken! */
-//        this.pr.sendStartingBet(Controller.strt_bet);
-//        String aux = this.pr.readHeader();
-//        if(aux.equals(Protocol.DRAW)) serveCard();
-//        else throw new SyntaxErrorException();
-// 
-//} /* end Thread run() */
-    
-    
    
-    
-  
-    
-    
-
-        
-        
-        
-    
-    
-    
-    
-    
-    
-
 }

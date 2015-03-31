@@ -148,9 +148,8 @@ public class ComUtils {
         byte bStr[]=new byte[numBytes];
         char cStr[]=new char[numBytes];
         bStr = read_bytes(numBytes);
-        for(int i=0;i<numBytes;i++)
-            cStr[i]=(char)bStr[i];
-
+        for(int i=0;i<numBytes;i++) cStr[i]=(char)bStr[i];
+                
         return String.valueOf(cStr);
     }
     

@@ -186,11 +186,10 @@ public class ClientProtocol extends utils.ComUtils{
     public int receiveStartingBet() throws IOException, ProtocolErrorException, SyntaxErrorException {
         int bet;
         
-        String cmd = read_string_command().toUpperCase();
+        String cmd = read_string_command().toUpperCase();   
         if( cmd.equals(ClientProtocol.ERROR) ) throw new ProtocolErrorException();
         if(!cmd.equals(ClientProtocol.STARTING_BET)) throw new SyntaxErrorException();
         if( !(read_char() == ' ') ) throw new SyntaxErrorException();
-        
         // bet caption
         bet = read_int32();
         return bet;
