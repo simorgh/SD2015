@@ -77,7 +77,7 @@ public class ClientCLI  {
             /* validate that 'port' has been set */
             if (cmd.hasOption("s")) {
                 this.matcher = pattern.matcher(cmd.getOptionValue("s")); // IPv4 verification
-                if(!matcher.matches()){
+                if(!matcher.matches() && !cmd.getOptionValue("s").equals("localhost")){
                     log.log(Level.SEVERE, "Introduced Server IPv4 is not a valid address");
                 } else {
                     this.server = cmd.getOptionValue("s");

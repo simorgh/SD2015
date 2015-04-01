@@ -142,7 +142,6 @@ public class ServerController implements Runnable {
             if(aux.equals(ServerProtocol.DRAW)) serveCard();
             else throw new SyntaxErrorException();
                 
-                
             /* game loop */       
             do{
                 String cmd;

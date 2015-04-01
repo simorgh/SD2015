@@ -2,9 +2,9 @@
  * Intended Status: Proposed Standard  (University of Barcelona)
  * Expires: 12/03/2015
  *
- * A protocol for the 7 and a half game. (SERVER abstraction)
- *  This protocol is used for the client/server version of the  popular
- *  card game ’seven and a half’.
+ * A protocol for the 7 and a half game. (SELECTOR abstraction)
+ * This protocol is used for the client/server version of the  popular
+ * card game ’seven and a half’.
  */
 package utils;
 
@@ -47,8 +47,9 @@ public class Protocol{
     private final SocketChannel socket;
     private final ByteBuffer buffer;
     
-    private ArrayList<Byte> backup;
-    private String lastState = "";
+    private final ArrayList<Byte> backup;
+    private String previousState = "";
+    private String currentState = "";
     
     /**
      * Class constructor.
@@ -64,20 +65,50 @@ public class Protocol{
     }
     
     /**
-     * 
+     * return true if matches the lasTurn-header (previous command) played.
      * @param state
      * @return 
      */
     public boolean isLastState(String state){
-        return lastState.equals(state);
-    }
-    
-    public boolean isDataReady(){
-        return (backup.size() > 4);
+        return previousState.equals(state);
     }
     
     /**
-     * - support method -
+     * return true if matches the current-turn header.
+     * @param state
+     * @return 
+     */
+    public boolean isCurrentState(String state){
+        return currentState.equals(state);
+    }
+    
+    /**
+     * step forward to new valid header.
+     * @param newState 
+     */
+    private void updateStates(String newState){
+        this.previousState = this.currentState;
+        this.currentState = newState;
+    }
+    
+    /**
+     * returns true if there is enough data to generate a new response, false otherwise.
+     * @return 
+     */
+    public boolean isDataReady(){
+        return ( ( currentState.equals(Protocol.ANTE) && backup.size() >= 6 ) 
+                || ( !currentState.equals(Protocol.ANTE) && backup.size() >= 4 ) );
+    }
+    
+    
+//////////////////////////////////////////////////////////////
+//                     SERVER MESSAGES
+//////////////////////////////////////////////////////////////
+   
+    /**
+     * 
+     * @param str
+     * @throws IOException 
      */
     private void sendHeader(String str) throws IOException {
         buffer.clear();
@@ -86,9 +117,6 @@ public class Protocol{
         socket.write(buffer);
     }
     
-//////////////////////////////////////////////////////////////
-//                     SERVER MESSAGES
-//////////////////////////////////////////////////////////////
     
     /**
      * STARTING_BET. - STBT SP/NUMBER
@@ -107,9 +135,8 @@ public class Protocol{
             buffer.putInt(bet);
             buffer.flip();
             while(buffer.hasRemaining()) socket.write(buffer);
-            System.out.println("\nS: " + Protocol.STARTING_BET + ' ' + bet);
-            
-            //this.log.println("\nS: " + Protocol.STARTING_BET + ' ' + bet);
+            System.out.println("\nS: " + Protocol.STARTING_BET + ' ' + bet);           
+            this.log.println("\nS: " + Protocol.STARTING_BET + ' ' + bet);
         } catch (IOException ex) {
             return false;
         }
@@ -136,7 +163,7 @@ public class Protocol{
             buffer.flip();
             socket.write(buffer);
             System.out.println("\nS: " + Protocol.CARD + ' ' + Character.toLowerCase(D) + Character.toLowerCase(P));
-            //this.log.println("\nS: " + Protocol.CARD + ' ' + Character.toLowerCase(D) + Character.toLowerCase(P));
+            this.log.println("\nS: " + Protocol.CARD + ' ' + Character.toLowerCase(D) + Character.toLowerCase(P));
         } catch (IOException ex) {
             return false;
         }
@@ -156,7 +183,7 @@ public class Protocol{
         try {
             sendHeader(Protocol.BUSTING);
             System.out.println("\nS: " + Protocol.BUSTING);
-            //this.log.println("\nS: " + Protocol.BUSTING);
+            this.log.println("\nS: " + Protocol.BUSTING);
         } catch (IOException ex) {
             return false;
         }
@@ -183,10 +210,10 @@ public class Protocol{
             buffer.put((byte) ' ');
             buffer.putInt(number);
             System.out.print("\nS: " + Protocol.BANK_SCORE + ' ' + number);
-            //this.log.print("\nS: " + Protocol.BANK_SCORE + ' ' + number);
+            this.log.print("\nS: " + Protocol.BANK_SCORE + ' ' + number);
             for (char[] c : cards) {
                 System.out.print(c[0] + "" + c[1]);
-                //this.log.print(c[0] + "" + c[1]);
+                this.log.print(c[0] + "" + c[1]);
                 buffer.put((byte) Character.toLowerCase(c[0]));
                 buffer.put((byte) Character.toLowerCase(c[1]));
             }
@@ -195,7 +222,7 @@ public class Protocol{
             buffer.flip();
             socket.write(buffer);
             System.out.println(' ' + customScoreFormat(score));
-            //this.log.println(' ' + customScoreFormat(score));
+            this.log.println(' ' + customScoreFormat(score));
         } catch (IOException ex) {
             return false;
         }
@@ -253,6 +280,7 @@ public class Protocol{
             buffer.put(err.getBytes());
             buffer.flip();
             socket.write(buffer);
+            //System.out.println("\nS: " + Protocol.ERROR + " " + String.format("%02d", err.length()) + err);
             this.log.println("\nS: " + Protocol.ERROR + " " + String.format("%02d", err.length()) + err);
         } catch (IOException ex) {
             return false;
@@ -261,7 +289,9 @@ public class Protocol{
     }
     
     /**
-     * 
+     * Reads data throght the SocketChannel and saves it to the byte-backup stack.s
+     * @return
+     * @throws IOException 
      */
     private byte[] readBytes() throws IOException{
         buffer.clear();
@@ -272,7 +302,7 @@ public class Protocol{
         buffer.flip();
         while(buffer.hasRemaining()){
             byte aux = buffer.get();
-            System.out.println("\t>> writing at postion " + buffer.position() + "\tvalue " + aux + ";\tchar " + (char) aux);
+            System.out.println("\t>> buffer at position " + buffer.position() + "\tvalue " + aux + ";\tchar " + (char) aux);
             b[buffer.position()-1] = aux;
         }
                 
@@ -302,29 +332,17 @@ public class Protocol{
         List <Byte> sub = backup.subList(0, 4);
         String header = getStringRepresentation( toByteArray(sub) ).toUpperCase();
         backup.removeAll(sub);
-        //this.log.print("C: " + header);
+        this.log.print("C: " + header);
+        System.out.println("\t***** HEADER RECIEVED is " + header);
+        showPendingData();
+        
         if(!isValidHeader(header)) throw new SyntaxErrorException();
+        else updateStates(header);
+            
         if(header.equals(Protocol.ERROR)) throw new ProtocolErrorException();
         
         return header;
-    }
-    
-    private byte[] toByteArray( List<Byte> list){
-        int size = list.size();
-        byte[] result = new byte[size];
-        for(int i = 0; i < size; i++) result[i] = list.get(i);
-        
-        return result;
-    }
-
-    private String getStringRepresentation(byte[] list){
-        String result = "";
-        for (byte b : list){
-            result += (char) b;
-        }
-        return result;
-    }
-     
+    } 
     
     /**
      * Start command reception.
@@ -362,75 +380,56 @@ public class Protocol{
             if(backup.size() >= 5){
                 List <Byte> sub = backup.subList(1, 5);
                 int raise = bytesToInt32( toByteArray(sub), "be");
+                this.log.println(" " + raise);
                 System.out.println("\t***** RAISE RECIEVED is " + raise);
-                lastState = "";
+                updateStates(""); //step forward ANTE
                 
                 backup.removeAll(sub);
                 backup.remove(0);
-                
-                /* Debug */
-                int i = 0; 
-                for( byte bb : backup ){
-                     System.out.println("\t>> backup postion " + i + "\tvalue " + bb + ";\tchar " + (char) bb);
-                     i++;
-                 }/* Debug */
-                
+                showPendingData();
                 return raise;
             }
-        }
-        
+        }   
         return -1;
     }
-
-     /* Passar de bytes a enters */
-    private int bytesToInt32(byte bytes[], String endianess){
-        int number;
-
-        if("be".equals(endianess.toLowerCase())) number=((bytes[0] & 0xFF) << 24) | ((bytes[1] & 0xFF) << 16) | ((bytes[2] & 0xFF) << 8) | (bytes[3] & 0xFF);
-        else number=(bytes[0] & 0xFF) | ((bytes[1] & 0xFF) << 8) | ((bytes[2] & 0xFF) << 16) | ((bytes[3] & 0xFF) << 24);
-
-        return number;
-    }
-    
-    
-    
-    
     
     /**
      * Error command reception.
      * 1. STRT header is expected.
      * 
+     * @return 
      * @throws java.io.IOException
      * @throws utils.SyntaxErrorException
      */ 
-    public void receiveErrorDescription() throws IOException, SyntaxErrorException {
+    public String receiveErrorDescription() throws IOException, SyntaxErrorException {
         System.out.println("Entering receiveErrorDescription()...");
         byte[] bytes = readBytes();
         for( byte b : bytes ) backup.add(b);
         
-        // description recovery
-        if(backup.size() < 3) return;
-        byte b = backup.get(0);  
-        if((char)b != ' ') return;
-            
-        byte d1 = backup.get(1);
-        byte d2 = backup.get(2);
-        List <Byte> sub1 = backup.subList(1, 3);
-        int len = Integer.parseInt( (char)sub1.get(0).byteValue() + "" + (char)sub1.get(1).byteValue() );
-       
-        List <Byte> sub2 = backup.subList(3, 3+len);
+        /* description reconstruction */
+        if(backup.size() < 3) throw new SyntaxErrorException();
+        byte b = backup.get(0);
+        if((char)b != ' ') throw new SyntaxErrorException();
+        
+        List sub1 = backup.subList(1, 3);
+        int len = Integer.parseInt( sub1.get(0) + "" + sub1.get(1) );
+        List sub2 = backup.subList(3, 3 + len);
         String des = getStringRepresentation( toByteArray(sub2) );
+        this.log.println(" " + des );
         System.out.println("\t***** ERROR RECIEVED is " + des);
         
         backup.removeAll(sub1);
         backup.removeAll(sub2);
+        return des;
     }
+    
+//////////////////////////////////////////////////////////////
+//                     SUPPORT METHODS
+//////////////////////////////////////////////////////////////    
     
     
     /**
-     * - Support method -
-     * 
-     * Desc. Customizes the format of the float to %2.1 
+     * Customizes the format value to %2.1 as its String representation. 
      * @param value
      * @return Formatted float as a String
      */
@@ -444,37 +443,90 @@ public class Protocol{
     }
     
     /**
-     * - Support method -
-     * 
+     * Determines if a given header is valid or not.
      * @param header Receivend command-string to be checked
      * @return true if cmd is any of the expected command string, false otherwise.
      */
     private boolean isValidHeader(String header){
-        System.out.println("\t***** HEADER RECIEVED is " + header);
-        /* Debug */
-        int i = 0; 
-        for( byte bb : backup ){
-             System.out.println("\t>> backup postion " + i + "\tvalue " + bb + ";\tchar " + (char) bb);
-             i++;
-         }/* Debug */
         switch (header) {
             case Protocol.START:
-                lastState = Protocol.START;
                 return true;
             case Protocol.DRAW:
-                lastState = Protocol.DRAW;
                 return true;
             case Protocol.ANTE:
-                lastState = Protocol.ANTE;
                 return true;
             case Protocol.PASS:
-                lastState = Protocol.PASS;
                 return true;
             case Protocol.ERROR:
-                lastState = Protocol.ERROR;
                 return true;
-            default: return false;
+            default:
+                currentState = "";
+                return false;
         } 
     }
     
+    /**
+     * Serialize a given Byte Collection to its primitive byte[] array
+     * @param list
+     * @return 
+     */
+    private byte[] toByteArray( List<Byte> list){
+        int size = list.size();
+        byte[] result = new byte[size];
+        for(int i = 0; i < size; i++) result[i] = list.get(i);
+
+        return result;
+    }
+       
+    /**
+     * Parse byte array to its ASCII String represent.
+     * @param list
+     * @return 
+     */
+    private String getStringRepresentation(byte[] list){
+        String result = "";
+        for (byte b : list){
+            result += (char) b;
+        }
+        return result;
+    }
+    
+    /**
+     * Debug porpuses only.
+     * Print actual status on received backup stack. 
+     */
+    private void showPendingData(){
+        if(backup.isEmpty()){
+        System.out.println(
+                "┌───────────────────────────────┐\n"
+              + "│ Backup Stack EMPTY            │\n"
+              + "└───────────────────────────────┘");
+            return;
+        }
+        System.out.println(
+                "┌───────────────────────────────┐\n"
+              + "│ Backup Stack                  │\n"
+              + "├───────────────────────────────┤");
+        int i = 0; 
+        for( byte bb : backup ){
+             System.out.println("│  @" + i + "\tvalue " + bb + "\tchar " + (char) bb + "  │");
+             i++;
+        }
+        System.out.println("└───────────────────────────────┘");
+    }
+    
+    /**
+     * Parse byte array to Integer.
+     * @param bytes
+     * @param endianess
+     * @return 
+     */
+    private int bytesToInt32(byte bytes[], String endianess){
+        int number;
+
+        if("be".equals(endianess.toLowerCase())) number=((bytes[0] & 0xFF) << 24) | ((bytes[1] & 0xFF) << 16) | ((bytes[2] & 0xFF) << 8) | (bytes[3] & 0xFF);
+        else number=(bytes[0] & 0xFF) | ((bytes[1] & 0xFF) << 8) | ((bytes[2] & 0xFF) << 16) | ((bytes[3] & 0xFF) << 24);
+
+        return number;
+    }
 }

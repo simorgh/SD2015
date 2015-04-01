@@ -100,7 +100,6 @@ public class ClientController {
                         g.updateHandPlayer(new String(card));
                         console.printNewCard(card);
                         
-                         
                         if(g.isBusted()){ 
                             pr.receiveBusting();
                             g.setFinished(true);

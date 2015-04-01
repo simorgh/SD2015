@@ -1,5 +1,5 @@
 /**
- * MultiThreat Server Controller
+ * Selector Server Controller
  */
 
 package controller;
@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InterruptedIOException;
-import java.io.OutputStream;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -24,7 +23,6 @@ import utils.InvalidDeckFileException;
 import utils.ProtocolErrorException;
 import utils.Protocol;
 import utils.SyntaxErrorException;
-//import java.util.concurrent.TimeoutException;
 
 /**
  * @author simorgh & dzigor92
@@ -68,44 +66,42 @@ public class Controller {
      * starts the server.
      */
     public void start() {
-        
-        /* preparing server */
+        // preparing server...
         loadDeck();
         initSelector();
         
-        /* main loop */
+        // main loop
         try {
             while(true) playTurn();
-        } catch (InterruptedIOException iioe) {
-            System.out.println("ERROR: Remote host timed out during read operation");
-            //if( !( this.connMap.get(clientkey).sendError(Protocol.ERR_TIMEOUT) ) System.out.println("ERROR: Cannot communicate to the peer. Connection interrupted."); 
-        } catch (IOException ex) {              // broken pipe
+        } catch (IOException ex) {  // broken pipe
             System.out.println("ERROR: Cannot communicate to the peer. Connection interrupted.");
         } finally {
-            //closeAll();
+            closeServer();
         }
    
-    } /* end start */
+    } // end start
     
     
     /**
      *
      * @param csocket
+     * @param key
      * @return 
      */
-    public Protocol initClientSocket(SocketChannel csocket){
-        OutputStream logout = null;
+    public Protocol initClientSocket(SocketChannel csocket, SelectionKey key){
         Protocol pr = null;
         
         try {
-            logout = new FileOutputStream("Server"+Thread.currentThread().getName()+".log");
-            pr = new Protocol(csocket, logout); /* binding IO stream to client */
+            pr = new Protocol(csocket, new FileOutputStream("Server" + key.toString().substring(key.toString().indexOf('@') )+ ".log") ); /* binding IO stream to client */
         } catch (IOException ex) {
-            pr.sendError(Protocol.ERR_SSE);
-            System.out.println("ERROR: Failed to open logfile OutputStream. - Connection aborted.");
-            closeClient(csocket);
+            if(!pr.sendError(Protocol.ERR_SSE));
+            System.out.println("ERROR: Failed to open logfile. Connection aborted."); 
+            try {
+                csocket.close();
+            } catch (IOException ex1) {
+                Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex1);
+            }
         }
-        
         return pr;
     }
     
@@ -125,27 +121,23 @@ public class Controller {
     }
     
     /**
-     * 
+     * initialize ServerSocket &  Selector.
      */
     private void initSelector(){
-        /* initialize ServerSocket &  Selector */
+
         try {
-            
             this.server = ServerSocketChannel.open();
             this.server.socket().bind(new java.net.InetSocketAddress("127.0.0.1", this.port));
             this.server.configureBlocking(false);
            
             this.selector = Selector.open();
-             this.serverkey = server.register(selector, SelectionKey.OP_ACCEPT);
+            this.serverkey = server.register(selector, SelectionKey.OP_ACCEPT);
             System.out.println("Selector Initialized: \t[serverKey] := " + serverkey.toString() );
         } catch (IOException ex) {
-            System.out.println("ERROR: Unable to establish connection through the port: " + this.port
+            System.out.println("ERROR: Unable to establish connection through the port " + this.port
                     + ": Port might be protected or already being used.\n"
-                    + "Run 'netstat -an | grep " + this.port + "' on your shell to spot that connection");
-        } finally {
-            /* closing connection */
-            //closeAll();
-            
+                    + "Run 'netstat -an | grep " + this.port + "' on your shell to spot that connection.");
+            closeServer();
         }
     }
  
@@ -153,26 +145,18 @@ public class Controller {
     /**
      * Terminates thread and closes selector resources
      */
-    private void closeAll(OutputStream out) {
+    private void closeServer() {
         try {
-            if(out!=null) out.close();
-            if(this.server != null) server.close();
-            selector.close();
+            if(this.server != null)
+                if(this.server.isOpen()) this.server.close();
+            if(this.selector != null)
+                if(this.selector.isOpen()) this.selector.close();
         } catch (IOException ex) {
-            //Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
-            System.exit(1);
+            System.exit(2);
         }
+        System.exit(1);
     }
     
-    
-     /**
-     * closes client resources
-     */
-    private void closeClient(SocketChannel csocket) {
-        try { csocket.close(); } catch (IOException ex) {
-            Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
     
     
     /**
@@ -190,7 +174,6 @@ public class Controller {
             g.setFinished(true);
         }                              
     }
-    
     
     
     /**
@@ -216,33 +199,34 @@ public class Controller {
                     client.configureBlocking(false);
                     client.socket().setSoTimeout(TIMEOUT);
 
-                    System.out.println("\tClient Connected...");
+                    System.out.println("\tnew Client Connected!");
                     SelectionKey clientkey = client.register(selector, SelectionKey.OP_READ); // read incoming stream
 
                     /* initializing new Game-model and socket */
-                    connMap.put(clientkey, initClientSocket(client) );
+                    connMap.put(clientkey, initClientSocket(client, clientkey) );
                     clientkey.attach(new Game( this.deck, this.strt_bet) );
                 }
 
             } else {
                 System.out.println("\t[CLIENT TURN]");
-                /* Client treatment */
+                // retrieve Client game & status data
                 Protocol pr = connMap.get(key);
                 Game g = (Game) key.attachment();
-                
-                // game loop treatment
+
                 try {
-                    
-                    //do {
+                    do {  // loop while received client data is enough
                         String cmd = null;
                         int raise = -1;
-
-                        if( pr.isLastState(Protocol.ANTE) ){
+                        
+                        if( pr.isCurrentState(Protocol.ANTE) ){
                             raise = pr.receiveRaise();
                             if(raise != -1) cmd = Protocol.ANTE;
                         } else {
                             cmd = pr.readHeader();
-                            if(pr.isLastState(Protocol.ANTE)) raise = pr.receiveRaise();
+                            // let's deal with protocol restrictive situations...
+                            if( cmd.equals(Protocol.START) && (g.getPlayerScore() > 0.0f) ) throw new SyntaxErrorException();
+                            if( pr.isLastState(Protocol.START) && ( !cmd.isEmpty() && !cmd.equals(Protocol.DRAW) ) ) throw new SyntaxErrorException();
+                            if( pr.isCurrentState(Protocol.ANTE) ) raise = pr.receiveRaise();
                         } 
 
                         if(cmd != null) {
@@ -253,7 +237,6 @@ public class Controller {
 
                                 case Protocol.ANTE:
                                     g.raiseBet(raise);
-                                    //serveCard(g, pr);
                                     break;
 
                                 case Protocol.PASS:
@@ -263,34 +246,47 @@ public class Controller {
                                 case Protocol.START:
                                     pr.sendStartingBet(this.strt_bet);
                                     break;
-                                /* other valid 'header' (STRT) is received -> the protocol is broken! */
+                                    
                                 default: throw new SyntaxErrorException();
                             }
-
-                            if(g.isFinished()){
-                                /* endgame status messages */
-                                g.playBank();
-                                pr.sendBankScore(g.getHandBank().size(), g.getHandBank(), g.getBankScore());
-                                pr.sendGains(g.computeGains());
-                                //closeAll();
-                            }
-                        } 
-                    //} while(pr.isDataReady());
+                        }
+                        
+                        if(g.isFinished()){
+                            // endgame status messages.
+                            g.playBank();
+                            pr.sendBankScore(g.getHandBank().size(), g.getHandBank(), g.getBankScore());
+                            pr.sendGains(g.computeGains());
+                            
+                            key.channel().close();
+                        }
+                        
+                    } while( pr.isDataReady() && !g.isFinished() );
+                
+                
+                 
+                } catch (InterruptedIOException e){
+                    System.out.println("ERROR: Remote host timed out during read operation");
+                    if( !( pr.sendError(Protocol.ERR_TIMEOUT) ) )
+                        System.out.println("ERROR: Cannot communicate to the peer. Connection interrupted."); 
+                    key.channel().close();
+                    
                 } catch (SyntaxErrorException e) {      // syntax error treatment
                     System.out.println("ERROR: Client message has Syntax Error - Connection aborted.");
                     pr.sendError(Protocol.ERR_SYNTAX);
-                } catch (ProtocolErrorException e) {    // ERRR header received
+                    key.channel().close();
+                    
+                } catch (ProtocolErrorException e) {    // ERRO header received
                     try {
-                        pr.receiveErrorDescription();
+                        String err = pr.receiveErrorDescription();
+                        System.out.println("ERROR " + err);
                     } catch (IOException | SyntaxErrorException ex) {
-                        Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+                        System.out.println("ERROR Message received. Connection closed");
                     }
-                    System.out.println("ERROR Message received. Connection closed");
+                    key.channel().close();
                 }
                 
-            }
-        } // for end
-    
+            } // client treatment (end)
+        } // looping over selectedkeys (end)
     }
     
    

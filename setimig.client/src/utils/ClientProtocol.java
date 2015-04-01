@@ -190,6 +190,7 @@ public class ClientProtocol extends utils.ComUtils{
         if( cmd.equals(ClientProtocol.ERROR) ) throw new ProtocolErrorException();
         if(!cmd.equals(ClientProtocol.STARTING_BET)) throw new SyntaxErrorException();
         if( !(read_char() == ' ') ) throw new SyntaxErrorException();
+        
         // bet caption
         bet = read_int32();
         return bet;
@@ -311,7 +312,7 @@ public class ClientProtocol extends utils.ComUtils{
     public String receiveErrorDescription() throws IOException, SyntaxErrorException {  
         if(!(read_char() == ' ')) throw new SyntaxErrorException();
         String des = read_string_variable(2);
-        return(" " + String.format("%02d", des.length()) + des);
+        return(" " + des);
     }
 
 }

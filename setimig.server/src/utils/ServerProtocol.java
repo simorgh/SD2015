@@ -280,7 +280,7 @@ public class ServerProtocol extends utils.ComUtils{
         if(!(read_char() == ' ')) throw new SyntaxErrorException();
         
         String des = read_string_variable(2);
-        this.log.println(" " + String.format("%02d", des.length()) + des);
+        this.log.println(" " + des );
     }
     
     
