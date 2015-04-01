@@ -166,7 +166,7 @@ public class Controller {
         char[] card;
         
         card = g.drawCard();
-        g.updatePlayerScore(card[0]);
+        g.updatePlayerScore(new String(card));
         pr.sendCard(card[0], card[1]);
 
         if (g.getPlayerScore() > 7.5f){

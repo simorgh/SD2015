@@ -216,7 +216,8 @@ public class ServerController implements Runnable {
         char[] card;
         
         card = this.g.drawCard();
-        this.g.updatePlayerScore(card[0]);
+        
+        this.g.updatePlayerScore(new String(card));
         this.pr.sendCard(card[0], card[1]);
 
         if (this.g.getPlayerScore() > 7.5f){

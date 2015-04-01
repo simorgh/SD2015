@@ -183,7 +183,7 @@ public class Protocol{
         try {
             sendHeader(Protocol.BUSTING);
             System.out.println("\nS: " + Protocol.BUSTING);
-            this.log.println("\nS: " + Protocol.BUSTING);
+            this.log.println("S: " + Protocol.BUSTING);
         } catch (IOException ex) {
             return false;
         }
@@ -210,7 +210,7 @@ public class Protocol{
             buffer.put((byte) ' ');
             buffer.putInt(number);
             System.out.print("\nS: " + Protocol.BANK_SCORE + ' ' + number);
-            this.log.print("\nS: " + Protocol.BANK_SCORE + ' ' + number);
+            this.log.print("S: " + Protocol.BANK_SCORE + ' ' + number);
             for (char[] c : cards) {
                 System.out.print(c[0] + "" + c[1]);
                 this.log.print(c[0] + "" + c[1]);

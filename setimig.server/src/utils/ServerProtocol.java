@@ -120,7 +120,7 @@ public class ServerProtocol extends utils.ComUtils{
     public boolean sendBusting() {
         try {
             sendHeader(ServerProtocol.BUSTING);
-            this.log.println("\nS: " + ServerProtocol.BUSTING);
+            this.log.println("S: " + ServerProtocol.BUSTING);
         } catch (IOException ex) {
             return false;
         }
@@ -146,7 +146,7 @@ public class ServerProtocol extends utils.ComUtils{
             write_char(' ');
             write_int32(number);
             
-            this.log.print("\nS: " + ServerProtocol.BANK_SCORE + ' ' + number);
+            this.log.print("S: " + ServerProtocol.BANK_SCORE + ' ' + number);
             for (char[] c : cards) {
                 this.log.print(c[0] + "" + c[1]);
                 write_char(Character.toLowerCase(c[0]));

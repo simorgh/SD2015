@@ -74,8 +74,9 @@ public class Game {
      * Adds the value of the drawn card to player's score
      * @param D
      */
-    public void updatePlayerScore(char D){
-        float value = this.getCardValue(D);
+    public void updatePlayerScore(String card){
+        float value = this.getCardValue(card.charAt(0));
+        this.handPlayer.add(card);
         this.playerScore += value;
     }
     
