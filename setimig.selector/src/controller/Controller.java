@@ -127,7 +127,7 @@ public class Controller {
 
         try {
             this.server = ServerSocketChannel.open();
-            this.server.socket().bind(new java.net.InetSocketAddress("127.0.0.1", this.port));
+            this.server.socket().bind(new java.net.InetSocketAddress(this.port) );
             this.server.configureBlocking(false);
            
             this.selector = Selector.open();
@@ -209,6 +209,7 @@ public class Controller {
 
             } else {
                 System.out.println("\t[CLIENT TURN]");
+                
                 // retrieve Client game & status data
                 Protocol pr = connMap.get(key);
                 Game g = (Game) key.attachment();
@@ -257,7 +258,9 @@ public class Controller {
                             pr.sendBankScore(g.getHandBank().size(), g.getHandBank(), g.getBankScore());
                             pr.sendGains(g.computeGains());
                             
-                            key.channel().close();
+                            pr.close();
+                            key.cancel();
+                            //key.channel().close();
                         }
                         
                     } while( pr.isDataReady() && !g.isFinished() );
@@ -268,13 +271,17 @@ public class Controller {
                     System.out.println("ERROR: Remote host timed out during read operation");
                     if( !( pr.sendError(Protocol.ERR_TIMEOUT) ) )
                         System.out.println("ERROR: Cannot communicate to the peer. Connection interrupted."); 
-                    key.channel().close();
+
+                    key.cancel();
+                    pr.close();
                     
                 } catch (SyntaxErrorException e) {      // syntax error treatment
                     System.out.println("ERROR: Client message has Syntax Error - Connection aborted.");
                     pr.sendError(Protocol.ERR_SYNTAX);
-                    key.channel().close();
-                    
+ 
+                    key.cancel();
+                    pr.close();
+                   
                 } catch (ProtocolErrorException e) {    // ERRO header received
                     try {
                         String err = pr.receiveErrorDescription();
@@ -282,7 +289,15 @@ public class Controller {
                     } catch (IOException | SyntaxErrorException ex) {
                         System.out.println("ERROR Message received. Connection closed");
                     }
-                    key.channel().close();
+                    
+                    key.cancel();
+                    pr.close();
+                    
+                } catch(IOException e) {
+                    System.out.println("ERROR: Broken Pipe. Closing client socket");
+                    
+                    key.cancel();
+                    pr.close();
                 }
                 
             } // client treatment (end)

@@ -5,9 +5,9 @@
 package controller;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import model.Game;
 import utils.DuplicatedCardException;
@@ -136,9 +136,9 @@ public class ClientController {
             int gain = pr.receiveGains();
             console.printGains(gain);
         
-        } catch (InterruptedIOException iioe) {
+        } catch (SocketTimeoutException toe) {
             console.printError(Console.ERR_00);
-             if(!pr.sendError(ClientProtocol.ERR_TIMEOUT)) console.printError(Console.ERR_05);
+            if(!pr.sendError(ClientProtocol.ERR_TIMEOUT)) console.printError(Console.ERR_05);
         } catch(ProtocolErrorException e){ /* Error message has been sent - let's read the description and close con. */
             try {
                 String des = pr.receiveErrorDescription();

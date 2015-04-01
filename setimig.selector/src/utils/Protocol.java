@@ -92,6 +92,15 @@ public class Protocol{
     }
     
     /**
+     * Close PrintWriter stream to File & client Socket
+     * @throws IOException 
+     */
+    public void close() throws IOException {
+        if(this.log != null)    this.log.close();
+        if(this.socket != null) this.socket.close();
+    }
+    
+    /**
      * returns true if there is enough data to generate a new response, false otherwise.
      * @return 
      */
@@ -296,7 +305,7 @@ public class Protocol{
     private byte[] readBytes() throws IOException{
         buffer.clear();
         int numBytes = socket.read(buffer);
-        if(numBytes == -1) throw new IOException("Broken Pipe");
+        if(numBytes == -1) throw new IOException();
         System.out.println("TOTAL READ BYTES " + numBytes);
         byte[] b = new byte[numBytes];
         buffer.flip();
@@ -380,6 +389,8 @@ public class Protocol{
             if(backup.size() >= 5){
                 List <Byte> sub = backup.subList(1, 5);
                 int raise = bytesToInt32( toByteArray(sub), "be");
+                if (raise < 0) throw new SyntaxErrorException();
+                
                 this.log.println(" " + raise);
                 System.out.println("\t***** RAISE RECIEVED is " + raise);
                 updateStates(""); //step forward ANTE
