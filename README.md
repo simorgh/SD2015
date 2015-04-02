@@ -10,10 +10,8 @@ L'objectiu docent de la pràctica és aprendre a utilitzar els mecanismes de pro
 ## Set i mig
 El Joc del Set i mig és un famós joc de cartes similar al blackjack que es juga en els casinos. En aquesta pràctica implementarem una versió client/servidor del joc. En aquesta versió un sol client jugarà contra el servidor, però el servidor podrà servir múltiples partides alhora.
 
+###### Compilació i Execució
 ```
-#####################################
-# None ANT - Compile Instructions:  #
-#####################################
 # recommended way (using system find to get a list for java files + creating special directory):
 :~/B7/setimig.client$ mkdir classes
 :~/B7/setimig.client$ find . -name "*.java" -print | xargs javac -d classes -cp ../lib/commons-cli-1.2.jar:
