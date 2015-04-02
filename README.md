@@ -12,21 +12,19 @@ El Joc del Set i mig és un famós joc de cartes similar al blackjack que es jug
 
 
 
-## None ANT - Compile Instructions:
+### None ANT - Compile Instructions:
 
-### recommended way (using system find to get a list for java files + creating special directory):
+#### recommended way (using system find to get a list for java files + creating special directory):
 :~/B7/setimig.client$ mkdir classes
 :~/B7/setimig.client$ find . -name "*.java" -print | xargs javac -d classes -cp ../lib/commons-cli-1.2.jar:
 
-### execution client example...
+#### execution client example...
 :~/B7/setimig.client$ cd classes/
 :~/B7/setimig.client/classes$ java -cp ../lib/commons-cli-1.2.jar:. Client -s localhost -p 1212
 
-##
-
-### explicit more typical-alike method:
+#### explicit more typical-alike method:
 :~/B7/setimig.client$ cd src/
 :~/B7/setimig.client/src$ javac -cp ../lib/commons-cli-1.2.jar: Client.java controller/*.java model/*.java utils/*.java view/*.java
 
-### execution
+#### execution
 :~/B7/setimig.client/src$ java -cp ../lib/commons-cli-1.2.jar:. Client -s localhost -p 1212
