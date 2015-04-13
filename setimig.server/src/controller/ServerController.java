@@ -81,7 +81,7 @@ public class ServerController implements Runnable {
             System.out.println("ERROR: " + this.deckfile.getName() + " doesn't contain the deck or has an incorrect format");
             System.exit(2);
         } catch (IOException ex) {
-            Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null);
+            //Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null);
             System.exit(1);
         }
         

@@ -115,7 +115,7 @@ public class Controller {
             System.out.println("ERROR: " + this.deckfile.getName() + " doesn't contain the deck or has an incorrect format");
             System.exit(2);
         } catch (IOException ex) {
-            Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null);
+            //Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null);
             System.exit(1);
         }
     }
@@ -218,17 +218,25 @@ public class Controller {
                     do {  // loop while received client data is enough
                         String cmd = null;
                         int raise = -1;
+                        pr.showState();
                         
                         if( pr.isCurrentState(Protocol.ANTE) ){
+                            System.out.println("Current state is ANTE (1)... receiving RAISE");
                             raise = pr.receiveRaise();
                             if(raise != -1) cmd = Protocol.ANTE;
                         } else {
-                            cmd = pr.readHeader();
-                            // let's deal with protocol restrictive situations...
-                            if( cmd.equals(Protocol.START) && (g.getPlayerScore() > 0.0f) ) throw new SyntaxErrorException();
-                            if( pr.isLastState(Protocol.START) && ( !cmd.isEmpty() && !cmd.equals(Protocol.DRAW) ) ) throw new SyntaxErrorException();
-                            if( pr.isCurrentState(Protocol.ANTE) ) raise = pr.receiveRaise();
-                        } 
+                            if( pr.isCurrentState(Protocol.ANTE) ){
+                                System.out.println("Current state is ANTE (0)... receiving RAISE");
+                                raise = pr.receiveRaise();
+                            } else {
+                                cmd = pr.readHeader();
+                                //pr.showState();
+                                
+                                // let's deal with protocol restrictive situations...
+                                if( pr.isLastState(Protocol.START) && ( !cmd.isEmpty() && !cmd.equals(Protocol.DRAW) ) ) throw new SyntaxErrorException();
+                                if( cmd.equals(Protocol.START) && (g.getPlayerScore() > 0.0f) ) throw new SyntaxErrorException();
+                            }
+                        }
 
                         if(cmd != null) {
                             switch(cmd) {

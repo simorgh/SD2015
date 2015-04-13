@@ -48,8 +48,8 @@ public class Protocol{
     private final ByteBuffer buffer;
     
     private final ArrayList<Byte> backup;
-    private String previousState = "";
-    private String currentState = "";
+    public String previousState = "";
+    public String currentState = "";
     
     /**
      * Class constructor.
@@ -105,7 +105,7 @@ public class Protocol{
      * @return 
      */
     public boolean isDataReady(){
-        return ( ( currentState.equals(Protocol.ANTE) && backup.size() >= 6 ) 
+        return ( ( currentState.equals(Protocol.ANTE) && backup.size() >= 5 ) 
                 || ( !currentState.equals(Protocol.ANTE) && backup.size() >= 4 ) );
     }
     
@@ -340,7 +340,10 @@ public class Protocol{
         
         List <Byte> sub = backup.subList(0, 4);
         String header = getStringRepresentation( toByteArray(sub) ).toUpperCase();
-        backup.removeAll(sub);
+        
+        //backup.removeAll(sub);
+        for(int i = 0, size = sub.size(); i < size; i++) backup.remove(0);
+        
         this.log.print("C: " + header);
         System.out.println("\t***** HEADER RECIEVED is " + header);
         showPendingData();
@@ -395,8 +398,8 @@ public class Protocol{
                 System.out.println("\t***** RAISE RECIEVED is " + raise);
                 updateStates(""); //step forward ANTE
                 
-                backup.removeAll(sub);
-                backup.remove(0);
+                //backup.removeAll(sub);
+                for(int i = 0, size = sub.size() + 1; i < size; i++) backup.remove(0);
                 showPendingData();
                 return raise;
             }
@@ -429,8 +432,10 @@ public class Protocol{
         this.log.println(" " + des );
         System.out.println("\t***** ERROR RECIEVED is " + des);
         
-        backup.removeAll(sub1);
-        backup.removeAll(sub2);
+        //backup.removeAll(sub1);
+        //backup.removeAll(sub2);
+        for(int i = 0, size = sub1.size() + sub2.size(); i < size; i++) backup.remove(0);
+
         return des;
     }
     
@@ -524,6 +529,17 @@ public class Protocol{
              i++;
         }
         System.out.println("└───────────────────────────────┘");
+    }
+    
+    /**
+     * Debug porpuses only.
+     * Print actual status for CURRENT/PREVIOUS header states. 
+     */
+    public void showState(){
+        System.out.println("┌────────────────────┐\n" +
+                      "│ LastState:    " + previousState + " │\n" + 
+                      "│ CurrentState: " + currentState +  " │\n" +
+                      "└────────────────────┘");
     }
     
     /**
