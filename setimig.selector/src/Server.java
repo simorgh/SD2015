@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////
 //  Distributed Computing Software (UB) [TASK 1]  //
 // ---------------------------------------------- //
-//   'seven and a half' - Multithreading Server   //
+//      'seven and a half' - Selector Server      //
 ////////////////////////////////////////////////////
 
 import controller.SelectorCLI;

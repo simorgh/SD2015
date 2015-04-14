@@ -48,8 +48,8 @@ public class Protocol{
     private final ByteBuffer buffer;
     
     private final ArrayList<Byte> backup;
-    public String previousState = "";
-    public String currentState = "";
+    private String previousState = "";
+    private String currentState = "";
     
     /**
      * Class constructor.

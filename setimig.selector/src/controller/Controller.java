@@ -215,24 +215,21 @@ public class Controller {
                 Game g = (Game) key.attachment();
 
                 try {
-                    do {  // loop while received client data is enough
+                    do {  /* loop while received client data is enough */
                         String cmd = null;
                         int raise = -1;
                         pr.showState();
                         
                         if( pr.isCurrentState(Protocol.ANTE) ){
-                            System.out.println("Current state is ANTE (1)... receiving RAISE");
                             raise = pr.receiveRaise();
                             if(raise != -1) cmd = Protocol.ANTE;
                         } else {
-                            if( pr.isCurrentState(Protocol.ANTE) ){
-                                System.out.println("Current state is ANTE (0)... receiving RAISE");
-                                raise = pr.receiveRaise();
-                            } else {
+                            if( pr.isCurrentState(Protocol.ANTE) ) raise = pr.receiveRaise();
+                            else {
                                 cmd = pr.readHeader();
                                 //pr.showState();
                                 
-                                // let's deal with protocol restrictive situations...
+                                /* let's deal with protocol restrictive situations... */
                                 if( pr.isLastState(Protocol.START) && ( !cmd.isEmpty() && !cmd.equals(Protocol.DRAW) ) ) throw new SyntaxErrorException();
                                 if( cmd.equals(Protocol.START) && (g.getPlayerScore() > 0.0f) ) throw new SyntaxErrorException();
                             }
