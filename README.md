@@ -2,28 +2,26 @@
 * Igor Dzinka (idzinkdz7@alumnes.ub.edu)
 * Vicent Roig (vroigrip8@alumnes.ub.edu)
 
-## SD | Pràctica 1 client-servidor.
-L'objectiu docent de la pràctica és aprendre a utilitzar els mecanismes de programació Client/Servidor en JAVA. Concretament és necessari que aprengueu com programar amb:
-* Sockets amb JAVA (utilitzant l'API Socket de Java.net)
-* Servidor multi-petició amb i sense threads (JAVA)
+## SD | Pràctica 2 Llibreria de Recursos Electrònics Online..
 
-## Set i mig
-El Joc del Set i mig és un famós joc de cartes similar al blackjack que es juga en els casinos. En aquesta pràctica implementarem una versió client/servidor del joc. En aquesta versió un sol client jugarà contra el servidor, però el servidor podrà servir múltiples partides alhora.
+### Objectius de la pràctica
+* fer ús de les tecnologies de desenvolupament web en la plataforma Java.
 
-###### Compilació i Execució
-```
-# recommended way (using system find to get a list for java files + creating special directory):
-:~/B7/setimig.client$ mkdir classes
-:~/B7/setimig.client$ find . -name "*.java" -print | xargs javac -d classes -cp ../lib/commons-cli-1.2.jar:
+### Què cal fer?
 
-# execution client example...
-:~/B7/setimig.client$ cd classes/
-:~/B7/setimig.client/classes$ java -cp ../lib/commons-cli-1.2.jar:. Client -s localhost -p 1212
+Es desitja fer una llibreria Online de recursos digitals, que permeti als usuaris baixar-se llibres, cançons, vídeos curts.. en qualsevol tipus de format mp3, pdf, avi... si tenen prou crèdit per adquirir-les.
 
-# explicit more typical-alike method:
-:~/B7/setimig.client$ cd src/
-:~/B7/setimig.client/src$ javac -cp ../lib/commons-cli-1.2.jar: Client.java controller/*.java model/*.java utils/*.java view/*.java
+### Tecnologies
 
-# execution
-:~/B7/setimig.client/src$ java -cp ../lib/commons-cli-1.2.jar:. Client -s localhost -p 1212
-```
+Els requeriments d'aquest sistema fan ús de les següents tecnologies: La implementació ha de seguir el patró de programació de Model-Vista-Controlador. La programació ha de ser en llenguatge Java usant Servlets i JSP. Ús de Tomcat com a contenidor de servlets. L'autenticació usarà l'especificació JASS. Implementació d'un Servei Web RESTful usant servlets i JSON.
+
+### DISSENY APP WEB
+
+L'aplicació web estarà formada per un catàleg de diferents recursos digitals:
+** llibres
+** cançons
+** vídeos curts.
+
+El catàleg està format per una sola pàgina per a cada tipus de recurs digital.
+Caldrà implementar un sistema d'autentificació (tal i com es comenta en l'apartat següent).
+Caldrà implementar una “Llista de descàrregues” per a que l'usuari de la llibreria pugui anar-hi ficant tots els recursos que vulgui baixar-se.
