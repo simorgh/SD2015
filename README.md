@@ -2,7 +2,7 @@
 * Igor Dzinka (idzinkdz7@alumnes.ub.edu)
 * Vicent Roig (vroigrip8@alumnes.ub.edu)
 
-## SD | Pràctica 2 Llibreria de Recursos Electrònics Online..
+## SD | Pràctica 2. Llibreria de Recursos Electrònics Online.
 
 ### Objectius de la pràctica
 * fer ús de les tecnologies de desenvolupament web en la plataforma Java.
@@ -18,10 +18,10 @@ Els requeriments d'aquest sistema fan ús de les següents tecnologies: La imple
 ### DISSENY APP WEB
 
 L'aplicació web estarà formada per un catàleg de diferents recursos digitals:
-** llibres
-** cançons
-** vídeos curts.
+* llibres
+* cançons
+* vídeos curts.
 
 El catàleg està format per una sola pàgina per a cada tipus de recurs digital.
-Caldrà implementar un sistema d'autentificació (tal i com es comenta en l'apartat següent).
-Caldrà implementar una “Llista de descàrregues” per a que l'usuari de la llibreria pugui anar-hi ficant tots els recursos que vulgui baixar-se.
+* Caldrà implementar un sistema d'autentificació (tal i com es comenta en l'apartat següent).
+* Caldrà implementar una “Llista de descàrregues” per a que l'usuari de la llibreria pugui anar-hi ficant tots els recursos que vulgui baixar-se.
