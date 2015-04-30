@@ -228,7 +228,10 @@ public class ServerProtocol extends utils.ComUtils{
      */
     public String readHeader() throws IOException, SyntaxErrorException, ProtocolErrorException {
         String header = read_string_command().toUpperCase();
-        this.log.print("C: " + header);
+        
+        if(header.equals(ServerProtocol.PASS)) this.log.println("C: " + header);
+        else this.log.print("C: " + header);
+        
         if(!isValidHeader(header)) throw new SyntaxErrorException();
         if(header.equals(ServerProtocol.ERROR)) throw new ProtocolErrorException();
         

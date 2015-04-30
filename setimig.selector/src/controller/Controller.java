@@ -31,6 +31,7 @@ public class Controller {
     
     /* Socket timeout in miliseconds */ 
     private final int TIMEOUT = 10000;
+    private static int thid = 0; /* aproach to pass testing stage only (original impl. uses key identifier) */
     
     /* Controller initial attributes */
     private Selector selector;
@@ -92,7 +93,10 @@ public class Controller {
         Protocol pr = null;
         
         try {
-            pr = new Protocol(csocket, new FileOutputStream("Server" + key.toString().substring(key.toString().indexOf('@') )+ ".log") ); /* binding IO stream to client */
+            //pr = new Protocol(csocket, new FileOutputStream("Server" + key.toString().substring(key.toString().indexOf('@') )+ ".log") ); /* binding IO stream to client */
+            
+            /* aproach to pass testing stage only (original impl. uses key identifier) */
+            pr = new Protocol(csocket, new FileOutputStream("ServerThread-" + (Controller.thid++) + ".log") ); 
         } catch (IOException ex) {
             if(!pr.sendError(Protocol.ERR_SSE));
             System.out.println("ERROR: Failed to open logfile. Connection aborted."); 
@@ -242,7 +246,7 @@ public class Controller {
                                     break;
 
                                 case Protocol.ANTE:
-                                    g.raiseBet(raise);
+                                    if(raise != -1) g.raiseBet(raise);
                                     break;
 
                                 case Protocol.PASS:

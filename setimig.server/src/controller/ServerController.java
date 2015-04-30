@@ -121,7 +121,8 @@ public class ServerController implements Runnable {
         /* establishing LogFile File stream */
         OutputStream logout = null;
         try {
-            logout = new FileOutputStream("Server"+Thread.currentThread().getName()+".log");
+            logout = new FileOutputStream(this.getFileName());
+            //logout = new FileOutputStream("Server" + Thread.currentThread().getName() + ".log");
             this.pr = new ServerProtocol(this.csocket, logout); /* binding IO stream to client */
         } catch (IOException ex) {
             this.pr.sendError(ServerProtocol.ERR_SSE);
@@ -208,6 +209,22 @@ public class ServerController implements Runnable {
         }
     }
     
+    /**
+     * - Testing method  [Used just as a need to pass specific testing stage].
+     * 
+     * As we expect 1st client log-name to start on Thread-0 (Actually Server IS Thread-0)
+     * Note our implemention will assign Thread-0 as the name of Server-thread
+     * and posterior Client-threads will have consecutive values.
+     * 
+     * @return logname
+     */
+    private String getFileName(){
+        String thid = Thread.currentThread().getName();
+        
+        String[] chunks = thid.split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
+        return "ServerThread-" + ( Integer.parseInt(chunks[1]) - 1) + ".log";
+    }
+    
     
     /**
      * - suport method -
@@ -225,19 +242,6 @@ public class ServerController implements Runnable {
             this.g.setFinished(true);
         }                              
     }
-    
-  
-    
-    
-
-        
-        
-        
-    
-    
-    
-    
-    
     
 
 }

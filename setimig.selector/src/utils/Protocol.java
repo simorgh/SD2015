@@ -344,7 +344,9 @@ public class Protocol{
         //backup.removeAll(sub);
         for(int i = 0, size = sub.size(); i < size; i++) backup.remove(0);
         
-        this.log.print("C: " + header);
+        if(header.equals(Protocol.PASS)) this.log.println("C: " + header);
+        else this.log.print("C: " + header);
+        
         System.out.println("\t***** HEADER RECIEVED is " + header);
         showPendingData();
         
