@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0"
+         xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+      
+   <!-- ############ AUTHENTICATION ############ -->
+   <security-constraint>
+       
+      <display-name>Exemple Autentificació</display-name>
+      
+      <web-resource-collection>
+         <web-resource-name>Protected Area</web-resource-name>
+         <!-- Define the context-relative URL(s) to be protected -->
+         <url-pattern>/jsp/protected/*</url-pattern>
+         <!-- If you list http methods, only those methods are protected -->
+         <http-method>DELETE</http-method>
+         <http-method>GET</http-method>
+         <http-method>POST</http-method>
+         <http-method>PUT</http-method>
+      </web-resource-collection>
+      
+      <auth-constraint>
+         <!-- Anyone with one of the listed roles may access this area -->
+         <role-name>Alumne</role-name>
+         <role-name>Professor</role-name>
+      </auth-constraint>
+    
+   </security-constraint>
+
+    <!-- Default login configuration uses form-based authentication -->
+    <login-config>
+      <auth-method>FORM</auth-method>
+      <realm-name>Secure Area</realm-name>
+      <form-login-config>
+        <form-login-page>/jsp/protected/login.jsp</form-login-page>
+        <form-error-page>/jsp/protected/error.jsp</form-error-page>
+      </form-login-config>
+    </login-config>
+
+    <!-- Security roles referenced by this web application -->
+    <security-role>
+      <role-name>Alumne</role-name>
+    </security-role>
+    <security-role>
+      <role-name>Professor</role-name>
+    </security-role>
+    
+    
+    
+    
+   <!-- ############ SERVLET ############ -->
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+    </session-config>
+    
+    <servlet>
+        <servlet-name>llibreria</servlet-name>
+        <servlet-class>controller.ServletDispatcher</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>llibreria</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+ 
+</web-app>
