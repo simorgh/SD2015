@@ -4,14 +4,14 @@
 	"desc": "Nils Frahm",
 	"price": "1.99",
 	"type" : "mp3",
-	"path" : "/resources/music/You.mp3"
+	"path" : "/resources/audio/You.mp3"
 	},
         {
 	"name": "Villancico linuxero",
 	"desc": "Pánico en el nucleo",
 	"price": "0.99",
 	"type" : "mp3",
-	"path" : "/resources/music/villancicolinuxero.mp3"
+	"path" : "/resources/audio/villancicolinuxero.mp3"
 	},
 	{
 	"name": "RFC 7 i mig",
