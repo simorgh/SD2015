@@ -26,7 +26,7 @@
         </p>
         Press any link to continue <blink>_</blink>
         <div class="menu">
-            <a href="index.jsp">index</a> | <a href="/WEB-INF/jsp/cataleg.jsp">cataleg</a>
+            <a href="./index.jsp">index</a> | <a href="/WEB-INF/jsp/cataleg.jsp">cataleg</a>
         </div>
     </body>
 </html>

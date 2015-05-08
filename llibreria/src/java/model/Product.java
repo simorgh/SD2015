@@ -29,7 +29,7 @@ public class Product {
 	this.name = (String) obj.get("name");
 	this.type = getFileType((String) obj.get("type"));
 	this.desc = (String) obj.get("desc");
-	this.price = (Float) obj.get("price");
+	this.price = Float.valueOf((String)obj.get("price"));
 	this.path = (String) obj.get("path");
         this.thumb = (String) obj.get("thumb");
     }
