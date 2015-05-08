@@ -6,48 +6,34 @@
 package controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import model.Data;
+import model.Product;
 
 /**
  *
  * @author simorgh
  */
 public class ServletDispatcher extends HttpServlet {
+    private Data data;
+    
+    @Override
+    public void init() throws ServletException {
+	super.init();
+	ServletContext c = getServletContext();
+	String users = c.getRealPath("WEB-INF/users.json");
+	String products = c.getRealPath("WEB-INF/products.json");
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        try {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        } finally {
-            out.close();
-        }
+	data = new Data(users, products);
     }
+    
     
     // SERVLET ==================================================
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -96,14 +82,14 @@ public class ServletDispatcher extends HttpServlet {
     
     // LOCATIONS ================================================
     public void locationProxy(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        System.out.println("@locationProxy");
+        //System.out.println("@locationProxy");
         String CONTEXT = request.getContextPath();
         String location = request.getRequestURI();
 	
         if (location.equals(CONTEXT + "/")) {
 	    showPage(request, response, "index.jsp");
 	} else if(location.equals(CONTEXT + "/cataleg")) {
-            showPage(request, response, "non-protected.jsp");
+            showCataleg(request, response);
         }
 /*      else if (location.equals(CONTEXT + "/login")) {
 	    showPage(request, response, "login.jsp");
@@ -128,6 +114,28 @@ public class ServletDispatcher extends HttpServlet {
 
 
     // PAGES ====================================================
+    private void showCataleg(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	HashMap<String, Product> basket = null;/* = getBasket(request); */
+
+        ArrayList<Product> lib_books = new ArrayList();
+	ArrayList<Product> lib_audio = new ArrayList();
+	ArrayList<Product> lib_video = new ArrayList();
+
+        /* Let's show only the products which are not purchased yet.*/
+	for (Product p : data.getProducts().values()) {
+            if(p.getType()==Product.FileType.BOOK && !basket.containsKey(p.getName())) lib_books.add(p); 
+            else if(p.getType()==Product.FileType.AUDIO && !basket.containsKey(p.getName())) lib_audio.add(p);
+            else if(p.getType()==Product.FileType.VIDEO && !basket.containsKey(p.getName())) lib_video.add(p);  
+	}
+        
+        request.setAttribute("BOOKS", lib_books);
+	request.setAttribute("AUDIO", lib_audio);
+	request.setAttribute("VIDEO", lib_video);
+        
+	showPage(request, response, "/WEB-INF/jsp/cataleg.jsp");
+    }
+    
+/*
     public void showPage1ini(HttpServletRequest request, HttpServletResponse response, String currentTime) throws ServletException, IOException {
         HttpSession session = request.getSession();
         session.setAttribute("currentTime", currentTime);
@@ -143,12 +151,8 @@ public class ServletDispatcher extends HttpServlet {
     public void showPageInternalError(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         showPage( request, response, "internalError.jsp" );
     }
+*/
 
-    // PROCESS ==================================================
-    public void processPage1(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (true) showPage1ini(request, response, "100");
-        else showPage1end(request, response, 100);
-    }
 
     public void showPage(HttpServletRequest request, HttpServletResponse response, String jspPage) throws ServletException, IOException{
         ServletContext sc = getServletContext();
@@ -156,4 +160,6 @@ public class ServletDispatcher extends HttpServlet {
         rd.forward(request, response);
     }
 
+    
+    
 }

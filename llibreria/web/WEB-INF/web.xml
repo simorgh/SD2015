@@ -33,8 +33,8 @@
       <auth-method>FORM</auth-method>
       <realm-name>Secure Area</realm-name>
       <form-login-config>
-        <form-login-page>/jsp/protected/login.jsp</form-login-page>
-        <form-error-page>/jsp/protected/error.jsp</form-error-page>
+        <form-login-page>/WEB-INF/jsp/protected/login.jsp</form-login-page>
+        <form-error-page>/WEB-INF/jsp/protected/error.jsp</form-error-page>
       </form-login-config>
     </login-config>
 
@@ -45,8 +45,6 @@
     <security-role>
       <role-name>Professor</role-name>
     </security-role>
-    
-    
     
     
    <!-- ############ SERVLET ############ -->
