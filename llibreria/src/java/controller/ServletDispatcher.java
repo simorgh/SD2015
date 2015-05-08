@@ -87,11 +87,12 @@ public class ServletDispatcher extends HttpServlet {
         String location = request.getRequestURI();
 	
         if (location.equals(CONTEXT + "/")) {
-	    showPage(request, response, "index.jsp");
+	    showPage(request, response, "/index.jsp");
 	} else if(location.equals(CONTEXT + "/cataleg")) {
             showCataleg(request, response);
         }
-/*      else if (location.equals(CONTEXT + "/login")) {
+/*      
+        else if (location.equals(CONTEXT + "/login")) {
 	    showPage(request, response, "login.jsp");
 	} else if (location.equals(CONTEXT + "/logout")) {
 	    request.getSession().invalidate();
@@ -106,10 +107,11 @@ public class ServletDispatcher extends HttpServlet {
 	    controlProduct(request, response);
 	} else if (location.contains(CONTEXT + "/augsaldo")) {
 	    controlWebServices(request, response);
-	} else {
-	    showPage(request, response, "error404.jsp");
 	}
 */
+        else {
+	    showPage(request, response, "/error404.jsp");
+	}
     }
 
 
@@ -156,7 +158,7 @@ public class ServletDispatcher extends HttpServlet {
 
     public void showPage(HttpServletRequest request, HttpServletResponse response, String jspPage) throws ServletException, IOException{
         ServletContext sc = getServletContext();
-        RequestDispatcher rd = sc.getRequestDispatcher( "/jsp/" + jspPage);
+        RequestDispatcher rd = sc.getRequestDispatcher(jspPage);
         rd.forward(request, response);
     }
 

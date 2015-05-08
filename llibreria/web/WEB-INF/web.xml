@@ -4,6 +4,11 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
       
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error404.jsp</location>
+    </error-page>
+    
    <!-- ############ AUTHENTICATION ############ -->
    <security-constraint>
        
@@ -12,7 +17,7 @@
       <web-resource-collection>
          <web-resource-name>Protected Area</web-resource-name>
          <!-- Define the context-relative URL(s) to be protected -->
-         <url-pattern>/jsp/protected/*</url-pattern>
+         <url-pattern>/WEB-INF/jsp/protected/*</url-pattern>
          <!-- If you list http methods, only those methods are protected -->
          <http-method>DELETE</http-method>
          <http-method>GET</http-method>

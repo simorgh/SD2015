@@ -1,0 +1,37 @@
+{"products": [
+	{
+	"name": "You",
+	"desc": "Nils Frahm",
+	"price": "1.99",
+	"type" : "mp3",
+	"path" : "/resources/music/You.mp3"
+	},
+        {
+	"name": "Villancico linuxero",
+	"desc": "Pánico en el nucleo",
+	"price": "0.99",
+	"type" : "mp3",
+	"path" : "/resources/music/villancicolinuxero.mp3"
+	},
+	{
+	"name": "RFC 7 i mig",
+	"desc": "\"Llegiu-lo atentament i seguiu-lo escrupulosament\"",
+	"price": "1.25",
+	"type" : "txt",
+	"path" : "/resources/books/SevenHalf_RFC.txt"
+	},
+        {
+	"name": "Grau d’Enginyeria Informàtica",
+	"desc": "El títol d’Enginyeria Informàtica té com a objectiu fonamental la formació en l’àmbit de la Informàtica.",
+	"price": "5.75",
+	"type" : "pdf",
+	"path" : "/resources/books/grau.pdf"
+	},
+	{
+	"name": "Soft Model",
+	"desc": "Computer Graphics World - Blob ball",
+	"price": "9.00",
+	"type" : "video",
+	"path" : "/resources/videos/softbody001.mp4"
+	}
+]}

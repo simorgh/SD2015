@@ -3,9 +3,15 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/Users/simorgh/NetBeansProjects/llibreria/web/WEB-INF/web.xml</file>
-            <file>file:/Users/simorgh/NetBeansProjects/llibreria/src/java/controller/ServletDispatcher.java</file>
-            <file>file:/Users/simorgh/NetBeansProjects/llibreria/web/index.jsp</file>
+            <file>file:/Users/simorgh/NetBeansProjects/B7/llibreria/web/WEB-INF/jsp/cataleg.jsp</file>
+            <file>file:/Users/simorgh/NetBeansProjects/B7/llibreria/src/java/model/Product.java</file>
+            <file>file:/Users/simorgh/NetBeansProjects/B7/llibreria/web/index.jsp</file>
+            <file>file:/Users/simorgh/NetBeansProjects/B7/llibreria/src/java/controller/ServletDispatcher.java</file>
+            <file>file:/Users/simorgh/NetBeansProjects/B7/llibreria/src/java/model/Data.java</file>
+            <file>file:/Users/simorgh/NetBeansProjects/B7/llibreria/web/error404.jsp</file>
+            <file>file:/Users/simorgh/NetBeansProjects/B7/llibreria/web/static/css/404.css</file>
+            <file>file:/Users/simorgh/NetBeansProjects/B7/llibreria/web/WEB-INF/web.xml</file>
+            <file>file:/Users/simorgh/NetBeansProjects/B7/llibreria/src/java/model/User.java</file>
         </group>
     </open-files>
 </project-private>
