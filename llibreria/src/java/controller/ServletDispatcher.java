@@ -125,9 +125,12 @@ public class ServletDispatcher extends HttpServlet {
 
         /* Let's show only the products which are not purchased yet.*/
 	for (Product p : data.getProducts().values()) {
-            if(p.getType()==Product.FileType.BOOK && !basket.containsKey(p.getName())) lib_books.add(p); 
-            else if(p.getType()==Product.FileType.AUDIO && !basket.containsKey(p.getName())) lib_audio.add(p);
-            else if(p.getType()==Product.FileType.VIDEO && !basket.containsKey(p.getName())) lib_video.add(p);  
+            if(p.getType()==Product.FileType.BOOK) lib_books.add(p);
+            else if (p.getType()==Product.FileType.AUDIO) lib_audio.add(p);
+            else if (p.getType()==Product.FileType.VIDEO) lib_video.add(p);
+            //if(p.getType()==Product.FileType.BOOK && !basket.containsKey(p.getName())) lib_books.add(p); 
+            //else if(p.getType()==Product.FileType.AUDIO && !basket.containsKey(p.getName())) lib_audio.add(p);
+            //else if(p.getType()==Product.FileType.VIDEO && !basket.containsKey(p.getName())) lib_video.add(p);  
 	}
         
         request.setAttribute("BOOKS", lib_books);
