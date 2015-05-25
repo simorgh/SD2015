@@ -17,7 +17,7 @@
       <web-resource-collection>
          <web-resource-name>Protected Area</web-resource-name>
          <!-- Define the context-relative URL(s) to be protected -->
-         <url-pattern>/WEB-INF/jsp/protected/*</url-pattern>
+         <url-pattern>/protegit/*</url-pattern>
          <!-- If you list http methods, only those methods are protected -->
          <http-method>DELETE</http-method>
          <http-method>GET</http-method>
@@ -31,7 +31,7 @@
          <role-name>Professor</role-name>
       </auth-constraint>
     
-   </security-constraint>
+    </security-constraint>
 
     <!-- Default login configuration uses form-based authentication -->
     <login-config>
@@ -39,7 +39,7 @@
       <realm-name>Secure Area</realm-name>
       <form-login-config>
         <form-login-page>/WEB-INF/jsp/protected/login.jsp</form-login-page>
-        <form-error-page>/WEB-INF/jsp/protected/error.jsp</form-error-page>
+        <form-error-page>/WEB-INF/jsp/protected/login_fail.jsp</form-error-page>
       </form-login-config>
     </login-config>
 
@@ -63,10 +63,30 @@
         <servlet-name>llibreria</servlet-name>
         <servlet-class>controller.ServletDispatcher</servlet-class>
     </servlet>
-    
+
+
+
     <servlet-mapping>
         <servlet-name>llibreria</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
- 
+    
+    <servlet-mapping>
+       <servlet-name>default</servlet-name>
+       <url-pattern>/static/*</url-pattern>
+    </servlet-mapping>
+    
+    
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.png</url-pattern>
+        <url-pattern>*.js</url-pattern>
+        <url-pattern>*.css</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping> 
+        <servlet-name>llibreria</servlet-name> 
+        <url-pattern>*.do</url-pattern> 
+    </servlet-mapping>
+
 </web-app>

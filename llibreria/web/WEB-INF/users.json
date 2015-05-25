@@ -1,3 +1,18 @@
 {
-    "users": []
+    "users" :   [
+	{
+            "name"      :   "vicent",
+            "credit"    :   "150",
+            "products"  :   [
+               "1","3","2"
+            ]
+	},
+        {
+            "name"      :   "igor",
+            "credit"    :   "200",
+            "products"  :   [
+                "2","5"
+            ]
+	}
+    ]
 }

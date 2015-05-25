@@ -10,7 +10,47 @@
 <html>
     <head>
         <title>- ooops! -</title>
-        <link rel="stylesheet" type="text/css" href="../static/css/404.css"/>
+        <style>
+        
+            body {
+                background:#0000aa;
+                color:#ffffff;
+                font-family:courier;
+                font-size:12pt;
+                text-align:center;
+                margin:100px;
+            }
+
+            blink {
+                color:yellow;
+            }
+
+            .neg {
+                background:#fff;
+                color:#0000aa;
+                padding:2px 8px;
+                font-weight:bold;
+            }
+
+            p {
+                margin:30px 100px;
+                text-align:left;
+            }
+
+            a,a:hover {
+                color:inherit;
+                font:inherit;
+            }
+
+            .menu {
+                text-align:center;
+                margin-top:50px;
+            }
+        
+        </style>
+        
+        
+        <link rel="stylesheet" type="text/css" href="/static/css/404.css"/>
     </head>
     
     <body>
@@ -26,7 +66,7 @@
         </p>
         Press any link to continue <blink>_</blink>
         <div class="menu">
-            <a href="./index.jsp">index</a> | <a href="/WEB-INF/jsp/cataleg.jsp">cataleg</a>
+            <a href="/llibreria">index</a> | <a href="/llibreria/cataleg">cataleg</a>
         </div>
     </body>
 </html>

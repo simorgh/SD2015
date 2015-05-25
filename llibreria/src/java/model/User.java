@@ -1,12 +1,12 @@
 package model;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 
 /**
- *
  * @author simorgh
  */
 public class User {
@@ -21,26 +21,24 @@ public class User {
     }
     
     /**
-     * 
      * @param obj
      * @param totalproducts 
      */
-    public User(JSONObject obj, HashMap<String, Product> totalproducts) {
-	this.name = (String) obj.get("name");
-	this.credit = (Float) obj.get("credit");
+    public User(JsonObject obj, HashMap<String, Product> totalproducts) {
+	this.name = obj.get("name").getAsString();
+	this.credit = obj.get("credit").getAsFloat();
 	this.products = new HashMap<String, Product>();
-        
-        JSONArray arr = (JSONArray) obj.get("products");
-        Iterator i = arr.iterator();
-
-        while (i.hasNext()) {
-            JSONObject product = (JSONObject) i.next();
-            String p = (String) product.get("title");
-            
-            if(totalproducts.containsKey(p)) {
-		products.put(p, totalproducts.get(p));
-	    }
-        }	
+  
+        JsonArray arr = obj.get("products").getAsJsonArray();
+        ArrayList<String> list = new ArrayList<String>();
+        for(int i = 0; i < arr.size(); i++){
+            String pid = arr.get(i).getAsString();
+            list.add(pid);
+            if(totalproducts.containsKey(pid) ) {
+                products.put(pid, totalproducts.get(pid));
+            }
+        }  
+        System.out.println("> User " + this.name + " adquired following items " + list.toString());
     }
 
     public String getName() {
@@ -68,17 +66,16 @@ public class User {
     }
     
     /**
-     * 
      * @param obj 
      */
-    public void save(JSONObject obj) {
-	obj.put("name", name);
-	obj.put("credit",credit);
-	
-	JSONArray arr = new JSONArray();
+    public void save(JsonObject obj) {
+	obj.addProperty("name", name);
+        obj.addProperty("credit", credit);
+
+	JsonArray arr = new JsonArray();
 	for (Product p : products.values()) {
-	    arr.add(p.getName());
+	    arr.add(new JsonPrimitive(p.getId()));
 	}
-	obj.put("products", arr);
+	obj.add("products", arr);
     }
 }

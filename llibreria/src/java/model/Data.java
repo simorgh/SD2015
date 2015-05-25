@@ -1,5 +1,9 @@
 package model;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -7,13 +11,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+
 
 /**
- *
  * @author simorgh
  */
 public class Data {
@@ -35,7 +35,6 @@ public class Data {
     
     
     /**
-     * 
      * @param file
      * @return 
      */
@@ -44,19 +43,15 @@ public class Data {
 	HashMap<String, Product> out = new HashMap<String, Product>();
 	if(text == null) return out;
 
-        /* Decode products from JSON string */
-        JSONArray array = null;
-        try {
-            JSONParser parser = new JSONParser();
-            Object obj = parser.parse(text);
-            JSONObject json = (JSONObject) obj;
-            array = (JSONArray) json.get("products");
-        } catch (ParseException ex) {
-            Logger.getLogger(Data.class.getName()).log(Level.SEVERE, null, ex);
-        }
-  
-        for (Object e : array) {
-            Product p = new Product((JSONObject) e);
+        /* Decode products from JSON string */   
+        JsonParser parser = new JsonParser();
+        Object obj = parser.parse(text);
+        JsonObject json = (JsonObject) obj;
+        JsonArray array = json.getAsJsonArray("products");
+       
+        System.out.println("Loading items from json @products.json");
+        for (JsonElement e : array) {
+            Product p = new Product((JsonObject) e);
             out.put(p.getName(), p);
         }
         
@@ -64,7 +59,6 @@ public class Data {
     }
     
     /**
-     * 
      * @param file
      * @param products
      * @return 
@@ -73,22 +67,15 @@ public class Data {
 	String text = getStringFile(file);
 	HashMap<String, User> out = new HashMap<String, User>();
 	if(text == null) return out;
-        //JSONObject obj = new JSONObject(text);
-        //JSONArray array = obj.getJSONArray("users");
         
         /* Decode products from JSON string */
-        JSONArray array = null;
-        try {
-            JSONParser parser = new JSONParser();
-            Object obj = parser.parse(text);
-            JSONObject json = (JSONObject) obj;
-            array = (JSONArray) json.get("users");
-        } catch (ParseException ex) {
-            Logger.getLogger(Data.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        for (Object e : array) {
-            User u = new User((JSONObject) e, products);
+        JsonParser parser = new JsonParser();
+        Object obj = parser.parse(text);
+        JsonObject json = (JsonObject) obj;  
+        JsonArray array = json.get("users").getAsJsonArray();
+  
+        for (JsonElement e : array) {
+            User u = new User((JsonObject) e, products);
             out.put(u.getName(), u);
         }
         
@@ -131,7 +118,5 @@ public class Data {
         
 	return null;
     }
-    
-    
-    
+        
 }

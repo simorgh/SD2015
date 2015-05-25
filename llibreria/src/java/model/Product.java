@@ -1,6 +1,6 @@
 package model;
 
-import org.json.simple.JSONObject;
+import com.google.gson.JsonObject;
 
 /**
  *
@@ -8,7 +8,7 @@ import org.json.simple.JSONObject;
  */
 public class Product {
     public static enum FileType {AUDIO, BOOK, VIDEO, UNDEFINED};
-         
+    private short id;
     private FileType type;
     private String name; /* name must be unique */
     private String desc;
@@ -16,7 +16,8 @@ public class Product {
     private String path;
     private String thumb;
 
-    public Product(FileType type, String name, String desc, int price, String path, String thumb) {
+    public Product(short id, FileType type, String name, String desc, int price, String path, String thumb) {
+        this.id = id;
 	this.type = type;
 	this.name = name;
 	this.desc = desc;
@@ -25,13 +26,24 @@ public class Product {
         this.thumb = thumb;
     }
     
-    public Product(JSONObject obj) {
-	this.name = (String) obj.get("name");
-	this.type = getFileType((String) obj.get("type"));
-	this.desc = (String) obj.get("desc");
-	this.price = Float.valueOf((String)obj.get("price"));
-	this.path = (String) obj.get("path");
-        this.thumb = (String) obj.get("thumb");
+    public Product(JsonObject obj) {
+        this.id = obj.get("id").getAsShort();
+        this.name = obj.get("name").getAsString();
+	this.type = getFileType(obj.get("type").getAsString());
+	this.desc = obj.get("desc").getAsString();
+	this.price = obj.get("price").getAsFloat();
+	this.path = obj.get("path").getAsString();
+        this.thumb = obj.get("thumb").getAsString();
+        
+        System.out.println("{\n" +
+                "\t\"id\"\t:\t" + Short.toString(this.id) + ",\n" +
+                "\t\"name\"\t:\t" + this.name + ",\n" +
+                "\t\"desc\"\t:\t" + this.desc + ",\n" +
+                "\t\"price\"\t:\t" + Float.toString(this.price) + ",\n" +
+                "\t\"type\"\t:\t" + this.type + ",\n" +
+                "\t\"path\"\t:\t" + this.path + ",\n" +
+                "\t\"thumb\"\t:\t" + this.thumb + "\n" +
+                "}");
     }
 
     private FileType getFileType(String type) {
@@ -58,6 +70,14 @@ public class Product {
 	this.name = mName;
     }
 
+    public short getId(){
+        return id;
+    }
+    
+    public void setId(short mId){
+        this.id = mId;
+    }
+    
     public String getDescription() {
 	return desc;
     }

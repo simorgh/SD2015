@@ -1,37 +1,49 @@
-{"products": [
+{
+    "products"  :   [
 	{
-	"name": "You",
-	"desc": "Nils Frahm",
-	"price": "1.99",
-	"type" : "AUDIO",
-	"path" : "/resources/audio/You.mp3"
+            "id"    :   "1",
+            "name"  :   "You",
+            "desc"  :   "Nils Frahm",
+            "price" :   "1.99",
+            "type"  :   "AUDIO",
+            "path"  :   "/resources/audio/You.mp3",
+            "thumb" :   "null"
 	},
         {
-	"name": "Villancico linuxero",
-	"desc": "Pánico en el nucleo",
-	"price": "0.99",
-	"type" : "AUDIO",
-	"path" : "/resources/audio/villancicolinuxero.mp3"
+            "id"    :   "2",
+            "name"  :   "Villancico linuxero",
+            "desc"  :   "Pánico en el nucleo",
+            "price" :   "0.99",
+            "type"  :   "AUDIO",
+            "path"  :   "/resources/audio/villancicolinuxero.mp3",
+            "thumb" :   "none"
 	},
 	{
-	"name": "RFC 7 i mig",
-	"desc": "\"Llegiu-lo atentament i seguiu-lo escrupulosament\"",
-	"price": "1.25",
-	"type" : "BOOK",
-	"path" : "/resources/books/SevenHalf_RFC.txt"
+            "id"    :   "3",
+            "name"  :   "RFC 7 i mig",
+            "desc"  :   "Llegiu-lo atentament i seguiu-lo escrupulosament",
+            "price" :   "1.25",
+            "type"  :   "BOOK",
+            "path"  :   "/resources/books/SevenHalf_RFC.txt",
+            "thumb" :   "none"
 	},
         {
-	"name": "Grau d’Enginyeria Informàtica",
-	"desc": "El títol d’Enginyeria Informàtica té com a objectiu fonamental la formació en l’àmbit de la Informàtica.",
-	"price": "5.75",
-	"type" : "BOOK",
-	"path" : "/resources/books/grau.pdf"
+            "id"    :   "4",
+            "name"  :   "Grau d’Enginyeria Informàtica",
+            "desc"  :   "El títol d’Enginyeria Informàtica té com a objectiu fonamental la formació en l’àmbit de la Informàtica.",
+            "price" :   "5.75",
+            "type"  :   "BOOK",
+            "path"  :   "/resources/books/grau.pdf",
+            "thumb" :   "none"
 	},
 	{
-	"name": "Soft Model",
-	"desc": "Computer Graphics World - Blob ball",
-	"price": "9.00",
-	"type" : "VIDEO",
-	"path" : "/resources/videos/softbody001.mp4"
+            "id"    :   "5",
+            "name"  :   "Soft Model",
+            "desc"  :   "Computer Graphics World - Blob ball",
+            "price" :   "9.00",
+            "type"  :   "VIDEO",
+            "path"  :   "/resources/videos/softbody001.mp4",
+            "thumb" :   "none"
 	}
-]}
+    ]
+}

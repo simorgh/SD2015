@@ -5,6 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
     
@@ -18,8 +19,8 @@
         Exemple del mecanisme d'autentificació de Tomcat
         <ul>
             <!-- <li><a href="WEB-INF/jsp/non-protected.jsp">Pàgina pública (cataleg)</a>: no requereix estar identificat.</li> -->
-            <li><a href="WEB-INF/jsp/cataleg.jsp">Cataleg</a>: no requereix estar identificat.</li>
-            <li><a href="WEB-INF/jsp/protected/secret.jsp">Pàgina protegida</a>: requereix estar identificat.</li>
+            <li><a href="./cataleg">Cataleg</a>: no requereix estar identificat.</li>
+            <li><a href="./protegit/llista">Llista de descàrregues</a>: requereix estar identificat.</li>
                 <ul>
                     <li>cal que tingueu els usuaris declarats a tomcat/conf/tomcat-users.xml, per exemple:<br/>
                         &lt;user username="alumne1" password="alumne1" roles="Alumne"/&gt;
@@ -30,5 +31,3 @@
         </ul>    
     </body>
 </html>
-
-

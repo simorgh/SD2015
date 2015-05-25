@@ -1,13 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -18,7 +12,6 @@ import model.Data;
 import model.Product;
 
 /**
- *
  * @author simorgh
  */
 public class ServletDispatcher extends HttpServlet {
@@ -35,8 +28,10 @@ public class ServletDispatcher extends HttpServlet {
     }
     
     
-    // SERVLET ==================================================
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    ////////////////////////////////////////////////////////
+    //                      SERVLET
+    ////////////////////////////////////////////////////////
+    
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -68,21 +63,19 @@ public class ServletDispatcher extends HttpServlet {
 
     /**
      * Returns a short description of the servlet.
-     *
+     * 
      * @return a String containing servlet description
      */
     @Override
     public String getServletInfo() {
         return "Short description";
-    }// </editor-fold>
+    }
     
     
-    
-    
-    
-    // LOCATIONS ================================================
+    ////////////////////////////////////////////////////////////////
+    //                       LOCATIONS
+    ////////////////////////////////////////////////////////////////
     public void locationProxy(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //System.out.println("@locationProxy");
         String CONTEXT = request.getContextPath();
         String location = request.getRequestURI();
 	
@@ -90,11 +83,11 @@ public class ServletDispatcher extends HttpServlet {
 	    showPage(request, response, "/index.jsp");
 	} else if(location.equals(CONTEXT + "/cataleg")) {
             showCataleg(request, response);
-        }
+        } else if (location.equals(CONTEXT + "/protegit/llista")) {
+	    showBasket(request, response);
+	}
 /*      
-        else if (location.equals(CONTEXT + "/login")) {
-	    showPage(request, response, "login.jsp");
-	} else if (location.equals(CONTEXT + "/logout")) {
+        else if (location.equals(CONTEXT + "/logout")) {
 	    request.getSession().invalidate();
 	    response.sendRedirect(CONTEXT + "/");        
 	} else if (location.equals(CONTEXT + "/Cataleg")) {
@@ -107,7 +100,7 @@ public class ServletDispatcher extends HttpServlet {
 	    controlProduct(request, response);
 	} else if (location.contains(CONTEXT + "/augsaldo")) {
 	    controlWebServices(request, response);
-	}
+        }
 */
         else {
 	    showPage(request, response, "/error404.jsp");
@@ -117,47 +110,30 @@ public class ServletDispatcher extends HttpServlet {
 
     // PAGES ====================================================
     private void showCataleg(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	HashMap<String, Product> basket = null;/* = getBasket(request); */
-
-        ArrayList<Product> lib_books = new ArrayList();
-	ArrayList<Product> lib_audio = new ArrayList();
-	ArrayList<Product> lib_video = new ArrayList();
+        //HashMap<String, Product> basket = getBasket(request);
+        ArrayList<Product> books = new ArrayList();
+	ArrayList<Product> audio = new ArrayList();
+	ArrayList<Product> video = new ArrayList();
 
         /* Let's show only the products which are not purchased yet.*/
 	for (Product p : data.getProducts().values()) {
-            if(p.getType()==Product.FileType.BOOK) lib_books.add(p);
-            else if (p.getType()==Product.FileType.AUDIO) lib_audio.add(p);
-            else if (p.getType()==Product.FileType.VIDEO) lib_video.add(p);
-            //if(p.getType()==Product.FileType.BOOK && !basket.containsKey(p.getName())) lib_books.add(p); 
-            //else if(p.getType()==Product.FileType.AUDIO && !basket.containsKey(p.getName())) lib_audio.add(p);
-            //else if(p.getType()==Product.FileType.VIDEO && !basket.containsKey(p.getName())) lib_video.add(p);  
+            if(p.getType()==Product.FileType.BOOK) books.add(p);
+            else if (p.getType()==Product.FileType.AUDIO) audio.add(p);
+            else if (p.getType()==Product.FileType.VIDEO) video.add(p);
+            //if(p.getType()==Product.FileType.BOOK && !basket.containsKey(p.getName())) arr_books.add(p); 
+            //else if(p.getType()==Product.FileType.AUDIO && !basket.containsKey(p.getName())) arr_audio.add(p);
+            //else if(p.getType()==Product.FileType.VIDEO && !basket.containsKey(p.getName())) arr_video.add(p);  
 	}
         
-        request.setAttribute("BOOKS", lib_books);
-	request.setAttribute("AUDIO", lib_audio);
-	request.setAttribute("VIDEO", lib_video);
-        
+        request.setAttribute("books", books);
+	request.setAttribute("audio", audio);
+	request.setAttribute("video", video); 
 	showPage(request, response, "/WEB-INF/jsp/cataleg.jsp");
     }
     
-/*
-    public void showPage1ini(HttpServletRequest request, HttpServletResponse response, String currentTime) throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        session.setAttribute("currentTime", currentTime);
-        showPage( request, response, "page1ini.jsp" );
+    private void showBasket(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        showPage(request, response, "/WEB-INF/jsp/protected/llista.jsp");
     }
-
-    public void showPage1end(HttpServletRequest request, HttpServletResponse response, int points) throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        session.setAttribute("points", points);
-        showPage( request, response, "page1end.jsp" );
-    }
-
-    public void showPageInternalError(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        showPage( request, response, "internalError.jsp" );
-    }
-*/
-
 
     public void showPage(HttpServletRequest request, HttpServletResponse response, String jspPage) throws ServletException, IOException{
         ServletContext sc = getServletContext();
