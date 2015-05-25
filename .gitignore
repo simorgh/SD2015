@@ -31,7 +31,8 @@ hs_err_pid*
 
 # Do not ignore Apache CLI commons!!
 !commons-cli-1.2.jar
-!json-simple-1.1.1.jar
+!gson-2.2.4-javadoc.jar
+!gson-2.2.4.jar
 
 # other exclusions:
 !nbproject/project.properties
