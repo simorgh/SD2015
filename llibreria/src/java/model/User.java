@@ -3,17 +3,22 @@ package model;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
  * @author simorgh
  */
-public class User {
+public class User implements Serializable{
     private String name; /* must be unique */
     private float credit;
     private HashMap<String, Product> products;
 
+    public User(){
+        
+    }
+    
     public User(String name, float credit, HashMap<String, Product> products) {
 	this.name = name;
 	this.credit = credit;
@@ -37,8 +42,9 @@ public class User {
             if(totalproducts.containsKey(pid) ) {
                 products.put(pid, totalproducts.get(pid));
             }
-        }  
-        System.out.println("> User " + this.name + " adquired following items " + list.toString());
+        }
+        
+        System.out.println(obj.toString());
     }
 
     public String getName() {

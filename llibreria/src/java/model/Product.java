@@ -1,12 +1,13 @@
 package model;
 
 import com.google.gson.JsonObject;
+import java.io.Serializable;
 
 /**
  *
  * @author simorgh
  */
-public class Product {
+public class Product implements Serializable {
     public static enum FileType {AUDIO, BOOK, VIDEO, UNDEFINED};
     private short id;
     private FileType type;
@@ -16,6 +17,10 @@ public class Product {
     private String path;
     private String thumb;
 
+    public Product(){
+        
+    }
+    
     public Product(short id, FileType type, String name, String desc, int price, String path, String thumb) {
         this.id = id;
 	this.type = type;
@@ -35,15 +40,7 @@ public class Product {
 	this.path = obj.get("path").getAsString();
         this.thumb = obj.get("thumb").getAsString();
         
-        System.out.println("{\n" +
-                "\t\"id\"\t:\t" + Short.toString(this.id) + ",\n" +
-                "\t\"name\"\t:\t" + this.name + ",\n" +
-                "\t\"desc\"\t:\t" + this.desc + ",\n" +
-                "\t\"price\"\t:\t" + Float.toString(this.price) + ",\n" +
-                "\t\"type\"\t:\t" + this.type + ",\n" +
-                "\t\"path\"\t:\t" + this.path + ",\n" +
-                "\t\"thumb\"\t:\t" + this.thumb + "\n" +
-                "}");
+        System.out.println(obj.toString());
     }
 
     private FileType getFileType(String type) {

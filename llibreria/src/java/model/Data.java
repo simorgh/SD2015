@@ -49,7 +49,7 @@ public class Data {
         JsonObject json = (JsonObject) obj;
         JsonArray array = json.getAsJsonArray("products");
        
-        System.out.println("Loading items from json @products.json");
+        System.out.println("> Loading items from json @products.json");
         for (JsonElement e : array) {
             Product p = new Product((JsonObject) e);
             out.put(p.getName(), p);
@@ -74,6 +74,7 @@ public class Data {
         JsonObject json = (JsonObject) obj;  
         JsonArray array = json.get("users").getAsJsonArray();
   
+        System.out.println("> Loading users from json @users.json");
         for (JsonElement e : array) {
             User u = new User((JsonObject) e, products);
             out.put(u.getName(), u);

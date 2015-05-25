@@ -15,8 +15,8 @@
     </head>
 
     <body>
-        <P><h3>Exemple d'autentificació</h3></P>
-        Exemple del mecanisme d'autentificació de Tomcat
+        <p><h3>Llibreria de Recursos Electrònics Online</h3></p>
+    
         <ul>
             <!-- <li><a href="WEB-INF/jsp/non-protected.jsp">Pàgina pública (cataleg)</a>: no requereix estar identificat.</li> -->
             <li><a href="./cataleg">Cataleg</a>: no requereix estar identificat.</li>
@@ -28,6 +28,7 @@
                 </ul>
             <li>Documentació Tomcat: <a href="http://tomcat.apache.org/tomcat-6.0-doc/realm-howto.html">Realm-HowTo</a></li>
             <li>Exemple Tomcat: <a href="http://localhost:8080/examples/security/protected">exemple de seguretat</a></li>
-        </ul>    
+        </ul>  
+    
     </body>
 </html>

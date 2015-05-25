@@ -7,7 +7,7 @@
             "price" :   "1.99",
             "type"  :   "AUDIO",
             "path"  :   "/resources/audio/You.mp3",
-            "thumb" :   "null"
+            "thumb" :   "./static/img/thumb_you.jpg"
 	},
         {
             "id"    :   "2",
@@ -16,7 +16,7 @@
             "price" :   "0.99",
             "type"  :   "AUDIO",
             "path"  :   "/resources/audio/villancicolinuxero.mp3",
-            "thumb" :   "none"
+            "thumb" :   "./static/img/thumb_linuxero.jpg"
 	},
 	{
             "id"    :   "3",
@@ -25,7 +25,7 @@
             "price" :   "1.25",
             "type"  :   "BOOK",
             "path"  :   "/resources/books/SevenHalf_RFC.txt",
-            "thumb" :   "none"
+            "thumb" :   "./static/img/thumb_7imig.png"
 	},
         {
             "id"    :   "4",
@@ -34,7 +34,7 @@
             "price" :   "5.75",
             "type"  :   "BOOK",
             "path"  :   "/resources/books/grau.pdf",
-            "thumb" :   "none"
+            "thumb" :   "./static/img/thumb_ginfo.jpg"
 	},
 	{
             "id"    :   "5",
@@ -43,7 +43,7 @@
             "price" :   "9.00",
             "type"  :   "VIDEO",
             "path"  :   "/resources/videos/softbody001.mp4",
-            "thumb" :   "none"
+            "thumb" :   "./static/img/thumb_blob.png"
 	}
     ]
 }
