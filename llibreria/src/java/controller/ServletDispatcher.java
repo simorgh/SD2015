@@ -1,21 +1,24 @@
 package controller;
 
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import model.Data;
-import model.Product;
+import beans.Product;
 
 /**
  * @author simorgh
  */
 public class ServletDispatcher extends HttpServlet {
-    private Data data;
+    private DataManager data;
     
     @Override
     public void init() throws ServletException {
@@ -24,7 +27,7 @@ public class ServletDispatcher extends HttpServlet {
 	String users = c.getRealPath("WEB-INF/users.json");
 	String products = c.getRealPath("WEB-INF/products.json");
 
-	data = new Data(users, products);
+	data = new DataManager(users, products);
     }
     
     
@@ -85,30 +88,15 @@ public class ServletDispatcher extends HttpServlet {
             showCataleg(request, response);
         } else if (location.equals(CONTEXT + "/protegit/llista")) {
 	    showBasket(request, response);
-	}
-/*      
-        else if (location.equals(CONTEXT + "/logout")) {
-	    request.getSession().invalidate();
-	    response.sendRedirect(CONTEXT + "/");        
-	} else if (location.equals(CONTEXT + "/Cataleg")) {
-	    showCataleg(request, response);
-	} else if (location.equals(CONTEXT + "/Cistell")) {
-	    showCistell(request, response);
-	} else if (location.equals(CONTEXT + "/Historial")) {
-	    showHistorial(request, response);
-	} else if (location.contains(CONTEXT + "/Producte")) {
-	    controlProduct(request, response);
-	} else if (location.contains(CONTEXT + "/augsaldo")) {
-	    controlWebServices(request, response);
-        }
-*/
-        else {
+        } else {
 	    showPage(request, response, "/error404.jsp");
 	}
     }
 
 
-    // PAGES ====================================================
+    ////////////////////////////////////////////////////////////////
+    //                       PAGES
+    ////////////////////////////////////////////////////////////////
     private void showCataleg(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         //HashMap<String, Product> basket = getBasket(request);
         ArrayList<Product> books = new ArrayList();
@@ -117,9 +105,9 @@ public class ServletDispatcher extends HttpServlet {
 
         /* Let's show only the products which are not purchased yet.*/
 	for (Product p : data.getProducts().values()) {
-            if(p.getType()==Product.FileType.BOOK) books.add(p);
-            else if (p.getType()==Product.FileType.AUDIO) audio.add(p);
-            else if (p.getType()==Product.FileType.VIDEO) video.add(p);
+            if(p.getType()==DataManager.FileType.BOOK) books.add(p);
+            else if (p.getType()==DataManager.FileType.AUDIO) audio.add(p);
+            else if (p.getType()==DataManager.FileType.VIDEO) video.add(p);
             //if(p.getType()==Product.FileType.BOOK && !basket.containsKey(p.getName())) arr_books.add(p); 
             //else if(p.getType()==Product.FileType.AUDIO && !basket.containsKey(p.getName())) arr_audio.add(p);
             //else if(p.getType()==Product.FileType.VIDEO && !basket.containsKey(p.getName())) arr_video.add(p);  
@@ -140,7 +128,19 @@ public class ServletDispatcher extends HttpServlet {
         RequestDispatcher rd = sc.getRequestDispatcher(jspPage);
         rd.forward(request, response);
     }
+/*
+    private void downloadResource(HttpServletResponse response) throws IOException {
+        ServletOutputStream outStream = response.getOutputStream();
+        response.setContentLength((int) file.length());
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
 
-    
-    
+        byte[] byteBuffer = new byte[1024];
+        DataInputStream in = new DataInputStream(new FileInputStream(file));
+        while ((length = in.read(byteBuffer)) != -1) {
+            outStream.write(byteBuffer, 0, length);
+        }
+        in.close();
+        outStream.close();
+    }
+ */   
 }

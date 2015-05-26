@@ -1,14 +1,16 @@
-package model;
+/**
+ * Class <code>Product Bean</code>.
+ */
 
-import com.google.gson.JsonObject;
+package beans;
+
 import java.io.Serializable;
+import controller.DataManager.FileType;
 
 /**
- *
  * @author simorgh
  */
 public class Product implements Serializable {
-    public static enum FileType {AUDIO, BOOK, VIDEO, UNDEFINED};
     private short id;
     private FileType type;
     private String name; /* name must be unique */
@@ -17,39 +19,10 @@ public class Product implements Serializable {
     private String path;
     private String thumb;
 
-    public Product(){
-        
+    /** No-arg constructor (takes no arguments). */
+    public Product(){    
     }
     
-    public Product(short id, FileType type, String name, String desc, int price, String path, String thumb) {
-        this.id = id;
-	this.type = type;
-	this.name = name;
-	this.desc = desc;
-	this.price = price;
-	this.path = path;
-        this.thumb = thumb;
-    }
-    
-    public Product(JsonObject obj) {
-        this.id = obj.get("id").getAsShort();
-        this.name = obj.get("name").getAsString();
-	this.type = getFileType(obj.get("type").getAsString());
-	this.desc = obj.get("desc").getAsString();
-	this.price = obj.get("price").getAsFloat();
-	this.path = obj.get("path").getAsString();
-        this.thumb = obj.get("thumb").getAsString();
-        
-        System.out.println(obj.toString());
-    }
-
-    private FileType getFileType(String type) {
-        try {
-            return FileType.valueOf(type);
-        } catch(IllegalArgumentException e) {
-            return FileType.UNDEFINED;
-        }
-    }
     
     public FileType getType() {
 	return type;
