@@ -65,15 +65,26 @@
         
         
         <ul class="products">
-            <h3>Downloads Available</h3>
+            <h3>Descarregues disponibles</h3>
             <c:forEach var="p" items="${products}">
                 <li>
                     <img src=../${p.getThumbnail()}>
                     <h4><c:out value="${p.getName()}"/></h4>
                     <p><c:out value="${p.getDescription()}"/></p>
                     <a class="myButton" href="llibreria//download?param=${p.getPath()}">Descarrega</a>
-                </li>
+                </li>   
+            </c:forEach>
+        </ul>
+        
                 
+        <ul class="products">
+            <h3>Actualment al carret</h3>
+            <c:forEach var="p" items="${products}">
+                <li>
+                    <img src=../${p.getThumbnail()}>
+                    <h4><c:out value="${p.getName()}"/></h4>
+                    <p><c:out value="${p.getDescription()}"/></p>
+                </li>   
             </c:forEach>
         </ul>
         

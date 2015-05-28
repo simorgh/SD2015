@@ -26,8 +26,8 @@ public class ServletDispatcher extends HttpServlet {
     public void init() throws ServletException {
 	super.init();
 	ServletContext c = getServletContext();
-	String users = c.getRealPath("WEB-INF/users.json");
-	String products = c.getRealPath("WEB-INF/products.json");
+	String users = c.getRealPath("/WEB-INF/users.json");
+	String products = c.getRealPath("/WEB-INF/products.json");
         
 	data = DataManager.getInstance(users, products);
     }
@@ -85,9 +85,9 @@ public class ServletDispatcher extends HttpServlet {
         String location = request.getRequestURI();
 	
         if (location.equals(CONTEXT + "/")) {
-            System.out.println("entering test0...");
+            System.out.println("entering testLogout_00...");
 	    //boolean logout = Boolean.getBoolean(request.getParameter("logoff"));
-           request.getSession().invalidate(); 
+           request.getSession().invalidate();
            showPage(request, response, "/index.jsp");
             
             
@@ -98,9 +98,9 @@ public class ServletDispatcher extends HttpServlet {
         } else if (location.contains("/download")) {
             downloadResource(request, response);
         } else if (location.equals("/logout")){
-            System.out.println("entring test1...");
+            System.out.println("entering testLogout_01..");
 	    //boolean logout = Boolean.getBoolean(request.getParameter("logoff"));
-           request.getSession().invalidate(); 
+           request.getSession().invalidate();
            showPage(request, response, "/index.jsp");
         } else {
 	    showPage(request, response, "/error404.jsp");
@@ -109,7 +109,7 @@ public class ServletDispatcher extends HttpServlet {
 
 
     ////////////////////////////////////////////////////////////////
-    //                       PAGES
+    //                          PAGES
     ////////////////////////////////////////////////////////////////
     
     /**

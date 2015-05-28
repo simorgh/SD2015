@@ -132,7 +132,8 @@ public class WebServiceServlet extends HttpServlet {
                     if(p.getType().equals(FileType.BOOK)){
                         //Gson gson = new Gson();
                         //out.println(gson.toJson(p));
-                         JsonObject obj = new JsonObject();
+                        
+                        JsonObject obj = new JsonObject();
                         obj.addProperty("desc", p.getDescription());
                         obj.addProperty("price", p.getPrice());
                         obj.addProperty("link", p.getPath());
@@ -146,9 +147,8 @@ public class WebServiceServlet extends HttpServlet {
                  System.out.println(idStr);
                   for (Product p : data.getProducts().values()) {
                     if(p.getType().equals(FileType.BOOK) && p.getName().endsWith(idStr)){
-                        //Gson gson = new Gson();
-                        //out.println(gson.toJson(p));
-                         JsonObject obj = new JsonObject();
+
+                        JsonObject obj = new JsonObject();
                         obj.addProperty("desc", p.getDescription());
                         obj.addProperty("price", p.getPrice());
                         obj.addProperty("link", p.getPath());

@@ -10,7 +10,7 @@
 <html>
     <head>
         <title>- ooops! -</title>    
-        <link rel="stylesheet" type="text/css" href="./static/css/404.css"/>      
+        <link rel="stylesheet" type="text/css" href="/llibreria/static/css/404.css"/>      
     </head>
     
     <body>
