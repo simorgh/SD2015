@@ -80,8 +80,8 @@ public class WebServiceServlet extends HttpServlet {
                         //Gson gson = new Gson();
                         //out.println(gson.toJson(p));
                         JsonObject obj = new JsonObject();
-                        obj.addProperty("name", p.getName());
-                        obj.addProperty("desc", p.getDescription());
+                        obj.addProperty("NAME", p.getName());
+                        obj.addProperty("DESC", p.getDescription());
                         out.println(obj);    
                     }
                 }
@@ -92,8 +92,8 @@ public class WebServiceServlet extends HttpServlet {
                   for (Product p : data.getProducts().values()) {
                     if(p.getType().equals(FileType.AUDIO) && p.getName().endsWith(idStr)){
                         JsonObject obj = new JsonObject();
-                        obj.addProperty("price", p.getPrice());
-                        obj.addProperty("link", p.getPath());
+                        obj.addProperty("PRICE", p.getPrice());
+                        obj.addProperty("LINK", p.getPath());
                         out.println(obj);    
                     }
                 }
@@ -110,8 +110,8 @@ public class WebServiceServlet extends HttpServlet {
                         //Gson gson = new Gson();
                         //out.println(gson.toJson(p));
                          JsonObject obj = new JsonObject();
-                        obj.addProperty("name", p.getName());
-                        obj.addProperty("desc", p.getDescription());
+                        obj.addProperty("NAME", p.getName());
+                        obj.addProperty("DESC", p.getDescription());
                         out.println(obj);    
                     }
                 }
@@ -122,8 +122,8 @@ public class WebServiceServlet extends HttpServlet {
                   for (Product p : data.getProducts().values()) {
                     if(p.getType().equals(FileType.VIDEO) && p.getName().endsWith(idStr)){
                         JsonObject obj = new JsonObject();
-                        obj.addProperty("price", p.getPrice());
-                        obj.addProperty("link", p.getPath());
+                        obj.addProperty("PRICE", p.getPrice());
+                        obj.addProperty("LINK", p.getPath());
                         out.println(obj);   
                     }
                 }
@@ -140,8 +140,8 @@ public class WebServiceServlet extends HttpServlet {
                         //Gson gson = new Gson();
                         //out.println(gson.toJson(p));
                          JsonObject obj = new JsonObject();
-                        obj.addProperty("name", p.getName());
-                        obj.addProperty("desc", p.getDescription());
+                        obj.addProperty("NAME", p.getName());
+                        obj.addProperty("DESC", p.getDescription());
                     }
                 }
              }
@@ -154,8 +154,8 @@ public class WebServiceServlet extends HttpServlet {
                         //Gson gson = new Gson();
                         //out.println(gson.toJson(p));
                         JsonObject obj = new JsonObject();
-                        obj.addProperty("price", p.getPrice());
-                        obj.addProperty("link", p.getPath());
+                        obj.addProperty("PRICE", p.getPrice());
+                        obj.addProperty("LINK", p.getPath());
                         out.println(obj); 
                     }
                 }
