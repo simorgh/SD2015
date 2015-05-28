@@ -23,8 +23,34 @@
                 border-style: solid;
                 border-color: blue;
                 border-width: 2px;
+                margin:auto;
+            }
+            .myButton {
+                background-color:#44c767;
+                -moz-border-radius:28px;
+                -webkit-border-radius:28px;
+                border-radius:28px;
+                border:1px solid #18ab29;
+                display:inline-block;
+                cursor:pointer;
+                color:#ffffff;
+                font-family:Arial;
+                font-size:13px;
+                padding:10px 15px;
+                text-decoration:none;
+                text-shadow:0px 1px 0px #2f6627;
+                margin-left:auto;
+                margin-right:auto;
+            }
+            .myButton:hover {
+                background-color:#5cbf2a;
+            }
+            .myButton:active {
+                position:relative;
+                top:1px;
             }
         </style>
+        
     </head>
     
     <body>
@@ -35,20 +61,19 @@
         Rol "Professor" <%= (request.isUserInRole("Professor"))?"assignat":"no assignat" %><br>
         Rol "Alumne" <%= (request.isUserInRole("Alumne"))?"assignat":"no assignat" %><br>  
      -->
-        <a href="/llibreria/index.jsp?logoff=true">Sortir</a><br><br>
+        <a href="logout">Sortir</a><br><br>
         
         
         <ul class="products">
             <h3>Downloads Available</h3>
             <c:forEach var="p" items="${products}">
                 <li>
-                    <a href="${p.getPath()}">
-                        <img src=${p.getThumbnail()}>
-                        <h4><c:out value="${p.getName()}"/></h4>
-                        <p><c:out value="${p.getDescription()}"/></p>
-                        <p>$<c:out value="${p.getPrice()}"/></p>
-                    </a>
+                    <img src=../${p.getThumbnail()}>
+                    <h4><c:out value="${p.getName()}"/></h4>
+                    <p><c:out value="${p.getDescription()}"/></p>
+                    <a class="myButton" href="llibreria//download?param=${p.getPath()}">Descarrega</a>
                 </li>
+                
             </c:forEach>
         </ul>
         

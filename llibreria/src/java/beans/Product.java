@@ -11,7 +11,7 @@ import controller.DataManager.FileType;
  * @author simorgh
  */
 public class Product implements Serializable {
-    private short id;
+    private short pid;
     private FileType type;
     private String name; /* name must be unique */
     private String desc;
@@ -40,12 +40,12 @@ public class Product implements Serializable {
 	this.name = mName;
     }
 
-    public short getId(){
-        return id;
+    public short getPid(){
+        return pid;
     }
     
-    public void setId(short mId){
-        this.id = mId;
+    public void setPid(short mId){
+        this.pid = mId;
     }
     
     public String getDescription() {

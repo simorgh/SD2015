@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import beans.Product;
 import beans.User;
+import com.google.gson.Gson;
 
 
 /**
@@ -56,18 +57,10 @@ public class DataManager {
         System.out.println("> Loading items from json @products.json");
         for (JsonElement e : array) {
             JsonObject obj = e.getAsJsonObject();
-            System.out.println(obj.toString());
-                        
-            Product p = new Product();
-            p.setId(obj.get("id").getAsShort());
-            p.setName(obj.get("name").getAsString());
-            p.setType(getFileType(obj.get("type").getAsString()));
-            p.setDescription(obj.get("desc").getAsString());
-            p.setPrice(obj.get("price").getAsFloat());
-            p.setPath(obj.get("path").getAsString());
-            p.setThumbnail(obj.get("thumb").getAsString());
             
-            out.put(Short.toString(p.getId()), p);
+            Gson gson = new Gson();
+            Product p = gson.fromJson(obj, Product.class);
+            out.put(Short.toString(p.getPid()), p);
         }
         
         return out;
@@ -110,17 +103,17 @@ public class DataManager {
             JsonArray arr = obj.get("products").getAsJsonArray();
             for(int i = 0; i < arr.size(); i++){
                 String pid = arr.get(i).getAsString();
-                if(products.containsKey(pid) ) {
+                if(products.containsKey(pid)) {
                     owned.add(products.get(pid));
                 }
             }
-            
+
             User u = new User();
             u.setName(obj.get("name").getAsString());
             u.setCredits(obj.get("credit").getAsFloat());
             u.setProducts(owned);
             System.out.println(obj.toString());
-            
+
             out.put(u.getName(), u); //update user hashmap
         }
         
@@ -186,7 +179,7 @@ public class DataManager {
             
             JsonArray arr = new JsonArray();
             for (Product p : u.getProducts()) {
-                arr.add(new JsonPrimitive(p.getId()));
+                arr.add(new JsonPrimitive(p.getPid()));
             }
             obj.add("products", arr); 
         }

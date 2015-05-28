@@ -13,6 +13,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import beans.Product;
+import beans.User;
+import java.util.HashMap;
+import javax.servlet.http.HttpSession;
 
 /**
  * @author simorgh
@@ -26,7 +29,6 @@ public class ServletDispatcher extends HttpServlet {
 	ServletContext c = getServletContext();
 	String users = c.getRealPath("WEB-INF/users.json");
 	String products = c.getRealPath("WEB-INF/products.json");
-
 	data = new DataManager(users, products);
     }
     
@@ -83,11 +85,23 @@ public class ServletDispatcher extends HttpServlet {
         String location = request.getRequestURI();
 	
         if (location.equals(CONTEXT + "/")) {
-	    showPage(request, response, "/index.jsp");
+            System.out.println("HEYYYY");
+	    //boolean logout = Boolean.getBoolean(request.getParameter("logoff"));
+           request.getSession().invalidate(); 
+           showPage(request, response, "/index.jsp");
+            
+            
 	} else if(location.equals(CONTEXT + "/cataleg")) {
             showCataleg(request, response);
         } else if (location.equals(CONTEXT + "/protegit/llista")) {
-	    showBasket(request, response);
+	    showPurchases(request, response);
+        } else if (location.contains("/download")) {
+            downloadResource(request, response);
+        } else if (location.equals("/logout")){
+            System.out.println("HEYYYY");
+	    //boolean logout = Boolean.getBoolean(request.getParameter("logoff"));
+           request.getSession().invalidate(); 
+           showPage(request, response, "/index.jsp");
         } else {
 	    showPage(request, response, "/error404.jsp");
 	}
@@ -97,6 +111,14 @@ public class ServletDispatcher extends HttpServlet {
     ////////////////////////////////////////////////////////////////
     //                       PAGES
     ////////////////////////////////////////////////////////////////
+    
+    /**
+     * 
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException 
+     */
     private void showCataleg(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         //HashMap<String, Product> basket = getBasket(request);
         ArrayList<Product> books = new ArrayList();
@@ -119,28 +141,57 @@ public class ServletDispatcher extends HttpServlet {
 	showPage(request, response, "/WEB-INF/jsp/cataleg.jsp");
     }
     
-    private void showBasket(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    /**
+     * 
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException 
+     */
+    private void showPurchases(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HashMap <String, User> users = data.getUsers();
+        if(users.containsKey(request.getRemoteUser())) request.setAttribute("products", users.get(request.getRemoteUser()).getProducts());
         showPage(request, response, "/WEB-INF/jsp/protected/llista.jsp");
     }
 
+    /**
+     * 
+     * @param request
+     * @param response
+     * @param jspPage
+     * @throws ServletException
+     * @throws IOException 
+     */
     public void showPage(HttpServletRequest request, HttpServletResponse response, String jspPage) throws ServletException, IOException{
         ServletContext sc = getServletContext();
         RequestDispatcher rd = sc.getRequestDispatcher(jspPage);
         rd.forward(request, response);
     }
-/*
-    private void downloadResource(HttpServletResponse response) throws IOException {
+ 
+  /**
+   * 
+   * @param request
+   * @param response
+   * @throws IOException 
+   */
+    private void downloadResource(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        
+        String link = request.getParameter("param");
+        String apath = this.getServletContext().getRealPath("/WEB-INF/");
+        File file = new File(apath + link);
+        
         ServletOutputStream outStream = response.getOutputStream();
         response.setContentLength((int) file.length());
         response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
 
         byte[] byteBuffer = new byte[1024];
         DataInputStream in = new DataInputStream(new FileInputStream(file));
+        int length;
         while ((length = in.read(byteBuffer)) != -1) {
             outStream.write(byteBuffer, 0, length);
         }
         in.close();
         outStream.close();
-    }
- */   
+    }   
+  
 }

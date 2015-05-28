@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class User implements Serializable{
     private String name; /* must be unique */
     private float credit;
-    private ArrayList <Product>products;
+    private ArrayList <Product> products;
 
     /** No-arg constructor (takes no arguments). */
     public User(){    
