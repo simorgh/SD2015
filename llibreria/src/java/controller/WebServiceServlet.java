@@ -97,10 +97,6 @@ public class WebServiceServlet extends HttpServlet {
                         out.println(obj);    
                     }
                 }
-             }
-             
-             else {
-                showPage(request,response, "/error404.jsp");
              } 
 
 	} else if (location.contains(CONTEXT + "/API/VIDEO/")) {
@@ -128,10 +124,6 @@ public class WebServiceServlet extends HttpServlet {
                     }
                 }
              }
-             
-             else {
-                showPage(request,response, "/error404.jsp");
-             } 
 
 	}else if (location.contains(CONTEXT + "/API/BOOK/")) {
              if (location.equals(CONTEXT + "/API/BOOK/cataleg")) {
@@ -142,6 +134,7 @@ public class WebServiceServlet extends HttpServlet {
                          JsonObject obj = new JsonObject();
                         obj.addProperty("NAME", p.getName());
                         obj.addProperty("DESC", p.getDescription());
+                         out.println(obj); 
                     }
                 }
              }
@@ -160,16 +153,8 @@ public class WebServiceServlet extends HttpServlet {
                     }
                 }
              }
-             
-             else {
-                showPage(request,response, "/error404.jsp");
-             } 
 
-	}
-        
-        else {
-           showPage(request,response, "/error404.jsp");
-        } 
+	} 
     }
         
         void showPage(HttpServletRequest request, HttpServletResponse response, String jspPage) throws ServletException, IOException{
