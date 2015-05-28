@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import beans.Product;
 import beans.User;
 import java.util.HashMap;
-import javax.servlet.http.HttpSession;
 
 /**
  * @author simorgh
@@ -29,7 +28,8 @@ public class ServletDispatcher extends HttpServlet {
 	ServletContext c = getServletContext();
 	String users = c.getRealPath("WEB-INF/users.json");
 	String products = c.getRealPath("WEB-INF/products.json");
-	data = new DataManager(users, products);
+        
+	data = DataManager.getInstance(users, products);
     }
     
     
@@ -85,7 +85,7 @@ public class ServletDispatcher extends HttpServlet {
         String location = request.getRequestURI();
 	
         if (location.equals(CONTEXT + "/")) {
-            System.out.println("HEYYYY");
+            System.out.println("entering test0...");
 	    //boolean logout = Boolean.getBoolean(request.getParameter("logoff"));
            request.getSession().invalidate(); 
            showPage(request, response, "/index.jsp");
@@ -98,7 +98,7 @@ public class ServletDispatcher extends HttpServlet {
         } else if (location.contains("/download")) {
             downloadResource(request, response);
         } else if (location.equals("/logout")){
-            System.out.println("HEYYYY");
+            System.out.println("entring test1...");
 	    //boolean logout = Boolean.getBoolean(request.getParameter("logoff"));
            request.getSession().invalidate(); 
            showPage(request, response, "/index.jsp");

@@ -63,7 +63,11 @@
         <servlet-name>llibreria</servlet-name>
         <servlet-class>controller.ServletDispatcher</servlet-class>
     </servlet>
-
+    
+    <servlet>
+        <servlet-name>service</servlet-name>
+        <servlet-class>controller.WebServiceServlet</servlet-class>
+    </servlet>
 
 
     <servlet-mapping>
@@ -72,20 +76,14 @@
     </servlet-mapping>
     
     <servlet-mapping>
-       <servlet-name>default</servlet-name>
-       <url-pattern>/static/*</url-pattern>
+        <servlet-name>service</servlet-name>
+        <url-pattern>/API/*</url-pattern>
     </servlet-mapping>
     
     <servlet-mapping>
-        <servlet-name>default</servlet-name>
-        <url-pattern>*.png</url-pattern>
-        <url-pattern>*.js</url-pattern>
-        <url-pattern>*.css</url-pattern>
+       <servlet-name>default</servlet-name>
+       <url-pattern>/static/*</url-pattern>
     </servlet-mapping>
-    
-    <servlet-mapping> 
-        <servlet-name>llibreria</servlet-name> 
-        <url-pattern>*.do</url-pattern> 
-    </servlet-mapping>
+       
 
 </web-app>
