@@ -77,8 +77,12 @@ public class WebServiceServlet extends HttpServlet {
              if (location.equals(CONTEXT + "/API/AUDIO/cataleg")) {
                 for (Product p : data.getProducts().values()) {
                     if(p.getType().equals(FileType.AUDIO)){
-                        Gson gson = new Gson();
-                        out.println(gson.toJson(p));
+                        //Gson gson = new Gson();
+                        //out.println(gson.toJson(p));
+                        JsonObject obj = new JsonObject();
+                        obj.addProperty("NAME", p.getName());
+                        obj.addProperty("DESC", p.getDescription());
+                        out.println(obj);    
                     }
                 }
              }
@@ -87,14 +91,12 @@ public class WebServiceServlet extends HttpServlet {
                  String idStr = location.substring(location.lastIndexOf('/') + 1);
                   for (Product p : data.getProducts().values()) {
                     if(p.getType().equals(FileType.AUDIO) && p.getName().endsWith(idStr)){
-                        Gson gson = new Gson();
-                        out.println(gson.toJson(p));
+                        JsonObject obj = new JsonObject();
+                        obj.addProperty("PRICE", p.getPrice());
+                        obj.addProperty("LINK", p.getPath());
+                        out.println(obj);    
                     }
                 }
-             }
-             
-             else {
-                showPage(request,response, "/error404.jsp");
              } 
 
 	} else if (location.contains(CONTEXT + "/API/VIDEO/")) {
@@ -103,10 +105,9 @@ public class WebServiceServlet extends HttpServlet {
                     if(p.getType().equals(FileType.VIDEO)){
                         //Gson gson = new Gson();
                         //out.println(gson.toJson(p));
-                        JsonObject obj = new JsonObject();
-                        obj.addProperty("desc", p.getDescription());
-                        obj.addProperty("price", p.getPrice());
-                        obj.addProperty("link", p.getPath());
+                         JsonObject obj = new JsonObject();
+                        obj.addProperty("NAME", p.getName());
+                        obj.addProperty("DESC", p.getDescription());
                         out.println(obj);    
                     }
                 }
@@ -116,15 +117,13 @@ public class WebServiceServlet extends HttpServlet {
                  String idStr = location.substring(location.lastIndexOf('/') + 1);
                   for (Product p : data.getProducts().values()) {
                     if(p.getType().equals(FileType.VIDEO) && p.getName().endsWith(idStr)){
-                        Gson gson = new Gson();
-                        out.println(gson.toJson(p));
+                        JsonObject obj = new JsonObject();
+                        obj.addProperty("PRICE", p.getPrice());
+                        obj.addProperty("LINK", p.getPath());
+                        out.println(obj);   
                     }
                 }
              }
-             
-             else {
-                showPage(request,response, "/error404.jsp");
-             } 
 
 	}else if (location.contains(CONTEXT + "/API/BOOK/")) {
              if (location.equals(CONTEXT + "/API/BOOK/cataleg")) {
@@ -132,40 +131,30 @@ public class WebServiceServlet extends HttpServlet {
                     if(p.getType().equals(FileType.BOOK)){
                         //Gson gson = new Gson();
                         //out.println(gson.toJson(p));
-                        
                         JsonObject obj = new JsonObject();
-                        obj.addProperty("desc", p.getDescription());
-                        obj.addProperty("price", p.getPrice());
-                        obj.addProperty("link", p.getPath());
-                        out.println(obj);
+                        obj.addProperty("NAME", p.getName());
+                        obj.addProperty("DESC", p.getDescription());
+                        out.println(obj); 
                     }
                 }
              }
              
-             else if (location.contains(CONTEXT + "/API/BOOK/item/")){
+             else if (location.contains(CONTEXT + "/API/BOOK/item/")) {
                  String idStr = location.substring(location.lastIndexOf('/') + 1).replace("%20", " ");
                  System.out.println(idStr);
                   for (Product p : data.getProducts().values()) {
                     if(p.getType().equals(FileType.BOOK) && p.getName().endsWith(idStr)){
-
+                        //Gson gson = new Gson();
+                        //out.println(gson.toJson(p));
                         JsonObject obj = new JsonObject();
-                        obj.addProperty("desc", p.getDescription());
-                        obj.addProperty("price", p.getPrice());
-                        obj.addProperty("link", p.getPath());
-                        out.println(obj);
+                        obj.addProperty("PRICE", p.getPrice());
+                        obj.addProperty("LINK", p.getPath());
+                        out.println(obj); 
                     }
                 }
              }
-             
-             else {
-                showPage(request,response, "/error404.jsp");
-             } 
 
-	}
-        
-        else {
-           showPage(request,response, "/error404.jsp");
-        } 
+	} 
     }
         
         void showPage(HttpServletRequest request, HttpServletResponse response, String jspPage) throws ServletException, IOException{
