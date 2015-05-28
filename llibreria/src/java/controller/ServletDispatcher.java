@@ -27,7 +27,7 @@ public class ServletDispatcher extends HttpServlet {
 	String users = c.getRealPath("WEB-INF/users.json");
 	String products = c.getRealPath("WEB-INF/products.json");
 
-	data = new DataManager(users, products);
+	data = DataManager.getInstance(users, products);
     }
     
     

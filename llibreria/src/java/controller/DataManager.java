@@ -21,14 +21,31 @@ import beans.User;
  * @author simorgh
  */
 public class DataManager {
+    private static DataManager instance = null;
     public static enum FileType {AUDIO, BOOK, VIDEO, UNDEFINED};
     private final HashMap<String, User> users;
     private final HashMap<String, Product> products;
     
-    public DataManager(String users, String products) {
+    protected DataManager(String users, String products) {
 	this.products = loadProducts(products);
 	this.users = loadUsers(users, this.products);
     }
+    /**
+     * Singleton pattern
+     * @param users
+     * @param products
+     * @return 
+     */
+    public static DataManager getInstance(String users, String products) {
+        if(instance == null) {
+            instance = new DataManager( users, products);
+        }
+        return instance;
+    }
+    
+    
+    
+    
     
     public HashMap<String, Product> getProducts() {
 	return products;

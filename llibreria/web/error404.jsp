@@ -9,8 +9,8 @@
 
 <html>
     <head>
-        <title>- ooops! -</title>        
-        <link rel="stylesheet" type="text/css" href="./static/css/404.css"/>
+        <title>- ooops! -</title>    
+        <link rel="stylesheet" type="text/css" href="./static/css/404.css"/>      
     </head>
     
     <body>
