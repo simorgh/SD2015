@@ -1,7 +1,7 @@
 <html>
     <head>
         <title>Autentificació</title>
-        <link rel="stylesheet" type="text/css" href="../static/css/login.css"/>
+        <link rel="stylesheet" type="text/css" href="/llibreria/static/css/login.css"/>
     </head>
     
     <body>

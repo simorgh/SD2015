@@ -18,7 +18,7 @@
          <web-resource-name>Protected Area</web-resource-name>
          <!-- Define the context-relative URL(s) to be protected -->
          <url-pattern>/protegit/*</url-pattern>
-         <url-pattern>/compra</url_pattern>
+         <url-pattern>/compra</url-pattern>
          
          <!-- If you list http methods, only those methods are protected -->
          <http-method>DELETE</http-method>

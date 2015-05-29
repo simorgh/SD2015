@@ -107,8 +107,13 @@ public class ServletDispatcher extends HttpServlet {
              * Add product to cart */
             String pid = request.getParameter("item");
             Product p = data.getProducts().get(pid);
-            u.addToCart(p);
+            if(!u.getCart().contains(p) && !u.getProducts().contains(p)) {
+                System.out.println(u.getName() + " adding item " + p.getName() + " to cart...");
+                u.addToCart(p);
+            }
             
+            System.out.println("CART ITEMS: " + u.getCart().size());
+            request.setAttribute("cart", u.getCart().size());
             showCataleg(request, response);
         } else if (location.contains("/download")) {
             downloadResource(request, response);

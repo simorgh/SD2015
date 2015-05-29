@@ -66,10 +66,10 @@ public class User {
     }
     
     public ArrayList<Product> getCart() {
-	return purchased;
+	return cart;
     }
     
-    public void addToCart(Product item){
+    public void addToCart(Product item) {
         this.cart.add(item);
     }
     
