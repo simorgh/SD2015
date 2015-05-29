@@ -120,7 +120,7 @@ public class WebServiceServlet extends HttpServlet {
                         JsonObject obj = new JsonObject();
                         obj.addProperty("PRICE", p.getPrice());
                         obj.addProperty("LINK", p.getPath());
-                        out.println(obj);   
+                        out.println(obj);
                     }
                 }
              }

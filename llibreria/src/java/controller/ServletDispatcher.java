@@ -1,5 +1,6 @@
 package controller;
 
+import model.User;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,7 +14,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import beans.Product;
-import beans.User;
 import java.util.HashMap;
 
 /**
@@ -48,7 +48,6 @@ public class ServletDispatcher extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         locationProxy(request, response);
-        //processRequest(request, response);
     }
 
     /**
@@ -62,7 +61,6 @@ public class ServletDispatcher extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         locationProxy(request, response);
-        //processRequest(request, response);
         //TODO. Implement POST-Redirect-GET Pattern Design.
     }
 
@@ -87,21 +85,38 @@ public class ServletDispatcher extends HttpServlet {
         if (location.equals(CONTEXT + "/")) {
             System.out.println("entering testLogout_00...");
 	    //boolean logout = Boolean.getBoolean(request.getParameter("logoff"));
-           request.getSession().invalidate();
-           showPage(request, response, "/index.jsp");
-            
-            
+            //request.getSession().invalidate();
+            //showPage(request, response, "/index.jsp");
 	} else if(location.equals(CONTEXT + "/cataleg")) {
             showCataleg(request, response);
         } else if (location.equals(CONTEXT + "/protegit/llista")) {
+
 	    showPurchases(request, response);
+        } else if (location.equals(CONTEXT + "/compra")) {    
+            /*
+             * User recovery */
+            String name = request.getRemoteUser();
+            User u;
+            if(data.getUsers().containsKey(name)) u = data.getUsers().get(name);
+            else {
+                u = new User(name, 500.0f);
+                data.addUser(u); // user needs to be added for persistence purposes
+            }
+            
+            /*
+            * Add product to cart */
+            String pid = request.getParameter("item");
+            Product p = data.getProducts().get(pid);
+            u.addToCart(p);
+            
         } else if (location.contains("/download")) {
             downloadResource(request, response);
+            
         } else if (location.equals("/logout")){
-            System.out.println("entering testLogout_01..");
-	    //boolean logout = Boolean.getBoolean(request.getParameter("logoff"));
-           request.getSession().invalidate();
-           showPage(request, response, "/index.jsp");
+            //System.out.println("entering testLogout_01..");
+            //boolean logout = Boolean.getBoolean(request.getParameter("logoff"));
+            //request.getSession().invalidate();
+            showPage(request, response, "/index.jsp");
         } else {
 	    showPage(request, response, "/error404.jsp");
 	}

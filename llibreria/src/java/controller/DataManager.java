@@ -1,5 +1,6 @@
 package controller;
 
+import model.User;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -9,14 +10,11 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import beans.Product;
-import beans.User;
 import com.google.gson.Gson;
-
 
 /**
  * @author simorgh
@@ -28,7 +26,7 @@ public class DataManager {
     private final HashMap<String, Product> products;
     
     protected DataManager(String users, String products) {
-	this.products = loadProducts(products);
+	this.products = loadProducts(products); //Note that products MUST be loaded first
 	this.users = loadUsers(users, this.products);
     }
     /**
@@ -114,23 +112,9 @@ public class DataManager {
         System.out.println("> Loading users from json @users.json");
         for (JsonElement e : array) {
             JsonObject obj = e.getAsJsonObject();
-            
-            /* load previosly owned Products from json */
-            ArrayList <Product> owned = new ArrayList();
-            JsonArray arr = obj.get("products").getAsJsonArray();
-            for(int i = 0; i < arr.size(); i++){
-                String pid = arr.get(i).getAsString();
-                if(products.containsKey(pid)) {
-                    owned.add(products.get(pid));
-                }
-            }
-
-            User u = new User();
-            u.setName(obj.get("name").getAsString());
-            u.setCredits(obj.get("credit").getAsFloat());
-            u.setProducts(owned);
-            System.out.println(obj.toString());
-
+            System.out.println(obj); //debug print
+                        
+            User u = new User(obj, this.getProducts());
             out.put(u.getName(), u); //update user hashmap
         }
         
@@ -174,7 +158,14 @@ public class DataManager {
 	return null;
     }
         
-    
+    /**
+     * 
+     * @param u 
+     */
+    public void addUser(User u){
+        if(users.containsKey(u.getName())) return;
+        this.users.put(u.getName(), u);
+    }
     
     
     
