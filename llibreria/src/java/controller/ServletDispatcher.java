@@ -109,9 +109,9 @@ public class ServletDispatcher extends HttpServlet {
         String CONTEXT = request.getContextPath();
         String location = request.getRequestURI();
 	
-        if (location.equals(CONTEXT + "/")) {
+        /*if (location.equals(CONTEXT + "/")) {
             showPage(request, response, "/index.jsp");
-	} else if(location.equals(CONTEXT + "/cataleg")) {
+	} else*/ if(location.equals(CONTEXT + "/cataleg")) {
             showCataleg(request, response);
         } else if (location.equals(CONTEXT + "/protegit/llista")) {
 
