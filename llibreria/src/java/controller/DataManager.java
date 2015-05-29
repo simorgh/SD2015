@@ -43,10 +43,7 @@ public class DataManager {
         return instance;
     }
     
-    
-    
-    
-    
+
     public HashMap<String, Product> getProducts() {
 	return products;
     }
@@ -175,22 +172,26 @@ public class DataManager {
     ///////////////////////////////
   
     public void saveUsers(String filename) throws FileNotFoundException {
-        PrintWriter out = new PrintWriter(filename);
-
+        JsonArray users = new JsonArray();
         for(User u : this.users.values()){
             
             JsonObject obj = new JsonObject();
             obj.addProperty("name", u.getName());
             obj.addProperty("credit", u.getCredits());
             
-            JsonArray arr = new JsonArray();
+            JsonArray products = new JsonArray();
             for (Product p : u.getProducts()) {
-                arr.add(new JsonPrimitive(p.getPid()));
+                products.add(new JsonPrimitive(p.getPid()));
             }
-            obj.add("products", arr); 
-            out.write(obj.toString());
+            obj.add("products", products); 
+            users.add(obj);
         }
-        out.close(); 
         
+        JsonObject root = new JsonObject();
+        root.add("users", root);
+        
+        PrintWriter out = new PrintWriter(filename);
+        out.write(root.toString());
+        out.close();
     }
 }

@@ -33,7 +33,7 @@ public class ServletDispatcher extends HttpServlet {
     
     @Override
     public void destroy() {
-        saveState();
+        //saveState();
     }
     
 
@@ -110,10 +110,7 @@ public class ServletDispatcher extends HttpServlet {
         String location = request.getRequestURI();
 	
         if (location.equals(CONTEXT + "/")) {
-            System.out.println("entering testLogout_00...");
-	    //boolean logout = Boolean.getBoolean(request.getParameter("logoff"));
-            //request.getSession().invalidate();
-            //showPage(request, response, "/index.jsp");
+            showPage(request, response, "/index.jsp");
 	} else if(location.equals(CONTEXT + "/cataleg")) {
             showCataleg(request, response);
         } else if (location.equals(CONTEXT + "/protegit/llista")) {
@@ -121,7 +118,8 @@ public class ServletDispatcher extends HttpServlet {
 	    showPurchases(request, response);
         } else if (location.equals(CONTEXT + "/afegir")) {    
             /*
-             * User recovery */
+             * User recovery
+             */
             String name = request.getRemoteUser();
             User u;
             if(data.getUsers().containsKey(name)) u = data.getUsers().get(name);
@@ -131,7 +129,8 @@ public class ServletDispatcher extends HttpServlet {
             }
             
             /*
-             * Add product to cart */
+             * Add product to cart
+             */
             String pid = request.getParameter("item");
             Product p = data.getProducts().get(pid);
             if(!u.getCart().contains(p) && !u.getProducts().contains(p)) {
@@ -144,16 +143,16 @@ public class ServletDispatcher extends HttpServlet {
             showCataleg(request, response);
         }else if (location.contains(CONTEXT + "/protegit/comprar")) {    
             /*
-             * User recovery */
+             * User recovery
+             */
             buyResource(request,response);
             showPurchases(request, response);
         } else if (location.contains("/download")) {
             downloadResource(request, response);
             
-        } else if (location.contains("logout")){
-            //System.out.println("entering testLogout_01..");
-            //boolean logout = Boolean.getBoolean(request.getParameter("logoff"));
+        } else if (location.contains("logout")) {
             request.getSession().invalidate();
+            saveState();
             showPage(request, response, "/index.jsp");
         } else {
 	    showPage(request, response, "/error404.jsp");
@@ -224,7 +223,7 @@ public class ServletDispatcher extends HttpServlet {
         rd.forward(request, response);
     }
  
-      /**
+  /**
    * 
    * @param request
    * @param response
