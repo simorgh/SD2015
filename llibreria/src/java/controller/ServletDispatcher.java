@@ -139,13 +139,18 @@ public class ServletDispatcher extends HttpServlet {
             System.out.println("CART ITEMS: " + u.getCart().size());
             request.setAttribute("cart", u.getCart().size());
             showCataleg(request, response);
+        }else if (location.contains(CONTEXT + "/protegit/comprar")) {    
+            /*
+             * User recovery */
+            buyResource(request,response);
+            showPurchases(request, response);
         } else if (location.contains("/download")) {
             downloadResource(request, response);
             
-        } else if (location.equals("/logout")){
+        } else if (location.contains("logout")){
             //System.out.println("entering testLogout_01..");
             //boolean logout = Boolean.getBoolean(request.getParameter("logoff"));
-            //request.getSession().invalidate();
+            request.getSession().invalidate();
             showPage(request, response, "/index.jsp");
         } else {
 	    showPage(request, response, "/error404.jsp");
@@ -216,6 +221,34 @@ public class ServletDispatcher extends HttpServlet {
         rd.forward(request, response);
     }
  
+      /**
+   * 
+   * @param request
+   * @param response
+   * @throws IOException 
+   */
+    private void buyResource(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String name = request.getRemoteUser();
+        User u;
+        if(data.getUsers().containsKey(name)) u = data.getUsers().get(name);
+            else {
+                u = new User(name, 500.0f);
+                data.addUser(u); // user needs to be added for persistence purposes
+            }
+        String pid = request.getParameter("param");
+        request.removeAttribute("param");
+        //String price = request.getParameter("param");  
+        
+        Product p = data.getProducts().get(pid);
+        float price = p.getPrice();
+        if(!(price > u.getCredits())){
+            u.addToPurchased(p);
+            u.removeFromCart(p);
+            u.setCredits(u.getCredits() - price);
+            System.out.println("Item "+ p.getName() +" ha sido comprado;" + " Dispones de "+ u.getCredits()+" creditos");
+        }
+        else  System.out.println("No hay saldo suficiente para comprar Item "+ p.getName());
+    } 
   /**
    * 
    * @param request

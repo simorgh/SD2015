@@ -61,17 +61,17 @@
         Rol "Professor" <%= (request.isUserInRole("Professor"))?"assignat":"no assignat" %><br>
         Rol "Alumne" <%= (request.isUserInRole("Alumne"))?"assignat":"no assignat" %><br>  
      -->
-        <a href="logout">Sortir</a><br><br>
+        <a href="../logout">Sortir</a><br><br>
         
         
         <ul class="products">
             <h3>Descarregues disponibles</h3>
             <c:forEach var="p" items="${purchased}">
                 <li>
-                    <img src=../${p.getThumbnail()}>
+                    <img src=${p.getThumbnail()}>
                     <h4><c:out value="${p.getName()}"/></h4>
                     <p><c:out value="${p.getDescription()}"/></p>
-                    <a class="myButton" href="llibreria//download?param=${p.getPath()}">Descarrega</a>
+                    <a class="myButton" href="./download?param=${p.getPath()}">Descarrega</a>
                 </li>   
             </c:forEach>
         </ul>
@@ -81,10 +81,10 @@
             <h3>Actualment al carret</h3>
             <c:forEach var="i" items="${cart}">
                 <li>
-                    <img src=../${i.getThumbnail()}>
+                    <img src=${i.getThumbnail()}>
                     <h4><c:out value="${i.getName()}"/></h4>
                     <p><c:out value="${i.getDescription()}"/></p>
-                    <a class="myButton" href="llibreria//download?param=${p.getPath()}">Compra!</a>
+                    <a class="myButton" href="./comprar?param=${i.getPid()}">Compra!</a>
                 </li>   
             </c:forEach>
         </ul>

@@ -60,6 +60,10 @@ public class User {
     public float getCredits() {
 	return credit;
     }
+    
+    public void setCredits(float c) {
+        this.credit = c;
+    }
 
     public ArrayList<Product> getProducts() {
 	return purchased;
@@ -72,5 +76,14 @@ public class User {
     public void addToCart(Product item) {
         this.cart.add(item);
     }
+    
+   public void addToPurchased(Product item) {
+        this.purchased.add(item);
+    }
+   
+   public void removeFromCart(Product item) {
+        this.cart.remove(item);
+    }
+   
     
 }
