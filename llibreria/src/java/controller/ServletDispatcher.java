@@ -171,7 +171,10 @@ public class ServletDispatcher extends HttpServlet {
      */
     private void showPurchases(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HashMap <String, User> users = data.getUsers();
-        if(users.containsKey(request.getRemoteUser())) request.setAttribute("products", users.get(request.getRemoteUser()).getProducts());
+        if(users.containsKey(request.getRemoteUser())){
+            request.setAttribute("purchased", users.get(request.getRemoteUser()).getProducts());
+            request.setAttribute("cart", users.get(request.getRemoteUser()).getCart());
+        }
         showPage(request, response, "/WEB-INF/jsp/protected/llista.jsp");
     }
 

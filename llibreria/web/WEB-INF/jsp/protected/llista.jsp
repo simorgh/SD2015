@@ -66,7 +66,7 @@
         
         <ul class="products">
             <h3>Descarregues disponibles</h3>
-            <c:forEach var="p" items="${products}">
+            <c:forEach var="p" items="${purchased}">
                 <li>
                     <img src=../${p.getThumbnail()}>
                     <h4><c:out value="${p.getName()}"/></h4>
@@ -79,11 +79,12 @@
                 
         <ul class="products">
             <h3>Actualment al carret</h3>
-            <c:forEach var="p" items="${products}">
+            <c:forEach var="i" items="${cart}">
                 <li>
-                    <img src=../${p.getThumbnail()}>
-                    <h4><c:out value="${p.getName()}"/></h4>
-                    <p><c:out value="${p.getDescription()}"/></p>
+                    <img src=../${i.getThumbnail()}>
+                    <h4><c:out value="${i.getName()}"/></h4>
+                    <p><c:out value="${i.getDescription()}"/></p>
+                    <a class="myButton" href="llibreria//download?param=${p.getPath()}">Compra!</a>
                 </li>   
             </c:forEach>
         </ul>
