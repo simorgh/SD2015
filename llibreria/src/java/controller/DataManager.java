@@ -188,7 +188,7 @@ public class DataManager {
         }
         
         JsonObject root = new JsonObject();
-        root.add("users", root);
+        root.add("users", users);
         
         PrintWriter out = new PrintWriter(filename);
         out.write(root.toString());

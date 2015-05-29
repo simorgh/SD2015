@@ -33,7 +33,7 @@ public class ServletDispatcher extends HttpServlet {
     
     @Override
     public void destroy() {
-        //saveState();
+        saveState();
     }
     
 
@@ -152,7 +152,6 @@ public class ServletDispatcher extends HttpServlet {
             
         } else if (location.contains("logout")) {
             request.getSession().invalidate();
-            saveState();
             showPage(request, response, "/index.jsp");
         } else {
 	    showPage(request, response, "/error404.jsp");
@@ -261,7 +260,7 @@ public class ServletDispatcher extends HttpServlet {
         
         String link = request.getParameter("param");
         String apath = this.getServletContext().getRealPath("/WEB-INF/");
-        File file = new File(apath + link);
+        File file = new File(apath + "/" + link);
         
         ServletOutputStream outStream = response.getOutputStream();
         response.setContentLength((int) file.length());
