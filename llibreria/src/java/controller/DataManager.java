@@ -175,8 +175,8 @@ public class DataManager {
     ///////////////////////////////
   
     public void saveUsers(String filename) throws FileNotFoundException {
+        PrintWriter out = new PrintWriter(filename);
 
-                           
         for(User u : this.users.values()){
             
             JsonObject obj = new JsonObject();
@@ -188,12 +188,9 @@ public class DataManager {
                 arr.add(new JsonPrimitive(p.getPid()));
             }
             obj.add("products", arr); 
-            
-            PrintWriter out = new PrintWriter(filename);
             out.write(obj.toString());
-            out.close(); 
         }
+        out.close(); 
         
- 
     }
 }

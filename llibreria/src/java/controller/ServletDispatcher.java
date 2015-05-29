@@ -14,7 +14,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import beans.Product;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author simorgh
@@ -40,11 +43,11 @@ public class ServletDispatcher extends HttpServlet {
    
     private void saveState(){
         System.out.println("@saveState()"); 
-        /*try {  
+        try {  
             this.data.saveUsers( getServletContext().getRealPath("/WEB-INF/users.json") );
         } catch (FileNotFoundException ex) {
             Logger.getLogger(ServletDispatcher.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
+        }
     }
    
     private void loadState() {
