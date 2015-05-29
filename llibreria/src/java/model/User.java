@@ -8,7 +8,7 @@ import beans.Product;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author simorgh
@@ -25,7 +25,7 @@ public class User {
      * @param obj
      * @param products 
      */
-    public User(JsonObject obj, HashMap <String, Product> products){
+    public User(JsonObject obj, ConcurrentHashMap <String, Product> products){
         this.name = obj.get("name").getAsString();
         this.credit = obj.get("credit").getAsFloat();
         

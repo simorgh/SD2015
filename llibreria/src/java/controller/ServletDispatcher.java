@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import beans.Product;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -109,28 +109,22 @@ public class ServletDispatcher extends HttpServlet {
         String CONTEXT = request.getContextPath();
         String location = request.getRequestURI();
 	
-        if (location.equals(CONTEXT + "/")) {
-            showPage(request, response, "/index.jsp");
-	} else if(location.equals(CONTEXT + "/cataleg")) {
+        if(location.equals(CONTEXT + "/cataleg")) {
             showCataleg(request, response);
         } else if (location.equals(CONTEXT + "/protegit/llista")) {
 
 	    showPurchases(request, response);
-        } else if (location.equals(CONTEXT + "/afegir")) {    
-            /*
-             * User recovery
-             */
+        } else if (location.equals(CONTEXT + "/afegir")) {
+            // User recovery
             String name = request.getRemoteUser();
             User u;
             if(data.getUsers().containsKey(name)) u = data.getUsers().get(name);
             else {
                 u = new User(name, 500.0f);
-                data.addUser(u); // user needs to be added for persistence purposes
+                data.addUser(u);    // user needs to be added for persistence purposes
             }
             
-            /*
-             * Add product to cart
-             */
+            // Add product to cart
             String pid = request.getParameter("item");
             Product p = data.getProducts().get(pid);
             if(!u.getCart().contains(p) && !u.getProducts().contains(p)) {
@@ -141,18 +135,18 @@ public class ServletDispatcher extends HttpServlet {
             System.out.println("CART ITEMS: " + u.getCart().size());
             request.setAttribute("cart", u.getCart().size());
             showCataleg(request, response);
+            
         }else if (location.contains(CONTEXT + "/protegit/comprar")) {    
-            /*
-             * User recovery
-             */
             buyResource(request,response);
             showPurchases(request, response);
+            
         } else if (location.contains("/download")) {
             downloadResource(request, response);
             
         } else if (location.contains("logout")) {
             request.getSession().invalidate();
             showPage(request, response, "/index.jsp");
+            
         } else {
 	    showPage(request, response, "/error404.jsp");
 	}
@@ -200,7 +194,7 @@ public class ServletDispatcher extends HttpServlet {
      * @throws IOException 
      */
     private void showPurchases(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HashMap <String, User> users = data.getUsers();
+        ConcurrentHashMap <String, User> users = data.getUsers();
         if(users.containsKey(request.getRemoteUser())){
             request.setAttribute("purchased", users.get(request.getRemoteUser()).getProducts());
             request.setAttribute("cart", users.get(request.getRemoteUser()).getCart());

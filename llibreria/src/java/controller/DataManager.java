@@ -10,12 +10,12 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import beans.Product;
 import com.google.gson.Gson;
 import java.io.PrintWriter;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author simorgh
@@ -23,8 +23,8 @@ import java.io.PrintWriter;
 public class DataManager {
     private static DataManager instance = null;
     public static enum FileType {AUDIO, BOOK, VIDEO, UNDEFINED};
-    private final HashMap<String, User> users;
-    private final HashMap<String, Product> products;
+    private final ConcurrentHashMap<String, User> users;
+    private final ConcurrentHashMap<String, Product> products;
     
     protected DataManager(String users, String products) {
 	this.products = loadProducts(products); //Note that products MUST be loaded first
@@ -44,11 +44,11 @@ public class DataManager {
     }
     
 
-    public HashMap<String, Product> getProducts() {
+    public ConcurrentHashMap<String, Product> getProducts() {
 	return products;
     }
 
-    public HashMap<String, User> getUsers() {
+    public ConcurrentHashMap<String, User> getUsers() {
 	return users;
     }
     
@@ -57,9 +57,9 @@ public class DataManager {
      * @param file
      * @return 
      */
-    private HashMap<String, Product> loadProducts(String file) {
+    private ConcurrentHashMap<String, Product> loadProducts(String file) {
 	String text = getStringFile(file);
-	HashMap<String, Product> out = new HashMap<String, Product>();
+	ConcurrentHashMap<String, Product> out = new ConcurrentHashMap<String, Product>();
 	if(text == null) return out;
 
         /* Decode products from JSON string */   
@@ -97,9 +97,9 @@ public class DataManager {
      * @param products
      * @return 
      */
-    private HashMap<String, User> loadUsers(String file, HashMap<String, Product> products) {
+    private ConcurrentHashMap<String, User> loadUsers(String file, ConcurrentHashMap<String, Product> products) {
 	String text = getStringFile(file);
-	HashMap<String, User> out = new HashMap();
+	ConcurrentHashMap<String, User> out = new ConcurrentHashMap();
 	if(text == null) return out;
         
         /* Decode products from JSON string */
