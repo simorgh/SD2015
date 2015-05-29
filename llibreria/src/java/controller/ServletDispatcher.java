@@ -25,11 +25,35 @@ public class ServletDispatcher extends HttpServlet {
     @Override
     public void init() throws ServletException {
 	super.init();
-	ServletContext c = getServletContext();
-	String users = c.getRealPath("/WEB-INF/users.json");
-	String products = c.getRealPath("/WEB-INF/products.json");
+        loadState();
+    }
+    
+    @Override
+    public void destroy() {
+        saveState();
+    }
+    
+
+    ////////////////////////////////////////////////////////
+    //                     PERSISTENCE
+    ////////////////////////////////////////////////////////
+   
+    private void saveState(){
+        System.out.println("@saveState()"); 
+        /*try {  
+            this.data.saveUsers( getServletContext().getRealPath("/WEB-INF/users.json") );
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(ServletDispatcher.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
+    }
+   
+    private void loadState() {
+        System.out.println("@loadState()");
         
-	data = DataManager.getInstance(users, products);
+        ServletContext c = getServletContext();
+        String users = c.getRealPath("/WEB-INF/users.json");
+	String products = c.getRealPath("/WEB-INF/products.json");
+	this.data = DataManager.getInstance(users, products);
     }
     
     

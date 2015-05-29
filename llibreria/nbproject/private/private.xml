@@ -4,13 +4,10 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/Users/simorgh/NetBeansProjects/B7/llibreria/src/java/controller/DataManager.java</file>
-            <file>file:/Users/simorgh/NetBeansProjects/B7/llibreria/web/WEB-INF/jsp/cataleg.jsp</file>
+            <file>file:/Users/simorgh/NetBeansProjects/B7/llibreria/web/WEB-INF/users.json</file>
             <file>file:/Users/simorgh/NetBeansProjects/B7/llibreria/src/java/controller/ServletDispatcher.java</file>
-            <file>file:/Users/simorgh/NetBeansProjects/B7/llibreria/src/java/controller/WebServiceServlet.java</file>
-            <file>file:/Users/simorgh/NetBeansProjects/B7/llibreria/web/WEB-INF/jsp/protected/llista.jsp</file>
             <file>file:/Users/simorgh/NetBeansProjects/B7/llibreria/web/WEB-INF/web.xml</file>
-            <file>file:/Users/simorgh/NetBeansProjects/B7/llibreria/src/java/beans/Product.java</file>
-            <file>file:/Users/simorgh/NetBeansProjects/B7/llibreria/src/java/model/User.java</file>
+            <file>file:/Users/simorgh/NetBeansProjects/B7/llibreria/web/WEB-INF/products.json</file>
         </group>
     </open-files>
 </project-private>

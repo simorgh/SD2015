@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import beans.Product;
 import com.google.gson.Gson;
+import java.io.PrintWriter;
 
 /**
  * @author simorgh
@@ -173,13 +174,10 @@ public class DataManager {
     //  Persistence Methods
     ///////////////////////////////
   
-    /**
-     * 
-     * @param users 
-     */
-    public void saveUsers(HashMap<String, User> users) {
-        
-        for(User u : users.values()){
+    public void saveUsers(String filename) throws FileNotFoundException {
+
+                           
+        for(User u : this.users.values()){
             
             JsonObject obj = new JsonObject();
             obj.addProperty("name", u.getName());
@@ -190,7 +188,12 @@ public class DataManager {
                 arr.add(new JsonPrimitive(p.getPid()));
             }
             obj.add("products", arr); 
+            
+            PrintWriter out = new PrintWriter(filename);
+            out.write(obj.toString());
+            out.close(); 
         }
-	
+        
+ 
     }
 }
