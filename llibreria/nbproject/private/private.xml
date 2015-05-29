@@ -4,10 +4,13 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/home/igor/B7/llibreria/src/java/controller/ServletDispatcher.java</file>
+            <file>file:/home/igor/B7/llibreria/web/WEB-INF/jsp/protected/login_fail.jsp</file>
+            <file>file:/home/igor/B7/llibreria/src/java/beans/Product.java</file>
             <file>file:/home/igor/B7/llibreria/web/WEB-INF/users.json</file>
+            <file>file:/home/igor/B7/llibreria/web/WEB-INF/jsp/protected/login.jsp</file>
             <file>file:/home/igor/B7/llibreria/web/WEB-INF/jsp/cataleg.jsp</file>
-            <file>file:/home/igor/B7/llibreria/web/WEB-INF/jsp/protected/llista.jsp</file>
             <file>file:/home/igor/B7/llibreria/src/java/controller/DataManager.java</file>
+            <file>file:/home/igor/B7/llibreria/src/java/model/User.java</file>
         </group>
     </open-files>
 </project-private>
