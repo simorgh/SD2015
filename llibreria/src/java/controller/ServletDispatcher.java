@@ -92,7 +92,7 @@ public class ServletDispatcher extends HttpServlet {
         } else if (location.equals(CONTEXT + "/protegit/llista")) {
 
 	    showPurchases(request, response);
-        } else if (location.equals(CONTEXT + "/compra")) {    
+        } else if (location.equals(CONTEXT + "/afegir")) {    
             /*
              * User recovery */
             String name = request.getRemoteUser();

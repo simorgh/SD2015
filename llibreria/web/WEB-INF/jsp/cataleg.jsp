@@ -43,7 +43,7 @@
                     <h4><c:out value="${b.getName()}"/></h4>
                     <p><c:out value="${b.getDescription()}"/></p>
                     <p>$<c:out value="${b.getPrice()}"/></p>
-                    <a href="./compra?item=${b.getPid()}">Afegeix al carret</a>
+                    <a href="./afegir?item=${b.getPid()}">Afegeix al carret</a>
                 </li>
             </c:forEach>
 
@@ -54,7 +54,7 @@
                     <h4><c:out value="${a.getName()}"/></h4>
                     <p><c:out value="${a.getDescription()}"/></p>
                     <p>$<c:out value="${a.getPrice()}"/></p>
-                    <a href="./compra?item=${a.getPid()}">Afegeix al carret</a>
+                    <a href="./afegir?item=${a.getPid()}">Afegeix al carret</a>
                 </li>
             </c:forEach>
 
@@ -65,7 +65,7 @@
                     <h4><c:out value="${v.getName()}"/></h4>
                     <p><c:out value="${v.getDescription()}"/></p>
                     <p>$<c:out value="${v.getPrice()}"/></p>
-                    <a href="./compra?item=${v.getPid()}">Afegeix al carret</a>
+                    <a href="./afegir?item=${v.getPid()}">Afegeix al carret</a>
                 </li>
             </c:forEach>
         </ul>
