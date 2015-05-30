@@ -148,7 +148,10 @@ public class ServletDispatcher extends HttpServlet {
             request.getSession().invalidate();
             showPage(request, response, "/index.jsp");
             
-        } else {
+        } else if (location.equals(CONTEXT + "/consulta")) {    
+                showPage(request, response, "/consulta.jsp");
+            
+            } else {
 	    showPage(request, response, "/error404.jsp");
 	}
     }
