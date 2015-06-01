@@ -26,6 +26,7 @@
               <li><a href="">Inici</a></li>
               <li><a href="./protegit/llista">Llista</a></li>
               <li><a href="./cataleg">Cataleg</a></li>
+              <li><a href="./consulta">Consulta</a></li>
             </ul>
         </div><!--header module -->
         <br><br>
