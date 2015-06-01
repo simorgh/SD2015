@@ -23,13 +23,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DataManager {
     private static DataManager instance = null;
     public static enum FileType {AUDIO, BOOK, VIDEO, UNDEFINED};
-    private final ConcurrentHashMap<String, User> users;
-    private final ConcurrentHashMap<String, Product> products;
+    private static ConcurrentHashMap<String, User> users;
+    private static ConcurrentHashMap<String, Product> products;
     
     protected DataManager(String users, String products) {
-	this.products = loadProducts(products); //Note that products MUST be loaded first
-	this.users = loadUsers(users, this.products);
+	DataManager.products = loadProducts(products); //Note that products MUST be loaded first
+	DataManager.users = loadUsers(users, DataManager.products);
     }
+    
     /**
      * Singleton pattern
      * @param users
@@ -44,11 +45,11 @@ public class DataManager {
     }
     
 
-    public ConcurrentHashMap<String, Product> getProducts() {
+    public static ConcurrentHashMap<String, Product> getProducts() {
 	return products;
     }
 
-    public ConcurrentHashMap<String, User> getUsers() {
+    public static ConcurrentHashMap<String, User> getUsers() {
 	return users;
     }
     
@@ -112,7 +113,7 @@ public class DataManager {
             JsonObject obj = e.getAsJsonObject();
             System.out.println(obj); //debug print
                         
-            User u = new User(obj, this.getProducts());
+            User u = new User(obj, DataManager.getProducts());
             out.put(u.getName(), u); //update user hashmap
         }
         
@@ -162,7 +163,7 @@ public class DataManager {
      */
     public void addUser(User u){
         if(users.containsKey(u.getName())) return;
-        this.users.put(u.getName(), u);
+        DataManager.users.put(u.getName(), u);
     }
     
     
@@ -170,10 +171,15 @@ public class DataManager {
     ///////////////////////////////
     //  Persistence Methods
     ///////////////////////////////
-  
+    
+    /**
+     * 
+     * @param filename
+     * @throws FileNotFoundException 
+     */
     public void saveUsers(String filename) throws FileNotFoundException {
         JsonArray users = new JsonArray();
-        for(User u : this.users.values()){
+        for(User u : DataManager.users.values()){
             
             JsonObject obj = new JsonObject();
             obj.addProperty("name", u.getName());

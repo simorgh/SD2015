@@ -126,6 +126,7 @@ public class ServletDispatcher extends HttpServlet {
             if(data.getUsers().containsKey(name)) u = data.getUsers().get(name);
             else {
                 u = new User(name, 500.0f);
+                
                 data.addUser(u);    // user needs to be added for persistence purposes
             }
             

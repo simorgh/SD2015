@@ -4,6 +4,8 @@
     Author     : simorgh
 --%>
 
+<%@page import="model.User"%>
+<%@page import="controller.DataManager"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
@@ -15,7 +17,8 @@
         <link href="/llibreria/static/css/style.css" rel="stylesheet" type="text/css"/>
     </head>
 
-    <body>    
+    <body>
+
         <!-- header module -->
         <div id="header">
             <h1>Llibreria de Recursos Electrònics Online</h1>

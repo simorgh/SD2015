@@ -4,6 +4,8 @@
     Author     : simorgh
 --%>
 
+<%@page import="controller.DataManager"%>
+<%@page import="model.User"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
@@ -56,7 +58,18 @@
     </head>
     
     <body>
-        Benvingut <b><%= request.getRemoteUser() %></b> <a href="../logout">Sortir</a><br><br>
+        
+    <%
+    // logged User scriptlet
+    if(request.getRemoteUser() != null) {
+        User u = DataManager.getUsers().get(request.getRemoteUser());
+
+        out.print( "Benvingut <b>" + u.getName() + "</b> | credit: " + String.format("%.2f", u.getCredits()) + "€ "
+        + "<a href=\"../logout\">Sortir</a><br><br>" );
+    }
+    %>
+         
+        
         <!-- header module -->
         <div id="header">
             <h1>Llibreria de Recursos Electrònics Online</h1>
