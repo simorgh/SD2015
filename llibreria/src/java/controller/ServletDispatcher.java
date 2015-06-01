@@ -1,3 +1,11 @@
+/**
+ * MAIN WEBAPP DISPATCHER - Master Controller
+ * 
+ * Provides WEB navegation throught our sitemap
+ * while controller model and session validation (Tomcat JASS).
+ */
+
+
 package controller;
 
 import model.User;
@@ -114,8 +122,7 @@ public class ServletDispatcher extends HttpServlet {
         if(location.equals(CONTEXT + "/cataleg")) {
             String user = request.getRemoteUser();
             if(user != null) DataManager.getUsers().get(user);
-            showCataleg(request, response);
-            
+            showCataleg(request, response);   
         } else if (location.equals(CONTEXT + "/protegit/llista")) {
             String name = request.getRemoteUser();
             User u;
@@ -150,18 +157,14 @@ public class ServletDispatcher extends HttpServlet {
         }else if (location.contains(CONTEXT + "/protegit/comprar")) {    
             buyResource(request,response);
             showPurchases(request, response);
-            
         } else if (location.contains("/download")) {
-            downloadResource(request, response);
-            
+            downloadResource(request, response);  
         } else if (location.contains("logout")) {
             request.getSession().invalidate();
-            showPage(request, response, "/index.jsp");
-            
+            showPage(request, response, "/index.jsp");       
         } else if (location.equals(CONTEXT + "/consulta")) {    
-                showPage(request, response, "/consulta.jsp");
-            
-            } else {
+            showPage(request, response, "/consulta.jsp");
+        } else {
 	    showPage(request, response, "/error404.jsp");
 	}
     }
@@ -227,6 +230,8 @@ public class ServletDispatcher extends HttpServlet {
  
     /**
      * 
+     * Allows the session user to buy, if possible, the listed product and stage its resource as 'purchased'.
+     * 
      * @param request
      * @param response
      * @throws IOException 
@@ -240,7 +245,6 @@ public class ServletDispatcher extends HttpServlet {
             data.addUser(u); // user needs to be added for persistence purposes
         }
         
-        //String pid = (String) request.getAttribute("param");
         String pid = request.getParameter("pid");
         
         Product p = DataManager.getProducts().get(pid);
@@ -251,8 +255,11 @@ public class ServletDispatcher extends HttpServlet {
             u.setCredits(u.getCredits() - price);
             System.out.println("Item "+ p.getName() +" ha sido comprado;" + " Dispones de "+ u.getCredits()+" creditos");
         } else  System.out.println("No hay saldo suficiente para comprar Item "+ p.getName());
-    } 
+    }
+    
+    
   /**
+   * Download for an exisiting Product. Has to be speceified on a GET "pid" paramater.
    * 
    * @param request
    * @param response

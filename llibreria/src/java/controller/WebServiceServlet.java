@@ -1,3 +1,13 @@
+/**
+ * WEB SERVICE RESTful functionality - Slave Controller
+ * 
+ * API works with the following structure:
+ * 
+ * GET /API/(AUDIO|VIDEO|BOOK)/cataleg
+ * GET /API/(AUDIO|VIDEO|BOOK)/item/name
+ */
+
+
 package controller;
 
 import beans.Product;
@@ -32,7 +42,13 @@ public class WebServiceServlet extends HttpServlet {
 	data = DataManager.getInstance(users, products);
     }
 
-    
+    /**
+     * 
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException 
+     */
     public void locationProxy(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String CONTEXT = request.getContextPath();
         String location = request.getRequestURI();
@@ -113,16 +129,24 @@ public class WebServiceServlet extends HttpServlet {
                         out.println(obj); 
                     }
                 }
-             }
-
-	} 
+            }
+             
+	}
     }
-        
-        void showPage(HttpServletRequest request, HttpServletResponse response, String jspPage) throws ServletException, IOException{
-            ServletContext sc = getServletContext();
-            RequestDispatcher rd = sc.getRequestDispatcher(jspPage);
-            rd.forward(request, response);
-        }
+    
+    /**
+     * 
+     * @param request
+     * @param response
+     * @param jspPage
+     * @throws ServletException
+     * @throws IOException 
+     */
+    void showPage(HttpServletRequest request, HttpServletResponse response, String jspPage) throws ServletException, IOException{
+        ServletContext sc = getServletContext();
+        RequestDispatcher rd = sc.getRequestDispatcher(jspPage);
+        rd.forward(request, response);
+    }
     
     
     

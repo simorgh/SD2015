@@ -1,5 +1,5 @@
 /**
- * Class <code>User Bean</code>.
+ * Class <code>User Model Data</code>.
  */
 
 package model;

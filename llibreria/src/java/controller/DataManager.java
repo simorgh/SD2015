@@ -1,3 +1,11 @@
+/**
+ * PERSISTENCE DATA CONTROLLER.
+ * 
+ * Acts as a handler for JSON formatted Data (Users/Products).
+ * Provides methods to load/save (JSON parsed) structured data.
+ * Implements static methods to get both ConcurrentHashMap.
+ */
+
 package controller;
 
 import model.User;
