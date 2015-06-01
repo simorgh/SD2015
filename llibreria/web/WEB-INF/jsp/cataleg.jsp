@@ -14,60 +14,91 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <title>Llibreria - Cataleg</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <style>
-            ul.products li {
-                width: 200px;
-                height: 300px;
-                background-color: gray;
-                padding: 5px;
-                vertical-align: text-top;
-                display: inline-block;
-                border-style: solid;
-                border-color: blue;
-                border-width: 2px;
-            }
-        </style>
-        <title>Cataleg</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="/llibreria/static/css/bootstrap.css" rel="stylesheet">
+        <link href="/llibreria/static/css/bootstrap-responsive.css" rel="stylesheet" media="screen">
+        <link href="/llibreria/static/css/hosting.css" rel="stylesheet" media="all">
+        <link href="/llibreria/static/css/style.css" rel="stylesheet" type="text/css"/>
     </head>
     
     <body>
-        <h1>Cataleg</h1>
+        <!-- header module -->
+        <div id="header">
+            <h1>Llibreria de Recursos Electrònics Online</h1>
+
+            <ul id="nav" >
+              <li><a href="./">Inici</a></li>
+              <li><a href="./protegit/llista">Llista</a></li>
+              <li><a href="">Cataleg</a></li>
+            </ul>
+        </div><!--header module -->
+       
         
-        <ul class="products">
+        <div class="container">  <!-- Contaner Starts -->
             
-            <h3>Books</h3>
-            <c:forEach var="b" items="${books}">
-                <li>
-                    <img src=${b.getThumbnail()}>
-                    <h4><c:out value="${b.getName()}"/></h4>
-                    <p><c:out value="${b.getDescription()}"/></p>
-                    <p>$<c:out value="${b.getPrice()}"/></p>
-                    <a href="./afegir?item=${b.getPid()}">Afegeix al carret</a>
-                </li>
-            </c:forEach>
+            <div class="row-fluid"><!-- BOOKS (Row2) start --> 
+                <c:forEach var="b" items="${books}"> 
+                <div class="span3 PlanPricing template4">
+                    <div class="planName">
+                        <span class="price">${b.getPrice()}€</span>
+                        <h2><c:out value="${b.getType()}"/></h2>
+                        <p><c:out value="${b.getName()}"/></p>
+                    </div>
+                    <div class="planFeatures">
+                        <ul>
+                           <li><img src=${b.getThumbnail()}></li>
+                           <li><c:out value="${b.getDescription()}"/></li>
+                        </ul>
+                    </div>
+                    <p><a href="./afegir?item=${b.getPid()}" role="button" data-toggle="modal" class="btn btn-success btn-large">Afegeix</a></p>
+                </div>
+                </c:forEach>
+            </div><!-- Row2 ends -->
+ 
+            
+            <div class="row-fluid"><!-- AUDIO (Row3) start -->
+                <c:forEach var="a" items="${audio}"> 
+                <div class="span3 PlanPricing template4">   
+                    <div class="planName">
+                        <span class="price">${a.getPrice()}€</span>
+                        <h2><c:out value="${a.getType()}"/></h2>
+                        <p><c:out value="${a.getName()}"/></p>
+                    </div>
+                    <div class="planFeatures">
+                        <ul>
+                           <li><img src=${a.getThumbnail()}></li>
+                           <li><c:out value="${a.getDescription()}"/></li>
+                        </ul>
+                    </div>
+                     <p><a href="./afegir?item=${a.getPid()}" role="button" data-toggle="modal" class="btn btn-success btn-large">Afegeix</a></p>
+                </div>
+                </c:forEach>
+            </div><!-- Row3 ends -->
 
-           <h3>Audio</h3>
-            <c:forEach var="a" items="${audio}">
-                <li>
-                    <img src=${a.getThumbnail()}>
-                    <h4><c:out value="${a.getName()}"/></h4>
-                    <p><c:out value="${a.getDescription()}"/></p>
-                    <p>$<c:out value="${a.getPrice()}"/></p>
-                    <a href="./afegir?item=${a.getPid()}">Afegeix al carret</a>
-                </li>
-            </c:forEach>
+            
+            <div class="row-fluid"><!-- VIDEO (Row4) start --> 
+                <c:forEach var="v" items="${video}"> 
+                <div class="span3 PlanPricing template4">   
+                    <div class="planName">
+                        <span class="price">${v.getPrice()}€</span>
+                        <h2><c:out value="${v.getType()}"/></h2>
+                        <p><c:out value="${v.getName()}"/></p>
+                    </div>
+                    <div class="planFeatures">
+                        <ul>
+                           <li><img src=${v.getThumbnail()}></li>
+                           <li><c:out value="${v.getDescription()}"/></li>
+                        </ul>
+                    </div>
+                    <p><a href="./afegir?item=${v.getPid()}" role="button" data-toggle="modal" class="btn btn-success btn-large">Afegeix</a></p>
+                </div>
+                </c:forEach>
+            </div><!-- Row3 ends -->
 
-            <h3>Videos</h3>
-            <c:forEach var="v" items="${video}">
-                <li>
-                    <img src=${v.getThumbnail()}>
-                    <h4><c:out value="${v.getName()}"/></h4>
-                    <p><c:out value="${v.getDescription()}"/></p>
-                    <p>$<c:out value="${v.getPrice()}"/></p>
-                    <a href="./afegir?item=${v.getPid()}">Afegeix al carret</a>
-                </li>
-            </c:forEach>
-        </ul>
+                
+        </div> <!-- Container ends -->
+        <br><br><br><br><br>
     </body>
 </html>

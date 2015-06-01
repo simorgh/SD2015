@@ -42,9 +42,10 @@ public class ServletDispatcher extends HttpServlet {
     ////////////////////////////////////////////////////////
    
     private void saveState(){
-        System.out.println("@saveState()"); 
+        System.out.println("@saveState()");
+        String path = getServletContext().getRealPath("/WEB-INF/users.json").replace("/build","");
         try {  
-            this.data.saveUsers( getServletContext().getRealPath("/WEB-INF/users.json") );
+            this.data.saveUsers(path);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(ServletDispatcher.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -110,10 +111,13 @@ public class ServletDispatcher extends HttpServlet {
         String location = request.getRequestURI();
 	
         if(location.equals(CONTEXT + "/cataleg")) {
+            String session = request.getRemoteUser();
+            User u;
+            if(session != null) data.getUsers().get(session);
             showCataleg(request, response);
         } else if (location.equals(CONTEXT + "/protegit/llista")) {
-
 	    showPurchases(request, response);
+            
         } else if (location.equals(CONTEXT + "/afegir")) {
             // User recovery
             String name = request.getRemoteUser();
@@ -133,7 +137,7 @@ public class ServletDispatcher extends HttpServlet {
             }
             
             System.out.println("CART ITEMS: " + u.getCart().size());
-            request.setAttribute("cart", u.getCart().size());
+            request.getSession().setAttribute("cart", u.getCart().size());
             showCataleg(request, response);
             
         }else if (location.contains(CONTEXT + "/protegit/comprar")) {    
@@ -169,7 +173,7 @@ public class ServletDispatcher extends HttpServlet {
         ArrayList<Product> books = new ArrayList();
 	ArrayList<Product> audio = new ArrayList();
 	ArrayList<Product> video = new ArrayList();
-
+        
         /* Let's show only the products which are not purchased yet.*/
 	for (Product p : data.getProducts().values()) {
             if(p.getType()==DataManager.FileType.BOOK) books.add(p);
@@ -216,23 +220,23 @@ public class ServletDispatcher extends HttpServlet {
         rd.forward(request, response);
     }
  
-  /**
-   * 
-   * @param request
-   * @param response
-   * @throws IOException 
-   */
+    /**
+     * 
+     * @param request
+     * @param response
+     * @throws IOException 
+     */
     private void buyResource(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String name = request.getRemoteUser();
         User u;
         if(data.getUsers().containsKey(name)) u = data.getUsers().get(name);
-            else {
-                u = new User(name, 500.0f);
-                data.addUser(u); // user needs to be added for persistence purposes
-            }
-        String pid = request.getParameter("param");
-        request.removeAttribute("param");
-        //String price = request.getParameter("param");  
+        else {
+            u = new User(name, 500.0f);
+            data.addUser(u); // user needs to be added for persistence purposes
+        }
+        
+        //String pid = (String) request.getAttribute("param");
+        String pid = request.getParameter("pid");
         
         Product p = data.getProducts().get(pid);
         float price = p.getPrice();
@@ -241,8 +245,7 @@ public class ServletDispatcher extends HttpServlet {
             u.removeFromCart(p);
             u.setCredits(u.getCredits() - price);
             System.out.println("Item "+ p.getName() +" ha sido comprado;" + " Dispones de "+ u.getCredits()+" creditos");
-        }
-        else  System.out.println("No hay saldo suficiente para comprar Item "+ p.getName());
+        } else  System.out.println("No hay saldo suficiente para comprar Item "+ p.getName());
     } 
   /**
    * 
@@ -251,10 +254,12 @@ public class ServletDispatcher extends HttpServlet {
    * @throws IOException 
    */
     private void downloadResource(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String pid = request.getParameter("pid");
+        Product p = data.getProducts().get(pid);
         
-        String link = request.getParameter("param");
         String apath = this.getServletContext().getRealPath("/WEB-INF/");
-        File file = new File(apath + "/" + link);
+        System.out.println(apath + p.getPath());
+        File file = new File(apath + p.getPath());
         
         ServletOutputStream outStream = response.getOutputStream();
         response.setContentLength((int) file.length());

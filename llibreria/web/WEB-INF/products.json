@@ -30,7 +30,7 @@
         {
             "pid"    :   4,
             "name"  :   "Grau d’Enginyeria Informàtica",
-            "desc"  :   "El títol d’Enginyeria Informàtica té com a objectiu fonamental la formació en l’àmbit de la Informàtica.",
+            "desc"  :   "El títol de formació en l’àmbit de la Informàtica.",
             "price" :   5.75,
             "type"  :   "BOOK",
             "path"  :   "/resources/books/grau.pdf",
@@ -44,6 +44,16 @@
             "type"  :   "VIDEO",
             "path"  :   "/resources/videos/softbody001.mp4",
             "thumb" :   "/llibreria/static/img/thumb_blob.png"
+	},
+        {
+            "pid"    :   6,
+            "name"  :   "Lego Robot",
+            "desc"  :   "Free MP4 format video sample",
+            "price" :   3.00,
+            "type"  :   "VIDEO",
+            "path"  :   "/resources/videos/lego_robot.mp4",
+            "thumb" :   "/llibreria/static/img/thumb_lego.png"
 	}
+        
     ]
 }

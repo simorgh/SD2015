@@ -10,18 +10,40 @@
 <html>
     
     <head>
-        <title>Apache Tomcat Examples</title>
+        <title>Llibreria - Inici</title>
         <META http-equiv=Content-Type content="text/html">
+        <link href="/llibreria/static/css/style.css" rel="stylesheet" type="text/css"/>
     </head>
 
-    <body>
-        <p><h1>Llibreria de Recursos Electrònics Online</h1></p>
-    
-        <ul>
-            <!-- <li><a href="WEB-INF/jsp/non-protected.jsp">Pàgina pública (cataleg)</a>: no requereix estar identificat.</li> -->
-            <li><a href="./cataleg">Cataleg</a>: no requereix estar identificat.</li>
-            <li><a href="./protegit/llista">Llista de descàrregues</a>: requereix estar identificat.</li>
-        </ul>  
-    
+    <body>    
+        <!-- header module -->
+        <div id="header">
+            <h1>Llibreria de Recursos Electrònics Online</h1>
+            <ul id="nav" >
+              <li><a href="">Inici</a></li>
+              <li><a href="./protegit/llista">Llista</a></li>
+              <li><a href="./cataleg">Cataleg</a></li>
+            </ul>
+        </div><!--header module -->
+        <br><br>
+       
+        <div>
+            <h2>Pàgina de Benvinguda</h2>
+
+            <h3>Objectius de la pràctica</h3>
+            <p>Es vol que l'alumne aprengui a fer ús de les tecnologies de desenvolupament web en la plataforma Java.</p>
+
+            <h3>Què cal fer?</h3>
+            <p>Es desitja fer una llibreria Online de recursos digitals, que permeti als usuaris baixar-se llibres, cançons, vídeos curts.. en qualsevol tipus de format mp3, pdf, avi... si tenen prou crèdit per adquirir-les.</p>
+
+            <h3>Tecnologies</h3>
+            <p>Els requeriments d'aquest sistema fan ús de les següents tecnologies:
+            La implementació ha de seguir el patró de programació de Model-Vista-Controlador.
+            La programació ha de ser en llenguatge Java usant Servlets i JSP.
+            Ús de Tomcat com a contenidor de servlets.
+            L'autenticació usarà l'especificació JASS.
+            Implementació d'un Servei Web RESTful usant servlets i JSON.</p>
+        <div>
+        
     </body>
 </html>

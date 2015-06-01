@@ -11,7 +11,9 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Llista de descarregues</title>
+        <link href="/llibreria/static/css/style.css" rel="stylesheet" type="text/css"/>
+        
         <style>
             ul.products li {
                 width: 200px;
@@ -54,14 +56,18 @@
     </head>
     
     <body>
-        <h1>Llista de descàrregues</h1>
-        Benvingut <b><%= request.getRemoteUser() %></b>
-     <!--   
-        Rols:<br>
-        Rol "Professor" <%= (request.isUserInRole("Professor"))?"assignat":"no assignat" %><br>
-        Rol "Alumne" <%= (request.isUserInRole("Alumne"))?"assignat":"no assignat" %><br>  
-     -->
-        <a href="../logout">Sortir</a><br><br>
+        Benvingut <b><%= request.getRemoteUser() %></b> <a href="../logout">Sortir</a><br><br>
+        <!-- header module -->
+        <div id="header">
+            <h1>Llibreria de Recursos Electrònics Online</h1>
+
+            <ul id="nav" >
+              <li><a href="../">Inici</a></li>
+              <li><a href="#">Llista</a></li>
+              <li><a href="../cataleg">Cataleg</a></li>
+            </ul>
+        </div><!--header module -->
+        
         
         
         <ul class="products">
@@ -71,7 +77,7 @@
                     <img src=${p.getThumbnail()}>
                     <h4><c:out value="${p.getName()}"/></h4>
                     <p><c:out value="${p.getDescription()}"/></p>
-                    <a class="myButton" href="./download?param=${p.getPath()}">Descarrega</a>
+                    <a class="myButton" href="./download?pid=${p.getPid()}">Descarrega</a>
                 </li>   
             </c:forEach>
         </ul>
@@ -84,10 +90,11 @@
                     <img src=${i.getThumbnail()}>
                     <h4><c:out value="${i.getName()}"/></h4>
                     <p><c:out value="${i.getDescription()}"/></p>
-                    <a class="myButton" href="./comprar?param=${i.getPid()}">Compra!</a>
+                    <a class="myButton" href="./comprar?pid=${i.getPid()}">Compra!</a>
                 </li>   
             </c:forEach>
         </ul>
+
         
     </body>
 </html>

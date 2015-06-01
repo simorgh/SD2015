@@ -1,0 +1,94 @@
+@import url('http://fonts.googleapis.com/css?family=Tangerine');
+
+/* * * * * * * * * * * * * * * * *
+ * Website Header Style
+ * * * * * * * * * * * * * * * * */
+#header {
+     background: #959595; /* Old browsers */
+     background: -moz-linear-gradient(top,  #959595 0%, #0d0d0d 46%, #010101 50%, #0a0a0a 53%, #4e4e4e 76%, #383838 87%, #1b1b1b 100%); /* FF3.6+ */
+     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#959595), color-stop(46%,#0d0d0d), color-stop(50%,#010101), color-stop(53%,#0a0a0a), color-stop(76%,#4e4e4e), color-stop(87%,#383838), color-stop(100%,#1b1b1b)); /* Chrome,Safari4+ */
+     background: -webkit-linear-gradient(top,  #959595 0%,#0d0d0d 46%,#010101 50%,#0a0a0a 53%,#4e4e4e 76%,#383838 87%,#1b1b1b 100%); /* Chrome10+,Safari5.1+ */
+     background: -o-linear-gradient(top,  #959595 0%,#0d0d0d 46%,#010101 50%,#0a0a0a 53%,#4e4e4e 76%,#383838 87%,#1b1b1b 100%); /* Opera 11.10+ */
+     background: -ms-linear-gradient(top,  #959595 0%,#0d0d0d 46%,#010101 50%,#0a0a0a 53%,#4e4e4e 76%,#383838 87%,#1b1b1b 100%); /* IE10+ */
+     background: linear-gradient(to bottom,  #959595 0%,#0d0d0d 46%,#010101 50%,#0a0a0a 53%,#4e4e4e 76%,#383838 87%,#1b1b1b 100%); /* W3C */
+     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#959595', endColorstr='#1b1b1b',GradientType=0 ); /* IE6-9 */
+     
+     width:100%;
+     height:auto;
+     margin:0;
+     padding:0;
+}
+
+#header h1{
+    font-family: 'Tangerine';
+    font-size: 5em;
+    color: white;
+    text-shadow:#000000 1px 1px 1px;
+    display:block;
+    padding:10px 0 0 0;
+    /*width:60%;
+    float:left;*/
+    margin-top: 5px;
+    margin-left: 2.5%;
+    margin-bottom: 5%;
+    vertical-align: bottom;
+}
+
+/* * * * * * * * * * * * * * * * * * * * *
+ * MemberSite logged user / logut module
+ * * * * * * * * * * * * * * * * * * * * */
+#profile {
+  font-size:0.8em;
+  padding: 0px 0px 0px 750px;
+  /*border-bottom: 1px solid #ccc;*/
+  /*border-top: 1px solid #ccc;*/
+}
+
+#logout {
+  float:right;
+  padding: 3px 3px 3px 3px;
+  background-color: #6495ed;
+  border: 1px solid #ccc; 
+}
+
+#profile a {
+  font-size: 0.8em;
+  text-decoration:none;
+  color:#ffffff
+}
+
+
+
+/* * * * * * * * * * * * * * * * *
+ * Navigation Menu Bar Style
+ * * * * * * * * * * * * * * * * */
+#nav {
+    width: 100%;
+    /*float: left;
+    margin: 0 0 3em 0;*/
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    background-color: #f2f2f2;
+    border-bottom: 1px solid #ccc; 
+    border-top: 1px solid #ccc;
+    display: inline-block;
+}
+
+#nav li {
+    float: left;
+}
+
+#nav li a {
+    display: block;
+    padding: 8px 15px;
+    text-decoration: none;
+    font-weight: bold;
+    color: #069;
+    border-right: 1px solid #ccc;
+}
+
+#nav li a:hover {
+    color: #c00;
+    background-color: #fff;
+}
