@@ -11,6 +11,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>WebService</title>
         <link href="/llibreria/static/css/style.css" rel="stylesheet" type="text/css"/>
+        <script src="/llibreria/static/js/jquery-1.11.3.min.js"></script><!-- jQuery -->
+        <script src="/llibreria/static/js/consulta.js"></script>
+
     </head>
     <body>
         <!-- header module -->
@@ -25,9 +28,13 @@
         </div><!--header module -->
         
         <h1>Consulta de item</h1>
-        <form action="" method="POST">
-            <input type="text" name ="consulta_text" value="Consulta">
-            <input type="submit" value="Consulta">
-        </form> 
+        <div>
+            <input id="search-product" type="text" name ="search-product" value="Consulta">
+            <input id="update-btn" type="submit" value="Consulta">
+        </div>
+        
+        <!-- results should come here -->
+        <div id="search-result"></div>
+        
     </body>
 </html>
