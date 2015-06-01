@@ -29,8 +29,8 @@
       
       <auth-constraint>
          <!-- Anyone with one of the listed roles may access this area -->
-         <role-name>Alumne</role-name>
-         <role-name>Professor</role-name>
+         <role-name>Client</role-name>
+         <role-name>Admin</role-name>
       </auth-constraint>
     
     </security-constraint>
@@ -47,10 +47,10 @@
 
     <!-- Security roles referenced by this web application -->
     <security-role>
-      <role-name>Alumne</role-name>
+      <role-name>Client</role-name>
     </security-role>
     <security-role>
-      <role-name>Professor</role-name>
+      <role-name>Admin</role-name>
     </security-role>
     
     

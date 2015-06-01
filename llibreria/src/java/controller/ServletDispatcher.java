@@ -112,27 +112,32 @@ public class ServletDispatcher extends HttpServlet {
 	
 
         if(location.equals(CONTEXT + "/cataleg")) {
-            String session = request.getRemoteUser();
-            User u;
-            if(session != null) data.getUsers().get(session);
+            String user = request.getRemoteUser();
+            if(user != null) DataManager.getUsers().get(user);
             showCataleg(request, response);
+            
         } else if (location.equals(CONTEXT + "/protegit/llista")) {
+            String name = request.getRemoteUser();
+            User u;
+            if(!DataManager.getUsers().containsKey(name)) {
+                u = new User(name, 500.0f);
+                data.addUser(u);    // user needs to be added for persistence purposes
+            }
 	    showPurchases(request, response);
             
         } else if (location.equals(CONTEXT + "/afegir")) {
             // User recovery
             String name = request.getRemoteUser();
             User u;
-            if(data.getUsers().containsKey(name)) u = data.getUsers().get(name);
+            if(DataManager.getUsers().containsKey(name)) u = DataManager.getUsers().get(name);
             else {
                 u = new User(name, 500.0f);
-                
                 data.addUser(u);    // user needs to be added for persistence purposes
             }
             
             // Add product to cart
             String pid = request.getParameter("item");
-            Product p = data.getProducts().get(pid);
+            Product p = DataManager.getProducts().get(pid);
             if(!u.getCart().contains(p) && !u.getProducts().contains(p)) {
                 System.out.println(u.getName() + " adding item " + p.getName() + " to cart...");
                 u.addToCart(p);
@@ -174,19 +179,14 @@ public class ServletDispatcher extends HttpServlet {
      * @throws IOException 
      */
     private void showCataleg(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //HashMap<String, Product> basket = getBasket(request);
         ArrayList<Product> books = new ArrayList();
 	ArrayList<Product> audio = new ArrayList();
 	ArrayList<Product> video = new ArrayList();
         
-        /* Let's show only the products which are not purchased yet.*/
-	for (Product p : data.getProducts().values()) {
+	for (Product p : DataManager.getProducts().values()) {
             if(p.getType()==DataManager.FileType.BOOK) books.add(p);
             else if (p.getType()==DataManager.FileType.AUDIO) audio.add(p);
-            else if (p.getType()==DataManager.FileType.VIDEO) video.add(p);
-            //if(p.getType()==Product.FileType.BOOK && !basket.containsKey(p.getName())) arr_books.add(p); 
-            //else if(p.getType()==Product.FileType.AUDIO && !basket.containsKey(p.getName())) arr_audio.add(p);
-            //else if(p.getType()==Product.FileType.VIDEO && !basket.containsKey(p.getName())) arr_video.add(p);  
+            else if (p.getType()==DataManager.FileType.VIDEO) video.add(p); 
 	}
         
         request.setAttribute("books", books);
@@ -203,7 +203,7 @@ public class ServletDispatcher extends HttpServlet {
      * @throws IOException 
      */
     private void showPurchases(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        ConcurrentHashMap <String, User> users = data.getUsers();
+        ConcurrentHashMap <String, User> users = DataManager.getUsers();
         if(users.containsKey(request.getRemoteUser())){
             request.setAttribute("purchased", users.get(request.getRemoteUser()).getProducts());
             request.setAttribute("cart", users.get(request.getRemoteUser()).getCart());
@@ -234,7 +234,7 @@ public class ServletDispatcher extends HttpServlet {
     private void buyResource(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String name = request.getRemoteUser();
         User u;
-        if(data.getUsers().containsKey(name)) u = data.getUsers().get(name);
+        if(DataManager.getUsers().containsKey(name)) u = DataManager.getUsers().get(name);
         else {
             u = new User(name, 500.0f);
             data.addUser(u); // user needs to be added for persistence purposes
@@ -243,7 +243,7 @@ public class ServletDispatcher extends HttpServlet {
         //String pid = (String) request.getAttribute("param");
         String pid = request.getParameter("pid");
         
-        Product p = data.getProducts().get(pid);
+        Product p = DataManager.getProducts().get(pid);
         float price = p.getPrice();
         if(!(price > u.getCredits())){
             u.addToPurchased(p);
@@ -260,7 +260,7 @@ public class ServletDispatcher extends HttpServlet {
    */
     private void downloadResource(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pid = request.getParameter("pid");
-        Product p = data.getProducts().get(pid);
+        Product p = DataManager.getProducts().get(pid);
         
         String apath = this.getServletContext().getRealPath("/WEB-INF/");
         System.out.println(apath + p.getPath());
