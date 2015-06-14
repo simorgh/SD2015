@@ -25,3 +25,5 @@ L'aplicació web estarà formada per un catàleg de diferents recursos digitals:
 El catàleg està format per una sola pàgina per a cada tipus de recurs digital.
 * Caldrà implementar un sistema d'autentificació (tal i com es comenta en l'apartat següent).
 * Caldrà implementar una “Llista de descàrregues” per a que l'usuari de la llibreria pugui anar-hi ficant tots els recursos que vulgui baixar-se.
+
+*For more details please reference /doc folder.

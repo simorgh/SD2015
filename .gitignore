@@ -1,12 +1,14 @@
 # NetBeans specific #
-build/
+build/*
+!build/build.xml
+nbproject/private/
 nbbuild/
 dist/
 nbdist/
 nbactions.xml
 nb-configuration.xml
-core
 nbproject/*
+*~
  
 #java specific
 *.class
