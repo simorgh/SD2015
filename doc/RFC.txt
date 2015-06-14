@@ -1,0 +1,419 @@
+
+INTERNET‐DRAFT                                              Eloi Puertas
+Intended Status: Proposed Standard             (University of Barcelona)
+Expires:                                                      12/03/2015
+
+
+                  A protocol for the 7 and a half game
+
+
+Abstract
+
+   This protocol is used for the client/server version of the  popular
+   card game ’seven and a half’.
+
+
+Status of this Memo
+
+   Internet‐Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet‐Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   The list of current Internet‐Drafts can be accessed at
+   http://www.ietf.org/1id‐abstracts.html
+
+   The list of Internet‐Draft Shadow Directories can be accessed at
+   http://www.ietf.org/shadow.html
+
+
+
+
+Table of Contents
+
+   1 Introduction . . . . . . . . . . . . . . . . . . . . . . . . . .  2
+   2 The 7 and a half procedure for player and bank.  . . . . . . . .  2
+   3 The 7 and a half Specification . . . . . . . . . . . . . . . . .  3
+     3.1 Player Commands Semantics: . . . . . . . . . . . . . . . . .  3
+     3.2 Server Commands Semantics: . . . . . . . . . . . . . . . . .  4
+     3.3 Command Syntax . . . . . . . . . . . . . . . . . . . . . . .  4
+     3.4 Error Command  . . . . . . . . . . . . . . . . . . . . . . .  5
+   4 Examples . . . . . . . . . . . . . . . . . . . . . . . . . . . .  7
+     4.1 Short game example . . . . . . . . . . . . . . . . . . . . .  7
+     4.2 Long busting game example  . . . . . . . . . . . . . . . . .  7
+     4.3 7.1/2 ante game example  . . . . . . . . . . . . . . . . . .  8
+   5 Rules of game  . . . . . . . . . . . . . . . . . . . . . . . . .  8
+   Authors’ Addresses . . . . . . . . . . . . . . . . . . . . . . . .  8
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1 Introduction
+
+   Seven and a half [7.1/2] is a very simple card game that is played
+   with Spanish deck, removing 8 and 9s. The goal is to approach the
+   value 7 and a half, without exceeding it.
+
+   The values of the cards are:
+
+
+    1 to 7: its own value.
+    "sota" , "cavall" and "rei": worth one half.
+
+
+   Bank is the person in charge of distributing the cards. He will have
+   to compete with the rest of players, once they have finish their
+   turn. Players must to place a minimum bet for play.  Following
+   clockwise order, the bank gives a card to each player. Before the
+   player watches the card, he can raise the ante. The player can stop
+   and pass the turn, whenever he want to. However, if a player exceeds
+   7 and a half he would be eliminated and loses the be. On the other
+   hand, if the player gets exactly 7 and a half, he wins twice which he
+   has bet, unless the bank can do the same. If the bank cannot beat the
+   score obtained by the player, this wins what he has bet.
+
+2 The 7 and a half procedure for player and bank.
+
+      The 7.1/2 design is based on the following procedure. The game is
+   only for one player and a bank. The player is the client application
+   and the bank is the server application. The player who wants to play
+   connects with the game server using the communication port number
+   1212.
+
+      Once the transmission channel is established, the player sends a
+   START command. The server returns a STARTING_BET indicating the price
+   of initial bet.  Then the player starts asking for a card with the
+   DRAW command. In reply the server sends a card using the CARD command
+   indicating the card identifier. Now the player optionally can
+   increase the bet using the ANTE command, indicating the amount of
+   money he wants to add to the initial bet. If he does the ANTE, he
+   must to use the DRAW command and draw card. If not, he must to decide
+   if draws another card using the DRAW command or he passes using the
+   PASS command, in which case he ends his game. In the case the player
+   draws a card and this causes he pass over the 7 and a half score, the
+   server sends a BUSTING command, causing the end of his game.
+
+   Once the player ends his game, whether he passes or he’s going bust,
+   it is the server turn. The server draws cards until he overtakes the
+   player’s score or it’s going bust. Then the server sends the
+   BANK_SCORE command indicating the scored points. Finally the server
+   sends the last command, GAINS,  indicating the players’ earnings:
+   negative bet amount if he loses, positive bet amount if he win,
+   double of the bet amount if he wins with the exact score of seven and
+   a half.  If both player and bank have the same score neither the
+   player neither wins or loses money.
+
+
+
+
+
+3 The 7 and a half Specification
+
+   This section presents the different commands used in the 7.1/2
+   protocol.
+
+3.1 Player Commands Semantics:
+
+   First, we start defining the commands used by the player
+     START
+
+       This command is used for starting a new game. Once this command
+       is sent a STARTING_BET message is expected.
+
+     DRAW
+
+       This command is used for asking for a new  card. This command is
+       mandatory after a STARTING_BET is received. Once a DRAW command
+       is sent a CARD message is expected.
+
+       If the sum of all the cards is bigger than 7 1/2 a following
+       BUSTING message is received. The resulting state is the same as
+       after the player sends a PASS command, thus a BANK_SCORE and
+       GAINS message are expected.
+
+     ANTE
+
+       This command is optional. It has to be issued before the DRAW
+       command. It is used for increasing the bet for this game.
+
+     PASS
+
+       This command is used for passing  the turn to the Bank. It is
+       used instead of a DRAW command. Once this command is sent a
+       BANK_SCORE message and GAINS message are expected.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3.2 Server Commands Semantics:
+
+       Now, we define the commands used by the server
+
+
+     STARTING_BET
+
+       This command is sent when a START message is received. Argument
+       field is required and means the minimum bet for playing.
+
+     CARD This command is sent when a DRAW command is received. Argument
+       field is required and means the card drawn.
+
+     BUSTING This command is sent after a CARD message is sent when the
+       score of the player is over seven and a half. It has no
+       arguments.
+
+
+     BANK_SCORE This command is sent when a PASS command is received or
+       a BUSTING message is sent. First argument is the number of cards
+       drawn following of the cards. The second argument is the scoring
+       after the bank has played.
+
+     GAINS This command is sent after the BANK_SCORE message is sent.
+       The argument is a positive number equals to the current bet if
+       the player has won, a negative number equals to the current bet
+       if the player has lost or it is equals to 0 if both of them have
+       the same scoring. If the player gets an exactly scoring of seven
+       and a half and the bank has not, the argument is a positive
+       number equals to the double of the current bet.
+
+3.3 Command Syntax
+
+       The commands consist of a command code sometimes followed by a
+       space and an argument field.  Command codes are four alphabetic
+       characters.  Upper and lower case alphabetic characters are to be
+       treated identically.  Thus, any of the following may represent
+       the START command:
+       STRT    Strt    strt    StRt    StRT
+
+       This also applies to any symbols representing parameter values.
+       Argument field is composed of one or two arguments separated by a
+       space character.
+
+
+       The following are the 7.1/2 commands:
+
+     START:
+     STRT
+
+     STARTING_BET:
+     STBT<SP><NUMBER>
+
+     DRAW:
+     DRAW
+
+     ANTE:
+     ANTE<SP><NUMBER>
+
+     CARD:
+     CARD<SP><D><P>
+
+     PASS:
+     PASS
+
+     BUSTING:
+     BSTG
+
+     BANK_SCORE:
+     BKSC<SP><NUMBER>((<D><P>)+)<SP><SCORE>
+
+     GAINS:
+     GAIN<SP><NUMBER>
+
+
+     <SCORE> ::= <d><d>’.’<d>
+     <SP> ::= ’ ’ Space character
+     <NUMBER> ::= Integer over the net: 4bytes BE.
+     <D> ::= "1" | "2" | "3" | "4" |
+           | "5" | "6" | "7" | "s" | "c" | "r"|
+           | "S" | "C" | "R"
+     <P> ::= "o" | "c" | "e" | "b"|
+           | "O" | "C" | "E" | "B"
+     <d> ::= any one of the ten digits 0 through 9
+     <c> any ascii character
+
+3.4 Error Command
+
+     Each side can issue a special error command any time instead of
+     normal command. This command has an argument field with the
+     explanation of the error. The length of the message can be from 0
+     to 99. In order to determine the length of the message, two digits
+     must to be placed prior to the message.  If no message is provided
+     two digits ’0’ have to be used.
+
+     ERROR: ERRO<SP><d><d><c>*
+
+     Examples:
+
+     ERRO 12Syntax error
+
+     ERRO 00
+
+     ERRO 09Div error
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4 Examples
+
+     P stands for player (the client) and B stands for bank (the
+     server).
+
+4.1 Short game example
+
+     This is an example of a short 7.1/2 game:
+
+     ‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐
+
+     P: STRT
+     B: STBT 100
+
+     P: DRAW
+     B: CARD ’7o’
+
+     P: PASS
+     B: BKSC 2’7c’’cc’ ’07.5’
+     B: GAIN ‐100
+     ‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐
+
+4.2 Long busting game example
+
+     This is an example of a long game where the player gets bust.
+     ‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐
+     P: STRT
+     B: STBT 50
+
+     P: DRAW
+     B: CARD ’1c’
+
+     P: DRAW
+     B: CARD ’se’
+
+     P: DRAW
+     B: CARD ’rb’
+
+     P: DRAW
+     B: CARD ’2b’
+
+     P: DRAW
+     B: CARD ’4o’
+     B: BSTG
+     B: BKSC 1’2o’ ’02.0’
+     B: GAIN ‐50
+     ‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐
+
+4.3 7.1/2 ante game example
+
+     This is an example where the player raise the ante and wins with a
+     seven and a half score. Notice that, in this case he wins double
+     the total amount of the bet. Notice that client‐side have to send a
+     pass command even when a 7.5 is got.
+
+     ‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐
+     P: STRT
+     B: STBT 10
+
+     P: DRAW
+     B: CARD ’2c’
+
+     P: ANTE 10
+     P: DRAW
+     B: CARD ’sc’
+
+     P: ANTE 10
+     P: DRAW
+     B: CARD ’4b’
+
+
+     P: DRAW
+     B: CARD ’1c’
+
+     P: PASS
+     B: BKSC 3’6c’’1o’’4c’ ’11.0’
+     B: GAIN 60
+     ‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐
+
+
+5 Rules of game
+
+   [7.1/2] http://ca.wikipedia.org/wiki/Set_i_mig
+
+
+
+Authors’ Addresses
+
+
+     Eloi Puertas i Prats
+     Adriana Romero Soriano
+     Gran Via de les Corts Catalanes 585, Barcelona
+
+     EMail: eloi@maia.ub.es
+            adriana.romero@ub.edu
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
