@@ -1,4 +1,4 @@
-SWD - course 2014-2015 - Master branch
+SD (B7) - 2014-2015 - Master branch
 =======================================
 
 ##Distributed Computing Course from Computer Science Bachelor's degree at University of Barcelona (UB)
